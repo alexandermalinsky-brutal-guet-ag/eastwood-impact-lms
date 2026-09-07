@@ -26,11 +26,34 @@ function connectionString(): string | undefined {
   return process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
 }
 
+/**
+ * Catches a DATABASE_URL that is obviously not a connection string — most often
+ * an unsubstituted placeholder copied out of a README. Without this, pg takes
+ * the value at face value and fails much later with an opaque DNS error.
+ */
+function assertUsable(url: string): void {
+  if (!/^postgres(ql)?:\/\//.test(url)) {
+    throw new Error(
+      `DATABASE_URL is not a Postgres connection string (got "${url.slice(0, 40)}").\n` +
+        "It should look like: postgresql://user:password@host/dbname?sslmode=require\n" +
+        "Copy it from Vercel → Storage → your database → the .env.local tab.",
+    );
+  }
+
+  if (/paste|placeholder|your-|<|>|example\.com/i.test(url)) {
+    throw new Error(
+      "DATABASE_URL still contains placeholder text — substitute the real connection string.",
+    );
+  }
+}
+
 function isHttpCapable(url: string): boolean {
   return /\.neon\.tech|\.vercel-storage\.com|neon\.build/.test(url);
 }
 
 function create(url: string): Database {
+  assertUsable(url);
+
   if (isHttpCapable(url)) {
     return drizzleNeon(neon(url), { schema });
   }

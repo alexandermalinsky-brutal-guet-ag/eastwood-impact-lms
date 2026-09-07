@@ -27,7 +27,14 @@ async function main() {
 
 main()
   .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
+  .catch((error: unknown) => {
+    // A bad connection string is the common case here and does not need a
+    // stack trace — just say what is wrong with it.
+    const message = error instanceof Error ? error.message : String(error);
+    if (/DATABASE_URL|ENOTFOUND|ECONNREFUSED|password authentication/i.test(message)) {
+      console.error(`\nCould not connect to the database.\n\n${message}\n`);
+    } else {
+      console.error(error);
+    }
     process.exit(1);
   });
