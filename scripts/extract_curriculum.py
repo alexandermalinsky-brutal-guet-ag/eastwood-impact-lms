@@ -24,9 +24,12 @@ WORKBOOK = ROOT / "Data RAW" / "IMPACT curriculum resources and projects.xlsx"
 OUT = ROOT / "src" / "data"
 
 # --- The six IMPACT strands ------------------------------------------------
-STRANDS = ["Imagination", "Movement", "Planet", "Action", "Character", "Technology"]
+# The handbook names the sixth strand "Technologies"; the workbook says
+# "Technology". The handbook is the published definition, so it wins.
+STRANDS = ["Imagination", "Movement", "Planet", "Action", "Character", "Technologies"]
 STRAND_LOOKUP = {s.lower(): s for s in STRANDS}
 STRAND_LOOKUP["movment"] = "Movement"  # recurring typo in the workbook
+STRAND_LOOKUP["technology"] = "Technologies"  # workbook spelling
 
 # Unambiguous spelling fixes. Original text is always kept in `sourceTitle`.
 SPELLING = {
@@ -154,15 +157,115 @@ def extract_projects(wb) -> tuple[list[dict], list[dict]]:
                 "slug": slug,
                 "title": title,
                 "sourceTitle": source_title,
+                # The workbook records one strand per project, so that is the
+                # lead strand. The handbook expects projects to span several —
+                # students choose the full set in their proposal rather than
+                # having one guessed for them here.
                 "strand": strand or None,
+                "strands": [strand] if strand else [],
                 "leads": people,
                 "description": clean(row[4]) if len(row) > 4 else "",
                 "notes": " · ".join(notes),
+                "origin": "workbook",
+                "projectType": None,
                 "sourceRow": index,
             }
         )
 
+    projects.extend(KICKOFF_PROJECTS)
     return projects, normalisations
+
+
+# --- Kickoff projects from The IMPACT Handbook, section 9 -------------------
+# Illustrative, not prescriptive. Strand sets and internal/external types are
+# exactly as printed; these are the only projects with a real multi-strand
+# assignment, because they are the only ones the handbook assigns.
+KICKOFF_PROJECTS = [
+    {
+        "slug": "kickoff-voices-of-tomorrow",
+        "title": "Student-led podcast: Voices of Tomorrow",
+        "sourceTitle": "PROJECT EXAMPLE 1 – STUDENT-LED PODCAST: VOICES OF TOMORROW",
+        "strand": "Imagination",
+        "strands": ["Imagination", "Action", "Character", "Technologies"],
+        "leads": [],
+        "description": (
+            "A student team conceptualises, produces and publishes a podcast featuring "
+            "interviews with young changemakers, entrepreneurs or activists. Students manage "
+            "research, outreach, recording, editing and distribution, while reflecting on "
+            "communication, ethics and audience responsibility."
+        ),
+        "notes": "Develops storytelling, collaboration, discipline and public engagement.",
+        "origin": "handbook",
+        "projectType": "external",
+        "sourceRow": 0,
+    },
+    {
+        "slug": "kickoff-sustainable-materials",
+        "title": "Sustainable materials research initiative",
+        "sourceTitle": "PROJECT EXAMPLE 2 – SUSTAINABLE MATERIALS RESEARCH INITIATIVE",
+        "strand": "Planet",
+        "strands": ["Planet", "Technologies", "Action"],
+        "leads": [],
+        "description": (
+            "Students research biodegradable materials and prototype small-scale applications. "
+            "The project involves experimentation, documentation, and presentation of findings "
+            "to external audiences such as exhibitions or sustainability forums."
+        ),
+        "notes": "Emphasises scientific rigour, systems thinking and responsible innovation.",
+        "origin": "handbook",
+        "projectType": "internal-to-external",
+        "sourceRow": 0,
+    },
+    {
+        "slug": "kickoff-wellbeing-campaign",
+        "title": "School-wide wellbeing campaign",
+        "sourceTitle": "PROJECT EXAMPLE 3 – SCHOOL-WIDE WELLBEING CAMPAIGN",
+        "strand": "Character",
+        "strands": ["Character", "Movement", "Action"],
+        "leads": [],
+        "description": (
+            "A campaign contributing to the life of the school through storytelling, "
+            "performance, media or artistic production, shared publicly."
+        ),
+        "notes": "Emphasises communication, creativity and audience engagement.",
+        "origin": "handbook",
+        "projectType": "external",
+        "sourceRow": 0,
+    },
+    {
+        "slug": "kickoff-digital-heritage-archive",
+        "title": "Digital heritage archive",
+        "sourceTitle": "PROJECT EXAMPLE 4 – DIGITAL HERITAGE ARCHIVE",
+        "strand": "Technologies",
+        "strands": ["Technologies", "Imagination", "Planet", "Action"],
+        "leads": [],
+        "description": (
+            "Students collaborate to create a digital archive preserving local history or "
+            "cultural narratives. The project blends research, technology and storytelling, "
+            "often in partnership with community organisations."
+        ),
+        "notes": "",
+        "origin": "handbook",
+        "projectType": "external",
+        "sourceRow": 0,
+    },
+    {
+        "slug": "kickoff-ai-study-support",
+        "title": "AI study support tool",
+        "sourceTitle": "PROJECT EXAMPLE 5 – AI STUDY SUPPORT TOOL",
+        "strand": "Technologies",
+        "strands": ["Technologies", "Character", "Action"],
+        "leads": [],
+        "description": (
+            "Students design a digital tool to support peer learning and wellbeing, accompanied "
+            "by reflection on data ethics and responsible AI use."
+        ),
+        "notes": "",
+        "origin": "handbook",
+        "projectType": "internal",
+        "sourceRow": 0,
+    },
+]
 
 
 # Resources that are the same practice recorded twice under different names.
@@ -318,7 +421,7 @@ def main() -> None:
         (OUT / f"{name}.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
 
     unassigned = [p["title"] for p in projects if not p["strand"]]
-    print(f"projects        {len(projects):>3}")
+    print(f"projects        {len(projects):>3}  ({sum(1 for p in projects if p['origin'] == 'handbook')} from the handbook)")
     print(f"  unassigned    {len(unassigned):>3}  {unassigned}")
     print(f"resources       {len(resources):>3}  ({sum(1 for r in resources if r['corePractice'])} core practices)")
     print(f"people          {len(people):>3}")

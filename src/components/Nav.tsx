@@ -12,6 +12,8 @@ const LINKS = [
   { href: "/strands", label: "Strands" },
   { href: "/projects", label: "Projects" },
   { href: "/toolkit", label: "Toolkit" },
+  { href: "/handbook", label: "Handbook" },
+  { href: "/profile", label: "Profile" },
 ];
 
 export function Nav({

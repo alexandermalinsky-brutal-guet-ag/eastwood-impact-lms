@@ -77,7 +77,7 @@ export default async function Landing() {
               </p>
               <h3 className="mt-4 text-xl font-bold">{strand.name}</h3>
               <p className="mt-1.5 text-sm font-medium opacity-80">
-                {strand.tagline}
+                {strand.definition}
               </p>
             </div>
           ))}

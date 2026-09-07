@@ -177,7 +177,7 @@ export default async function Dashboard() {
                   </span>
                 </div>
                 <p className="mt-1 text-sm font-medium opacity-80">
-                  {strand.tagline}
+                  {strand.definition}
                 </p>
               </Link>
             );

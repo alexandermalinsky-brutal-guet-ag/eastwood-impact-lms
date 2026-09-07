@@ -6,8 +6,17 @@ import { z } from "zod";
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { criteria, enrolments, reflections, tasks } from "@/db/schema";
+import {
+  criteria,
+  enrolments,
+  goals,
+  reflections,
+  scorecards,
+  tasks,
+} from "@/db/schema";
 import { DEFAULT_CRITERIA, DEFAULT_TASKS, getProject } from "@/lib/curriculum";
+import { STRANDS } from "@/lib/brand";
+import { STAGE_ORDER, type StageKey } from "@/lib/handbook";
 
 async function requireUser() {
   const session = await auth();
@@ -227,4 +236,244 @@ export async function startNextCycle(enrolmentId: string) {
   const next = existing.length ? Math.max(...existing.map((r) => r.cycle)) + 1 : 1;
   await db().insert(reflections).values({ enrolmentId: row.id, cycle: next });
   revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+
+// --- The IMPACT Journey ----------------------------------------------------
+
+const STRAND_NAMES = STRANDS.map((s) => s.name);
+
+/**
+ * A coach or admin may move a project to any stage; a student may only move
+ * forward, and only out of stages whose deliverable actually exists. Stage 2 is
+ * the approval gate, so a student can never move themselves into it.
+ */
+export async function setStage(enrolmentId: string, stage: StageKey) {
+  const user = await requireUser();
+  const row = await ownedOrCoached(enrolmentId);
+
+  if (user.role === "student") {
+    const from = STAGE_ORDER.indexOf(row.stage);
+    const to = STAGE_ORDER.indexOf(stage);
+    if (to !== from + 1) {
+      throw new Error("You can only move to the next stage.");
+    }
+    if (stage === "execution" && !row.approvedAt) {
+      throw new Error("A coach has to approve the proposal first.");
+    }
+    if (stage === "execution" && !row.charterSignedAt) {
+      throw new Error("Sign the Commitment Charter before starting execution.");
+    }
+  }
+
+  await db().update(enrolments).set({ stage }).where(eq(enrolments.id, row.id));
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/dashboard");
+}
+
+/** Lets a coach act on an enrolment they do not own. */
+async function ownedOrCoached(enrolmentId: string) {
+  const user = await requireUser();
+  const [row] = await db()
+    .select()
+    .from(enrolments)
+    .where(eq(enrolments.id, enrolmentId))
+    .limit(1);
+
+  if (!row) throw new Error("Enrolment not found.");
+  if (row.userId !== user.id && user.role === "student") {
+    throw new Error("Not your project.");
+  }
+  return row;
+}
+
+const proposalSchema = z.object({
+  proposalIdea: z.string().max(4000),
+  proposalInternalImpact: z.string().max(4000),
+  proposalExternalImpact: z.string().max(4000),
+  proposalFeasibility: z.string().max(4000),
+  projectType: z.enum(["internal", "external", "internal-to-external"]),
+});
+
+export async function saveProposal(enrolmentId: string, formData: FormData) {
+  const row = await ownedEnrolment(enrolmentId);
+
+  const values = proposalSchema.parse({
+    proposalIdea: String(formData.get("proposalIdea") ?? ""),
+    proposalInternalImpact: String(formData.get("proposalInternalImpact") ?? ""),
+    proposalExternalImpact: String(formData.get("proposalExternalImpact") ?? ""),
+    proposalFeasibility: String(formData.get("proposalFeasibility") ?? ""),
+    projectType: String(formData.get("projectType") ?? "internal"),
+  });
+
+  // The handbook expects a project to target several strands, chosen here
+  // rather than inherited from whatever the planning workbook happened to say.
+  const targetStrands = formData
+    .getAll("targetStrands")
+    .map(String)
+    .filter((name) => STRAND_NAMES.includes(name as (typeof STRAND_NAMES)[number]));
+
+  await db()
+    .update(enrolments)
+    .set({ ...values, targetStrands, proposalSubmittedAt: new Date() })
+    .where(eq(enrolments.id, row.id));
+
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+/** Stage 2 approval. Coaches and admins only — this is the gate. */
+export async function approveProposal(enrolmentId: string) {
+  const user = await requireUser();
+  if (user.role === "student") throw new Error("Only a coach can approve a proposal.");
+
+  const [row] = await db()
+    .select({ id: enrolments.id, projectSlug: enrolments.projectSlug })
+    .from(enrolments)
+    .where(eq(enrolments.id, enrolmentId))
+    .limit(1);
+  if (!row) throw new Error("Enrolment not found.");
+
+  await db()
+    .update(enrolments)
+    .set({
+      approvedAt: new Date(),
+      approvedBy: user.id,
+      leadCoachId: user.id,
+      stage: "commitment",
+    })
+    .where(eq(enrolments.id, row.id));
+
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/staff");
+}
+
+/**
+ * Signing the Commitment Charter — formally agreeing to see the project through
+ * unless a coach-led review determines a pivot is necessary.
+ */
+export async function signCharter(enrolmentId: string) {
+  const row = await ownedEnrolment(enrolmentId);
+  if (!row.approvedAt) throw new Error("The proposal has not been approved yet.");
+
+  await db()
+    .update(enrolments)
+    .set({ charterSignedAt: new Date() })
+    .where(eq(enrolments.id, row.id));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+// --- SMART goals -----------------------------------------------------------
+
+const goalSchema = z.object({
+  kind: z.enum(["deliverable", "milestone", "qualitative"]),
+  statement: z.string().trim().min(1).max(300),
+  measure: z.string().max(300),
+  dueBy: z.string().max(100),
+});
+
+export async function addGoal(enrolmentId: string, formData: FormData) {
+  const row = await ownedOrCoached(enrolmentId);
+  const values = goalSchema.parse({
+    kind: String(formData.get("kind") ?? "deliverable"),
+    statement: String(formData.get("statement") ?? ""),
+    measure: String(formData.get("measure") ?? ""),
+    dueBy: String(formData.get("dueBy") ?? ""),
+  });
+
+  const [{ value }] = await db()
+    .select({ value: max(goals.position) })
+    .from(goals)
+    .where(eq(goals.enrolmentId, row.id));
+
+  await db()
+    .insert(goals)
+    .values({ ...values, enrolmentId: row.id, position: (value ?? 0) + 1 });
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+export async function setGoalProgress(goalId: string, progress: number) {
+  const user = await requireUser();
+  const [row] = await db()
+    .select({ projectSlug: enrolments.projectSlug, userId: enrolments.userId })
+    .from(goals)
+    .innerJoin(enrolments, eq(goals.enrolmentId, enrolments.id))
+    .where(eq(goals.id, goalId))
+    .limit(1);
+  if (!row) throw new Error("Goal not found.");
+  if (row.userId !== user.id && user.role === "student") {
+    throw new Error("Not your project.");
+  }
+
+  const clamped = Math.min(100, Math.max(0, Math.round(progress)));
+  await db()
+    .update(goals)
+    .set({ progress: clamped, achieved: clamped >= 100 })
+    .where(eq(goals.id, goalId));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+export async function deleteGoal(goalId: string) {
+  const user = await requireUser();
+  const [row] = await db()
+    .select({ projectSlug: enrolments.projectSlug, userId: enrolments.userId })
+    .from(goals)
+    .innerJoin(enrolments, eq(goals.enrolmentId, enrolments.id))
+    .where(eq(goals.id, goalId))
+    .limit(1);
+  if (!row) throw new Error("Goal not found.");
+  if (row.userId !== user.id && user.role === "student") {
+    throw new Error("Not your project.");
+  }
+
+  await db().delete(goals).where(eq(goals.id, goalId));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+// --- Scorecards ------------------------------------------------------------
+
+/**
+ * Collects `rating.<key>` and `note.<key>` fields into two JSON maps. A student
+ * may only write a student scorecard; only a coach may write a coach one.
+ */
+export async function saveScorecard(
+  enrolmentId: string,
+  kind: "student" | "coach",
+  formData: FormData,
+) {
+  const user = await requireUser();
+  const row = await ownedOrCoached(enrolmentId);
+
+  if (kind === "coach" && user.role === "student") {
+    throw new Error("Only a coach can complete a Coach Scorecard.");
+  }
+  if (kind === "student" && row.userId !== user.id) {
+    throw new Error("A student scorecard is written by the student.");
+  }
+
+  const ratings: Record<string, number> = {};
+  const notes: Record<string, string> = {};
+
+  for (const [field, value] of formData.entries()) {
+    if (field.startsWith("rating.")) {
+      const score = Number(value);
+      if (Number.isFinite(score) && score >= 1 && score <= 5) {
+        ratings[field.slice(7)] = score;
+      }
+    } else if (field.startsWith("note.")) {
+      notes[field.slice(5)] = String(value).slice(0, 2000);
+    }
+  }
+
+  await db().insert(scorecards).values({
+    enrolmentId: row.id,
+    kind,
+    authorId: user.id,
+    ratings: JSON.stringify(ratings),
+    notes: JSON.stringify(notes),
+    comment: String(formData.get("comment") ?? "").slice(0, 4000),
+    periodLabel: String(formData.get("periodLabel") ?? "").slice(0, 60),
+  });
+
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/profile");
 }

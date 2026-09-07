@@ -7,8 +7,14 @@ import { JoinButton } from "@/components/JoinButton";
 import { Kanban } from "@/components/Kanban";
 import { Criteria } from "@/components/Criteria";
 import { ReflectionCycles } from "@/components/ReflectionCycles";
+import { Goals } from "@/components/Goals";
+import { JourneyTracker } from "@/components/JourneyTracker";
+import { Proposal } from "@/components/Proposal";
+import { Scorecards } from "@/components/Scorecard";
+import { StageAdvance } from "@/components/StageAdvance";
 import { StrandChip } from "@/components/ui";
-import { strandOf } from "@/lib/brand";
+import { strandOf, strandsOf } from "@/lib/brand";
+import { PROJECT_TYPES } from "@/lib/handbook";
 import { corePractices, getProject, projects } from "@/lib/curriculum";
 import { enrolmentDetail, myEnrolmentFor, projectRoster } from "@/lib/queries";
 
@@ -42,7 +48,7 @@ export default async function ProjectPage({
   const enrolment = await myEnrolmentFor(user.id, slug);
   const detail = enrolment
     ? await enrolmentDetail(enrolment.id)
-    : { tasks: [], criteria: [], reflections: [] };
+    : { tasks: [], criteria: [], reflections: [], goals: [], scorecards: [] };
   const roster = await projectRoster(slug);
   const isStaff = user.role !== "student";
 
@@ -57,7 +63,25 @@ export default async function ProjectPage({
 
       <header className="mt-4 flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
-          <StrandChip strand={strand} size="md" />
+          <div className="flex flex-wrap items-center gap-2">
+            {project.strands.length > 0 ? (
+              strandsOf(project.strands).map((s) => (
+                <StrandChip key={s.slug} strand={s} size="md" />
+              ))
+            ) : (
+              <StrandChip strand={strand} size="md" />
+            )}
+            {project.origin === "handbook" ? (
+              <span className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-muted">
+                Handbook kickoff project
+              </span>
+            ) : null}
+            {project.projectType ? (
+              <span className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-muted">
+                {PROJECT_TYPES.find((t) => t.key === project.projectType)?.label}
+              </span>
+            ) : null}
+          </div>
           <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-ink">
             {project.title}
           </h1>
@@ -110,11 +134,50 @@ export default async function ProjectPage({
 
       {enrolment ? (
         <div className="mt-12 space-y-12">
+          <section>
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+              <h2 className="text-xl font-bold tracking-tight text-ink">
+                The IMPACT Journey
+              </h2>
+              <StageAdvance
+                enrolmentId={enrolment.id}
+                stage={enrolment.stage}
+                isStaff={isStaff}
+                approved={Boolean(enrolment.approvedAt)}
+                charterSigned={Boolean(enrolment.charterSignedAt)}
+              />
+            </div>
+            <JourneyTracker current={enrolment.stage} />
+          </section>
+
+          <Proposal enrolment={enrolment} canApprove={isStaff} />
+
+          {enrolment.stage !== "ideation" ? (
+            <Goals
+              enrolmentId={enrolment.id}
+              goals={detail.goals}
+              editable
+            />
+          ) : null}
+
           <Kanban enrolmentId={enrolment.id} tasks={detail.tasks} />
           <Criteria enrolmentId={enrolment.id} criteria={detail.criteria} />
           <ReflectionCycles
             enrolmentId={enrolment.id}
             reflections={detail.reflections}
+          />
+
+          <Scorecards
+            enrolmentId={enrolment.id}
+            scorecards={detail.scorecards}
+            kind="student"
+            canWrite
+          />
+          <Scorecards
+            enrolmentId={enrolment.id}
+            scorecards={detail.scorecards}
+            kind="coach"
+            canWrite={isStaff}
           />
         </div>
       ) : (

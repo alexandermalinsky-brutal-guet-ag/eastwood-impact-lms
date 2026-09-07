@@ -4,9 +4,14 @@
     "title": "Creative writing",
     "sourceTitle": "creative writing",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 2
   },
   {
@@ -14,9 +19,14 @@
     "title": "Battle of the bands",
     "sourceTitle": "battle of the bands",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 3
   },
   {
@@ -24,11 +34,16 @@
     "title": "Song writing",
     "sourceTitle": "song writing",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Camila"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 4
   },
   {
@@ -36,12 +51,17 @@
     "title": "Public speaking",
     "sourceTitle": "public speaking",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Leo",
       "Christoph"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 5
   },
   {
@@ -49,9 +69,14 @@
     "title": "Drawing",
     "sourceTitle": "Drawing",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 6
   },
   {
@@ -59,11 +84,16 @@
     "title": "Posters (Montreux Jazz)",
     "sourceTitle": "Posters (Montreux Jazz)",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Alex"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 7
   },
   {
@@ -71,9 +101,14 @@
     "title": "Cartoons",
     "sourceTitle": "Cartoons",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 8
   },
   {
@@ -81,11 +116,16 @@
     "title": "Mural",
     "sourceTitle": "Mural",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Camila"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 9
   },
   {
@@ -93,9 +133,14 @@
     "title": "Podcasts",
     "sourceTitle": "podcasts",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 10
   },
   {
@@ -103,11 +148,16 @@
     "title": "Videos",
     "sourceTitle": "videos",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Josue"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 11
   },
   {
@@ -115,11 +165,16 @@
     "title": "Documentaries",
     "sourceTitle": "documentaries",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Nuria"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 12
   },
   {
@@ -127,9 +182,14 @@
     "title": "Anime",
     "sourceTitle": "anime",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 13
   },
   {
@@ -137,11 +197,16 @@
     "title": "Dance performance",
     "sourceTitle": "dance performance",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Camila"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 14
   },
   {
@@ -149,9 +214,14 @@
     "title": "Fashion and design",
     "sourceTitle": "fashion and design",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 15
   },
   {
@@ -159,9 +229,14 @@
     "title": "History of EM building and Montreux",
     "sourceTitle": "history of EM building and Montreux",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 16
   },
   {
@@ -169,9 +244,14 @@
     "title": "Collaboration with Jazz Festival",
     "sourceTitle": "collaboration with Jazz Festival",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 18
   },
   {
@@ -179,9 +259,14 @@
     "title": "Graphic novel",
     "sourceTitle": "graphic novel",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 19
   },
   {
@@ -189,9 +274,14 @@
     "title": "Poetry",
     "sourceTitle": "poetry",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 20
   },
   {
@@ -199,12 +289,17 @@
     "title": "Film making",
     "sourceTitle": "film making",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Leo",
       "Alex"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 21
   },
   {
@@ -212,9 +307,14 @@
     "title": "Creating marketing material",
     "sourceTitle": "creating marketing material",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 22
   },
   {
@@ -222,9 +322,14 @@
     "title": "Global issues",
     "sourceTitle": "global issues",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 23
   },
   {
@@ -232,9 +337,14 @@
     "title": "Perform theater piece",
     "sourceTitle": "perform theater piece",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 24
   },
   {
@@ -242,11 +352,16 @@
     "title": "Maths Scrabble",
     "sourceTitle": "Maths Scrabble",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Matthias"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 25
   },
   {
@@ -254,9 +369,14 @@
     "title": "Micro plastics",
     "sourceTitle": "micro plastics",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 26
   },
   {
@@ -264,9 +384,14 @@
     "title": "Renewable energy",
     "sourceTitle": "renewable energy",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 27
   },
   {
@@ -274,9 +399,14 @@
     "title": "Second hand clothing",
     "sourceTitle": "second hand clothing",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 28
   },
   {
@@ -284,9 +414,14 @@
     "title": "Textile donation bins",
     "sourceTitle": "textile donation bins",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 29
   },
   {
@@ -294,11 +429,16 @@
     "title": "Family holiday with environmental mission",
     "sourceTitle": "family holiday with environmental mission",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [
       "Leo"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 30
   },
   {
@@ -306,9 +446,14 @@
     "title": "School sustainability plan",
     "sourceTitle": "school sustainability plan",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 31
   },
   {
@@ -316,9 +461,14 @@
     "title": "Travel project",
     "sourceTitle": "travel project",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 32
   },
   {
@@ -326,9 +476,14 @@
     "title": "How globalisation impacts the planet",
     "sourceTitle": "How globalisation impacts the planet",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 33
   },
   {
@@ -336,9 +491,14 @@
     "title": "Recycling",
     "sourceTitle": "recycling",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 34
   },
   {
@@ -346,9 +506,14 @@
     "title": "Travel blog",
     "sourceTitle": "travel blog",
     "strand": "Planet",
+    "strands": [
+      "Planet"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 35
   },
   {
@@ -356,9 +521,14 @@
     "title": "Create art for the local library, restaurants, public spaces",
     "sourceTitle": "create art for the local library, restaurants, public spaces",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 36
   },
   {
@@ -366,12 +536,17 @@
     "title": "Offline Chess Tournament",
     "sourceTitle": "Offline Chess Tournament",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [
       "Matthias",
       "Pedro"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 37
   },
   {
@@ -379,11 +554,16 @@
     "title": "Online Chess Tournament",
     "sourceTitle": "Online Chess Tournament",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [
       "Pedro"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 38
   },
   {
@@ -391,9 +571,14 @@
     "title": "Bringing entrepreneur in residence",
     "sourceTitle": "bringing entrepreneur in residence",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 39
   },
   {
@@ -401,9 +586,14 @@
     "title": "Blind tasting of multicultural dishes",
     "sourceTitle": "blind tasting of multicultural dishes",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 40
   },
   {
@@ -411,9 +601,14 @@
     "title": "Model United Nations (MUN)",
     "sourceTitle": "MUN",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 41
   },
   {
@@ -421,9 +616,14 @@
     "title": "TEDx",
     "sourceTitle": "TEDx",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 42
   },
   {
@@ -431,9 +631,14 @@
     "title": "Music making",
     "sourceTitle": "Music making",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 43
   },
   {
@@ -441,9 +646,14 @@
     "title": "Planning concert for the community",
     "sourceTitle": "planning concert for the community",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 44
   },
   {
@@ -451,9 +661,14 @@
     "title": "Volunteering in the region",
     "sourceTitle": "volunteering in the region",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 45
   },
   {
@@ -461,9 +676,14 @@
     "title": "Entrepreneurship competition",
     "sourceTitle": "entrepreneurship competition",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 46
   },
   {
@@ -471,9 +691,14 @@
     "title": "Empower minority communities with their cultural traditions",
     "sourceTitle": "empower minority communities with their cultural traditions",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 47
   },
   {
@@ -481,12 +706,17 @@
     "title": "A trip to Annecy",
     "sourceTitle": "A trip to Annecy",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [
       "Pedro",
       "Maria"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 48
   },
   {
@@ -494,98 +724,143 @@
     "title": "Events",
     "sourceTitle": "events",
     "strand": "Action",
+    "strands": [
+      "Action"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 49
   },
   {
-    "slug": "technology-phone-usage-measurement-app",
+    "slug": "technologies-phone-usage-measurement-app",
     "title": "Phone usage measurement app",
     "sourceTitle": "Phone usage measurement app",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [
       "Matthias"
     ],
     "description": "",
     "notes": "Open to the whole team",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 50
   },
   {
-    "slug": "technology-promotional-film-and-sound",
+    "slug": "technologies-promotional-film-and-sound",
     "title": "Promotional film and sound",
     "sourceTitle": "promotional film and sound",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 51
   },
   {
-    "slug": "technology-podcasts",
+    "slug": "technologies-podcasts",
     "title": "Podcasts",
     "sourceTitle": "podcasts",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [
       "Josue"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 52
   },
   {
-    "slug": "technology-make-apps",
+    "slug": "technologies-make-apps",
     "title": "Make apps",
     "sourceTitle": "make apps",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 53
   },
   {
-    "slug": "technology-youtube-channel-with-a-purpose",
+    "slug": "technologies-youtube-channel-with-a-purpose",
     "title": "Youtube channel with a purpose",
     "sourceTitle": "youtube channel with a purpose",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [
       "Alex",
       "Pedro"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 54
   },
   {
-    "slug": "technology-designer-at-local-theatre",
+    "slug": "technologies-designer-at-local-theatre",
     "title": "Designer at local theatre",
     "sourceTitle": "designer at local theatre",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 55
   },
   {
-    "slug": "technology-ai-bot-for-the-school",
+    "slug": "technologies-ai-bot-for-the-school",
     "title": "AI bot for the school",
     "sourceTitle": "AI Bot school",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 56
   },
   {
-    "slug": "technology-3d-printing-for-noisy-chairs",
+    "slug": "technologies-3d-printing-for-noisy-chairs",
     "title": "3D printing for noisy chairs",
     "sourceTitle": "3D printing for noisy chairs",
-    "strand": "Technology",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies"
+    ],
     "leads": [
       "Josue"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 57
   },
   {
@@ -593,9 +868,14 @@
     "title": "Escape room",
     "sourceTitle": "Escape room",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 58
   },
   {
@@ -603,9 +883,14 @@
     "title": "Online English instruction for others",
     "sourceTitle": "online English instruction for others",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 59
   },
   {
@@ -613,9 +898,14 @@
     "title": "Mentorship programs",
     "sourceTitle": "mentorship programs",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 60
   },
   {
@@ -623,9 +913,14 @@
     "title": "Volunteering in the region",
     "sourceTitle": "volunteering in the region",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 61
   },
   {
@@ -633,11 +928,16 @@
     "title": "Building a company",
     "sourceTitle": "building a company",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [
       "Daniel"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 62
   },
   {
@@ -645,9 +945,14 @@
     "title": "Expedition",
     "sourceTitle": "expedition",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 63
   },
   {
@@ -655,9 +960,14 @@
     "title": "Plan weekend outings",
     "sourceTitle": "plan weekend outings",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 64
   },
   {
@@ -665,9 +975,14 @@
     "title": "Community service at Tertianum",
     "sourceTitle": "community service et Tertianum",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 65
   },
   {
@@ -675,9 +990,14 @@
     "title": "Local school support",
     "sourceTitle": "local school support",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 66
   },
   {
@@ -685,9 +1005,14 @@
     "title": "Cultural profiles",
     "sourceTitle": "cultural profiles",
     "strand": "Character",
+    "strands": [
+      "Character"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 67
   },
   {
@@ -695,9 +1020,14 @@
     "title": "Personal fitness program",
     "sourceTitle": "personal fitness program",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 68
   },
   {
@@ -705,9 +1035,14 @@
     "title": "Learn a new sport/skill",
     "sourceTitle": "learn a new sport/skill",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 69
   },
   {
@@ -715,9 +1050,14 @@
     "title": "Participate In a Tournament",
     "sourceTitle": "Participate In a Tournament",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 70
   },
   {
@@ -725,9 +1065,14 @@
     "title": "Organize A Tournament",
     "sourceTitle": "Organize A Tournament",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 71
   },
   {
@@ -735,9 +1080,14 @@
     "title": "Study a theatre tradition",
     "sourceTitle": "study a tehatre tradition",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 72
   },
   {
@@ -745,9 +1095,14 @@
     "title": "Sports psychology",
     "sourceTitle": "sports psychology",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 73
   },
   {
@@ -755,9 +1110,14 @@
     "title": "Data in sport / movement",
     "sourceTitle": "data in sport / movement",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 74
   },
   {
@@ -765,9 +1125,14 @@
     "title": "Improve skill in sport",
     "sourceTitle": "improve skill in sport",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 75
   },
   {
@@ -775,9 +1140,14 @@
     "title": "Dance choreography",
     "sourceTitle": "dance choreography",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 76
   },
   {
@@ -785,9 +1155,14 @@
     "title": "Camping trip",
     "sourceTitle": "camping trip",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 77
   },
   {
@@ -795,9 +1170,12 @@
     "title": "Clubs",
     "sourceTitle": "clubs",
     "strand": null,
+    "strands": [],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 78
   },
   {
@@ -805,9 +1183,12 @@
     "title": "Committees",
     "sourceTitle": "committees",
     "strand": null,
+    "strands": [],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 79
   },
   {
@@ -815,9 +1196,12 @@
     "title": "A better, new TEDx for high school",
     "sourceTitle": "a better, new TEDx - high school",
     "strand": null,
+    "strands": [],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 80
   },
   {
@@ -825,11 +1209,16 @@
     "title": "Beatmaking",
     "sourceTitle": "Beatmaking",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Efe"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 81
   },
   {
@@ -837,11 +1226,14 @@
     "title": "Writing a book on topic of choice",
     "sourceTitle": "Writing a book on topic of choice",
     "strand": null,
+    "strands": [],
     "leads": [
       "Saishha"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 83
   },
   {
@@ -849,11 +1241,14 @@
     "title": "Writing a psychology column for teenagers in a local magazine or newspaper",
     "sourceTitle": "Writing a pyschology column for teenagers on a local magazine or newspaper",
     "strand": null,
+    "strands": [],
     "leads": [
       "Saishha"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 84
   },
   {
@@ -861,11 +1256,16 @@
     "title": "Designing the yearbook",
     "sourceTitle": "Desining yearbook",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Maria"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 86
   },
   {
@@ -873,11 +1273,16 @@
     "title": "Cheer team",
     "sourceTitle": "Cheer team",
     "strand": "Movement",
+    "strands": [
+      "Movement"
+    ],
     "leads": [
       "Maria"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 88
   },
   {
@@ -885,9 +1290,12 @@
     "title": "Experimental testing and dynamic research on a 2-cylinder nitro engine",
     "sourceTitle": "Experimental testing and dynamic research dependent on a 2 cylinder nitro engine.",
     "strand": null,
+    "strands": [],
     "leads": [],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 89
   },
   {
@@ -895,12 +1303,17 @@
     "title": "Book club",
     "sourceTitle": "book club",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Maria",
       "Trellia"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 90
   },
   {
@@ -908,11 +1321,16 @@
     "title": "Instrument lessons (students teaching students)",
     "sourceTitle": "instrument lesson ( student teach students )",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Maria"
     ],
     "description": "",
     "notes": "",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 91
   },
   {
@@ -920,12 +1338,104 @@
     "title": "Short movie: the lore of the school",
     "sourceTitle": "Short movie , lore of school",
     "strand": "Imagination",
+    "strands": [
+      "Imagination"
+    ],
     "leads": [
       "Maria",
       "Alex"
     ],
     "description": "",
     "notes": "Open to the whole team",
+    "origin": "workbook",
+    "projectType": null,
     "sourceRow": 92
+  },
+  {
+    "slug": "kickoff-voices-of-tomorrow",
+    "title": "Student-led podcast: Voices of Tomorrow",
+    "sourceTitle": "PROJECT EXAMPLE 1 – STUDENT-LED PODCAST: VOICES OF TOMORROW",
+    "strand": "Imagination",
+    "strands": [
+      "Imagination",
+      "Action",
+      "Character",
+      "Technologies"
+    ],
+    "leads": [],
+    "description": "A student team conceptualises, produces and publishes a podcast featuring interviews with young changemakers, entrepreneurs or activists. Students manage research, outreach, recording, editing and distribution, while reflecting on communication, ethics and audience responsibility.",
+    "notes": "Develops storytelling, collaboration, discipline and public engagement.",
+    "origin": "handbook",
+    "projectType": "external",
+    "sourceRow": 0
+  },
+  {
+    "slug": "kickoff-sustainable-materials",
+    "title": "Sustainable materials research initiative",
+    "sourceTitle": "PROJECT EXAMPLE 2 – SUSTAINABLE MATERIALS RESEARCH INITIATIVE",
+    "strand": "Planet",
+    "strands": [
+      "Planet",
+      "Technologies",
+      "Action"
+    ],
+    "leads": [],
+    "description": "Students research biodegradable materials and prototype small-scale applications. The project involves experimentation, documentation, and presentation of findings to external audiences such as exhibitions or sustainability forums.",
+    "notes": "Emphasises scientific rigour, systems thinking and responsible innovation.",
+    "origin": "handbook",
+    "projectType": "internal-to-external",
+    "sourceRow": 0
+  },
+  {
+    "slug": "kickoff-wellbeing-campaign",
+    "title": "School-wide wellbeing campaign",
+    "sourceTitle": "PROJECT EXAMPLE 3 – SCHOOL-WIDE WELLBEING CAMPAIGN",
+    "strand": "Character",
+    "strands": [
+      "Character",
+      "Movement",
+      "Action"
+    ],
+    "leads": [],
+    "description": "A campaign contributing to the life of the school through storytelling, performance, media or artistic production, shared publicly.",
+    "notes": "Emphasises communication, creativity and audience engagement.",
+    "origin": "handbook",
+    "projectType": "external",
+    "sourceRow": 0
+  },
+  {
+    "slug": "kickoff-digital-heritage-archive",
+    "title": "Digital heritage archive",
+    "sourceTitle": "PROJECT EXAMPLE 4 – DIGITAL HERITAGE ARCHIVE",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies",
+      "Imagination",
+      "Planet",
+      "Action"
+    ],
+    "leads": [],
+    "description": "Students collaborate to create a digital archive preserving local history or cultural narratives. The project blends research, technology and storytelling, often in partnership with community organisations.",
+    "notes": "",
+    "origin": "handbook",
+    "projectType": "external",
+    "sourceRow": 0
+  },
+  {
+    "slug": "kickoff-ai-study-support",
+    "title": "AI study support tool",
+    "sourceTitle": "PROJECT EXAMPLE 5 – AI STUDY SUPPORT TOOL",
+    "strand": "Technologies",
+    "strands": [
+      "Technologies",
+      "Character",
+      "Action"
+    ],
+    "leads": [],
+    "description": "Students design a digital tool to support peer learning and wellbeing, accompanied by reflection on data ethics and responsible AI use.",
+    "notes": "",
+    "origin": "handbook",
+    "projectType": "internal",
+    "sourceRow": 0
   }
 ]

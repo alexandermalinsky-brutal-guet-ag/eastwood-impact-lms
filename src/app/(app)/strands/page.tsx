@@ -13,7 +13,7 @@ export default function StrandsPage() {
       <SectionHeading
         eyebrow="I · M · P · A · C · T"
         title="The six strands"
-        description="Every IMPACT project sits in one strand. The strand sets what counts as a good outcome — not the subject it borrows from."
+        description="The strands are a developmental lens: they say what kind of growth a project is meant to produce. They are an integrated system, not six separate tracks — projects are expected to span several and make the connections explicit."
       />
 
       <div className="grid gap-5 md:grid-cols-2">
@@ -35,7 +35,7 @@ export default function StrandsPage() {
                   </p>
                   <h2 className="mt-4 text-2xl font-bold">{strand.name}</h2>
                   <p className="mt-1 text-sm font-medium opacity-80">
-                    {strand.tagline}
+                    {strand.definition}
                   </p>
                 </div>
                 <span className="rounded-full bg-black/15 px-3 py-1 text-sm font-bold tabular-nums">
@@ -43,7 +43,7 @@ export default function StrandsPage() {
                 </span>
               </div>
               <p className="p-6 text-sm leading-relaxed text-muted">
-                {strand.description}
+                {strand.summary}
               </p>
             </Link>
           );

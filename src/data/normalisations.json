@@ -217,10 +217,28 @@
       "to": "Events"
     },
     {
+      "row": 50,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
+    },
+    {
+      "row": 51,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
+    },
+    {
       "row": 51,
       "field": "title",
       "from": "promotional film and sound",
       "to": "Promotional film and sound"
+    },
+    {
+      "row": 52,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
     },
     {
       "row": 52,
@@ -230,9 +248,21 @@
     },
     {
       "row": 53,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
+    },
+    {
+      "row": 53,
       "field": "title",
       "from": "make apps",
       "to": "Make apps"
+    },
+    {
+      "row": 54,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
     },
     {
       "row": 54,
@@ -242,15 +272,33 @@
     },
     {
       "row": 55,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
+    },
+    {
+      "row": 55,
       "field": "title",
       "from": "designer at local theatre",
       "to": "Designer at local theatre"
     },
     {
       "row": 56,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
+    },
+    {
+      "row": 56,
       "field": "title",
       "from": "AI Bot school",
       "to": "AI bot for the school"
+    },
+    {
+      "row": 57,
+      "field": "strand",
+      "from": "Technology",
+      "to": "Technologies"
     },
     {
       "row": 59,

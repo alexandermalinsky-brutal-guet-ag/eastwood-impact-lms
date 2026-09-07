@@ -14,10 +14,20 @@ export type Project = {
   title: string;
   /** Exact wording from the planning workbook, before normalisation. */
   sourceTitle: string;
+  /** The strand that owns the project — one per row in the workbook. */
   strand: string | null;
+  /**
+   * Every strand the project engages. The workbook records one, so most
+   * projects list one here; the handbook's kickoff projects carry the full set
+   * it prints. Students choose the real set in their own proposal.
+   */
+  strands: string[];
   leads: string[];
   description: string;
   notes: string;
+  /** Where the project came from: the planning workbook or the handbook. */
+  origin: "workbook" | "handbook";
+  projectType: "internal" | "external" | "internal-to-external" | null;
   sourceRow: number;
 };
 
@@ -64,6 +74,9 @@ export function projectsInStrand(strand: Strand): Project[] {
 }
 
 export const unassignedProjects = projects.filter((p) => !p.strand);
+
+/** The five illustrative projects printed in the handbook. */
+export const kickoffProjects = projects.filter((p) => p.origin === "handbook");
 
 export function strandFor(project: Project): Strand | null {
   return strandOf(project.strand);

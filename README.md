@@ -20,12 +20,37 @@ plan still need a person against them.
 | Projects | `/projects` | All 87 projects, filterable by strand and searchable |
 | Project workspace | `/projects/[slug]` | Kanban board, success criteria, Plan · Act · Reflect cycles |
 | Toolkit | `/toolkit` | 58 teaching practices, 9 of them flagged as core |
+| Handbook | `/handbook` | The programme's own structures: journey, goals, evaluation, progression |
+| Profile | `/profile` | The Impact Profile — the holistic synthesis feeding the Eastwood Passport |
 | Staff | `/staff` | Take-up, roster, and the gaps in the plan (staff and admin only) |
 
 ### The six strands
 
 **I**magination · **M**ovement · **P**lanet · **A**ction · **C**haracter ·
-**T**echnology — each assigned one colour from the school's secondary palette.
+**T**echnologies — each assigned one colour from the school's secondary palette.
+
+Strand definitions in `src/lib/brand.ts` are taken verbatim from the handbook,
+not paraphrased. Note the handbook spells the sixth strand **Technologies**;
+the planning workbook says "Technology", and the extractor maps one onto the
+other.
+
+### The IMPACT Journey
+
+Every project runs the same four stages, at every grade. What changes with
+readiness is scope, ambition and independence.
+
+1. **Ideation & Feedback** → a Project Proposal
+2. **Goals & Commitments** → approval, 3–5 SMART goals, a signed Commitment Charter
+3. **Development, Coaching & Execution** → reflection logs, mini-showcases
+4. **Presentation, Reflection & Evaluation** → final outcome, portfolio, panel
+
+`src/lib/handbook.ts` holds these definitions along with the scorecard
+dimensions, goal types, progression phases and external-impact categories. It
+is the single place to change if the handbook is revised.
+
+**Stage 2 is an approval gate.** A student can only advance one stage at a
+time, and cannot move themselves into or through approval — a coach does that.
+The rule lives in `setStage` in `src/lib/actions.ts`, not just in the UI.
 
 ---
 
@@ -54,6 +79,12 @@ src/data/{projects,resources,people,normalisations}.json
 
 Projects that arrived without a strand are **not** given one by guesswork. They
 surface as "Needs a strand" on `/strands` and `/staff` for a human to place.
+
+The handbook expects projects to span several strands. The workbook records
+one, so that is treated as the *lead* strand; the only projects carrying a real
+multi-strand set are the five kickoff projects the handbook itself assigns.
+Students choose the full set in their own proposal rather than having one
+guessed for them.
 
 To update the curriculum: edit the workbook, run `npm run data:extract`, review
 the diff, commit.

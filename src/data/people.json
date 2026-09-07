@@ -5,7 +5,7 @@
     "projects": [
       "imagination-posters-montreux-jazz",
       "imagination-film-making",
-      "technology-youtube-channel-with-a-purpose",
+      "technologies-youtube-channel-with-a-purpose",
       "imagination-short-movie-the-lore-of-the-school"
     ],
     "resources": [
@@ -53,8 +53,8 @@
     "slug": "josue",
     "projects": [
       "imagination-videos",
-      "technology-podcasts",
-      "technology-3d-printing-for-noisy-chairs"
+      "technologies-podcasts",
+      "technologies-3d-printing-for-noisy-chairs"
     ],
     "resources": [
       "theatre-in-education-tie"
@@ -89,7 +89,7 @@
     "projects": [
       "imagination-maths-scrabble",
       "action-offline-chess-tournament",
-      "technology-phone-usage-measurement-app"
+      "technologies-phone-usage-measurement-app"
     ],
     "resources": [
       "pitch"
@@ -127,7 +127,7 @@
       "action-offline-chess-tournament",
       "action-online-chess-tournament",
       "action-a-trip-to-annecy",
-      "technology-youtube-channel-with-a-purpose"
+      "technologies-youtube-channel-with-a-purpose"
     ],
     "resources": []
   },

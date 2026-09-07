@@ -1,7 +1,15 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 
 import { db, isDatabaseConfigured } from "@/db";
-import { criteria, enrolments, reflections, tasks, users } from "@/db/schema";
+import {
+  criteria,
+  enrolments,
+  goals,
+  reflections,
+  scorecards,
+  tasks,
+  users,
+} from "@/db/schema";
 
 export type EnrolmentRow = typeof enrolments.$inferSelect;
 
@@ -65,11 +73,23 @@ export async function enrolmentDetail(enrolmentId: string) {
         .from(reflections)
         .where(eq(reflections.enrolmentId, enrolmentId))
         .orderBy(asc(reflections.cycle)),
+      goals: await db()
+        .select()
+        .from(goals)
+        .where(eq(goals.enrolmentId, enrolmentId))
+        .orderBy(asc(goals.position)),
+      scorecards: await db()
+        .select()
+        .from(scorecards)
+        .where(eq(scorecards.enrolmentId, enrolmentId))
+        .orderBy(desc(scorecards.createdAt)),
     }),
     {
       tasks: [] as (typeof tasks.$inferSelect)[],
       criteria: [] as (typeof criteria.$inferSelect)[],
       reflections: [] as (typeof reflections.$inferSelect)[],
+      goals: [] as (typeof goals.$inferSelect)[],
+      scorecards: [] as (typeof scorecards.$inferSelect)[],
     },
   );
 }
