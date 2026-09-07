@@ -11,7 +11,8 @@
     "db:generate": "node node_modules/drizzle-kit/bin.cjs generate",
     "db:push": "node node_modules/drizzle-kit/bin.cjs push",
     "db:seed": "node node_modules/tsx/dist/cli.mjs scripts/seed.ts",
-    "data:extract": "python3 scripts/extract_curriculum.py"
+    "data:extract": "python3 scripts/extract_curriculum.py",
+    "db:migrate": "node node_modules/tsx/dist/cli.mjs scripts/migrate.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
@@ -20,6 +21,7 @@
     "drizzle-orm": "^0.45.2",
     "next": "^16.3.4",
     "next-auth": "^5.0.0-beta.32",
+    "pg": "^8.23.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zod": "^3.24.1"
@@ -28,6 +30,7 @@
     "@tailwindcss/postcss": "^4.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.5",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "drizzle-kit": "^0.31.10",

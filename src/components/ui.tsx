@@ -14,7 +14,9 @@ export function StrandChip({
   const tone = strand ?? UNASSIGNED;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-semibold tracking-wide ${
+      // w-fit/self-start keep the pill from stretching when it is a direct
+      // child of a stretching flex column, as it is inside ProjectCard.
+      className={`inline-flex w-fit self-start items-center gap-1.5 rounded-full font-semibold tracking-wide ${
         size === "sm" ? "px-2.5 py-0.5 text-[0.68rem]" : "px-3 py-1 text-xs"
       }`}
       style={{ background: tone.colour, color: tone.ink }}

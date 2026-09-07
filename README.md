@@ -85,18 +85,23 @@ Requires Node 20+ and Python 3 (for the extraction script only).
 ```bash
 npm install
 cp .env.example .env.local     # then fill in DATABASE_URL and AUTH_SECRET
-npm run db:push                # create the tables
+npm run db:migrate             # apply drizzle/*.sql
 npm run db:seed                # create the first accounts
 npm run dev
 ```
+
+Schema changes: edit `src/db/schema.ts`, run `npm run db:generate` to write a
+new migration into `drizzle/`, review the SQL, commit it. `npm run db:push`
+skips the migration file and is for throwaway local databases only.
 
 Generate an auth secret with `npx auth secret`, or any 32+ byte random string.
 
 ### Database
 
-Postgres, via Vercel's managed store (Neon under the hood). The Neon HTTP
-driver works the same from a laptop as it does in production, so local
-development runs against the same kind of database as the deployment.
+Postgres. `src/db/index.ts` picks a driver from the connection string: the
+Neon HTTP driver for Vercel/Neon URLs (no TCP handshake, no connection pool to
+exhaust from serverless functions), and node-postgres for anything else, so
+`postgres://localhost/impact_lms` works on a laptop with no cloud database.
 
 Attach one in the Vercel dashboard: **Storage → Create Database → Postgres**,
 then link it to this project. Vercel injects `DATABASE_URL` automatically.
@@ -133,5 +138,9 @@ not self-service by design.
   plain `next build` and friends.
 - `drizzle-kit` pulls in an `esbuild` advisory through a transitive dependency.
   It is a schema tool that never runs in production or during the Vercel build.
+- **This checkout sits in an iCloud-synced Desktop folder.** The sync duplicated
+  files inside `node_modules` and even `.git/refs` as `<name> 2`, which broke
+  `tsc`. If that recurs: `find . -name "* 2" -delete`. Moving the repo out of
+  the synced folder avoids it entirely.
 - Every write goes through an ownership check in `src/lib/actions.ts` — a
   guessed id cannot reach another student's board.

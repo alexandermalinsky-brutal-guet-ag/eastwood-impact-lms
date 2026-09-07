@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { Card, Empty, LinkButton, SectionHeading, StrandChip, Stat } from "@/components/ui";
 import { isDatabaseConfigured } from "@/db";
 import { STRANDS, strandOf } from "@/lib/brand";
-import { corePractices, getProject, strandCounts } from "@/lib/curriculum";
+import { corePractices, getProject, projects, strandCounts } from "@/lib/curriculum";
 import { enrolmentDetail, myEnrolments } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -82,8 +82,7 @@ export default async function Dashboard() {
             <Link href="/projects" className="font-semibold text-royal-purple underline">
               project menu
             </Link>{" "}
-            — there are {strandCounts.reduce((n, s) => n + s.count, 0)} to choose
-            from across the six strands.
+            — there are {projects.length} to choose from.
           </Empty>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">

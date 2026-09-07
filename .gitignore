@@ -9,4 +9,4 @@ build
 .vercel
 next-env.d.ts
 *.tsbuildinfo
-drizzle/meta
+# Migration journal is part of the migration history and must be committed.
