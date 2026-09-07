@@ -20,7 +20,7 @@ export default async function Landing() {
 
           <div className="mt-20 max-w-3xl">
             <p className="text-[0.72rem] font-bold uppercase tracking-[0.24em] text-light-purple">
-              Imagination · Movement · Planet · Action · Character · Technology
+              {STRANDS.map((s) => s.name).join(" · ")}
             </p>
             <h1 className="mt-5 text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
               Projects that leave
