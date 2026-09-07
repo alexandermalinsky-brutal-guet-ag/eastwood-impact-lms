@@ -106,6 +106,22 @@ exhaust from serverless functions), and node-postgres for anything else, so
 Attach one in the Vercel dashboard: **Storage → Create Database → Postgres**,
 then link it to this project. Vercel injects `DATABASE_URL` automatically.
 
+For a local database instead:
+
+```bash
+brew install postgresql@16
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+export LC_ALL="en_US.UTF-8"          # Postgres 16 refuses to start without this
+pg_ctl -D /opt/homebrew/var/postgresql@16 -l /tmp/pg.log start
+createdb impact_lms
+```
+
+Then set `DATABASE_URL="postgres://$USER@localhost:5432/impact_lms"` in
+`.env.local`. Stop it again with `pg_ctl -D /opt/homebrew/var/postgresql@16 stop`.
+
+`scripts/dev-student.ts` creates a throwaway student account for testing:
+`npm run db:seed && node node_modules/tsx/dist/cli.mjs scripts/dev-student.ts`.
+
 The app is built to survive not having one: pages render, the curriculum is
 readable, and anything that needs to persist shows a clear warning instead of
 crashing. That way the first deploy succeeds before the store exists.
