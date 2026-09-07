@@ -119,7 +119,22 @@ createdb impact_lms
 Then set `DATABASE_URL="postgres://$USER@localhost:5432/impact_lms"` in
 `.env.local`. Stop it again with `pg_ctl -D /opt/homebrew/var/postgresql@16 stop`.
 
-`npm run db:student` creates a throwaway student account for testing sign-in.
+### Creating individual accounts
+
+`npm run db:seed` is for bootstrapping. For one account at a time — which is
+how real people should be added — use:
+
+```bash
+npm run user -- --email someone@eastwoodmontreux.ch --name "Their Name" --role coach
+```
+
+`--role` is `student`, `coach` or `admin` (default `admin`). It generates a
+strong password and prints it once; pass `--password` to choose one. Running it
+again for an existing email updates the role but leaves the password alone
+unless you add `--reset-password`.
+
+Against production, use `npm run user:prod -- …`, which reads
+`.env.prod.local`. Same for `db:migrate:prod` and `db:seed:prod`.
 
 All `db:*` scripts read `.env.local` automatically (via Node's own
 `--env-file-if-exists`, no dependency). To point one at a different database for

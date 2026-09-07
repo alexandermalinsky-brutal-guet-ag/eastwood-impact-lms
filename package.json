@@ -13,7 +13,10 @@
     "db:seed": "node --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs scripts/seed.ts",
     "data:extract": "python3 scripts/extract_curriculum.py",
     "db:migrate": "node --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs scripts/migrate.ts",
-    "db:student": "node --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs scripts/dev-student.ts"
+    "user": "node --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs scripts/create-user.ts",
+    "user:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/create-user.ts",
+    "db:migrate:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/migrate.ts",
+    "db:seed:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/seed.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
