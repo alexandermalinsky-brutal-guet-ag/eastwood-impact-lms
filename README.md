@@ -119,8 +119,18 @@ createdb impact_lms
 Then set `DATABASE_URL="postgres://$USER@localhost:5432/impact_lms"` in
 `.env.local`. Stop it again with `pg_ctl -D /opt/homebrew/var/postgresql@16 stop`.
 
-`scripts/dev-student.ts` creates a throwaway student account for testing:
-`npm run db:seed && node node_modules/tsx/dist/cli.mjs scripts/dev-student.ts`.
+`npm run db:student` creates a throwaway student account for testing sign-in.
+
+All `db:*` scripts read `.env.local` automatically (via Node's own
+`--env-file-if-exists`, no dependency). To point one at a different database for
+a one-off — a production migration, say — override it inline:
+
+```bash
+DATABASE_URL='postgres://…' npm run db:migrate
+```
+
+An inline variable wins over the env file, so this never risks pointing
+`npm run dev` at production.
 
 The app is built to survive not having one: pages render, the curriculum is
 readable, and anything that needs to persist shows a clear warning instead of
