@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card, SectionHeading } from "@/components/ui";
 import {
   corePractices,
+  documents,
   resources,
   resourcesByCategory,
 } from "@/lib/curriculum";
@@ -20,6 +21,34 @@ export default function ToolkitPage() {
         title="The IMPACT toolkit"
         description={`${resources.length} practices, methods and references the team draws on. The ${corePractices.length} marked as core are the ones being rolled out first, each with a member of staff who owns it.`}
       />
+
+      <section className="mb-12">
+        <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.16em] text-royal-purple">
+          Documentation
+        </h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {documents.map((doc) => (
+            <Link
+              key={doc.slug}
+              href={doc.href || `/toolkit/${doc.slug}`}
+              className="card flex h-full flex-col p-5 transition-shadow hover:shadow-md"
+            >
+              <p className="font-bold leading-snug text-ink">{doc.title}</p>
+              <p className="mt-1 text-xs text-muted">
+                {[doc.author, doc.year].filter(Boolean).join(" · ")}
+              </p>
+              <p className="mt-2.5 line-clamp-4 text-sm leading-relaxed text-muted">
+                {doc.notes}
+              </p>
+              {doc.href ? (
+                <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wider text-royal-purple">
+                  Read it here →
+                </span>
+              ) : null}
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <section className="mb-12">
         <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.16em] text-royal-purple">
@@ -48,7 +77,9 @@ export default function ToolkitPage() {
         </div>
       </section>
 
-      {groups.map((group) => (
+      {groups
+        .filter((group) => group.category !== "Documentation")
+        .map((group) => (
         <section key={group.category} className="mb-10">
           <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.16em] text-muted">
             {group.category}{" "}

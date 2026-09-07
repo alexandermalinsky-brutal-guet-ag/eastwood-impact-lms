@@ -4,7 +4,7 @@ import Link from "next/link";
 import { JourneyDetail } from "@/components/JourneyTracker";
 import { SectionHeading } from "@/components/ui";
 import { INTEGRATION_NOTE, STRANDS } from "@/lib/brand";
-import { kickoffProjects } from "@/lib/curriculum";
+import { evidenceBase, kickoffProjects } from "@/lib/curriculum";
 import {
   COACH_ROLES,
   COACH_SCORECARD,
@@ -24,6 +24,14 @@ export default function HandbookPage() {
         eyebrow="The IMPACT Handbook · Vol. 1"
         title="How the programme works"
         description="The structures every project runs on — the four stages, the strands, how goals and evaluation work, and what changes as students progress."
+        action={
+          <Link
+            href="/toolkit/impact-handbook"
+            className="card px-4 py-2 text-sm font-semibold text-ink hover:border-light-purple"
+          >
+            Source document
+          </Link>
+        }
       />
 
       <nav className="mb-12 flex flex-wrap gap-2">
@@ -36,6 +44,7 @@ export default function HandbookPage() {
           ["#progression", "Progression"],
           ["#external", "External impact"],
           ["#kickoff", "Kickoff projects"],
+          ["#evidence", "Evidence base"],
         ].map(([href, label]) => (
           <a
             key={href}
@@ -259,7 +268,7 @@ export default function HandbookPage() {
         </div>
       </section>
 
-      <section id="kickoff" className="scroll-mt-24">
+      <section id="kickoff" className="mb-16 scroll-mt-24">
         <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
           Kickoff projects
         </h2>
@@ -295,6 +304,33 @@ export default function HandbookPage() {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section id="evidence" className="scroll-mt-24">
+        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
+          Evidence base
+        </h2>
+        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
+          The research the handbook grounds the programme in, cited as printed —
+          so you can go and read the source rather than take it on trust.
+        </p>
+        <ul className="space-y-3">
+          {evidenceBase.map((work) => (
+            <li key={work.slug}>
+              <Link href={`/toolkit/${work.slug}`} className="card block p-5 hover:border-light-purple">
+                <p className="font-bold leading-snug text-ink">{work.title}</p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {[work.author, work.year].filter(Boolean).join(" · ")}
+                </p>
+                {work.notes ? (
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    {work.notes}
+                  </p>
+                ) : null}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
     </>
   );

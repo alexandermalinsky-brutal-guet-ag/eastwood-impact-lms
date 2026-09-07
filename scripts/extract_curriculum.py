@@ -386,10 +386,195 @@ def extract_resources(wb) -> tuple[list[dict], list[dict]]:
             "notes": note,
             "url": url,
             "alsoListedAs": [],
+            "origin": "workbook",
+            "author": "",
+            "year": "",
+            "citation": "",
+            "href": "",
             "sourceRow": index,
         }
 
-    return list(resources.values()), normalisations
+    ordered = DOCUMENTS + list(resources.values()) + CITATIONS
+    return ordered, normalisations
+
+
+def _document(**kwargs):
+    """A resource that came from a published document rather than the workbook."""
+    base = {
+        "sourceTitle": kwargs.get("title", ""),
+        "strand": None,
+        "focus": "",
+        "leads": [],
+        "corePractice": False,
+        "notes": "",
+        "url": "",
+        "alsoListedAs": [],
+        "origin": "handbook",
+        "author": "",
+        "year": "",
+        "citation": "",
+        "href": "",
+        "sourceRow": 0,
+    }
+    base.update(kwargs)
+    return base
+
+
+# --- Documentation ---------------------------------------------------------
+# The documents the programme actually runs on. Listing them means anyone can
+# see where a piece of content came from, rather than guessing.
+DOCUMENTS = [
+    _document(
+        slug="impact-handbook",
+        title="The IMPACT Handbook, Vol. 1",
+        category="Documentation",
+        author="Eastwood Montreux",
+        year="v8",
+        href="/handbook",
+        notes=(
+            "The published description of the programme, in eleven sections: the rationale, "
+            "the strands, the four-stage journey, coaching and governance, measurement, "
+            "progression across grades, external impact, kickoff projects, and outcomes. "
+            "Where this and the planning workbook disagree, the handbook is authoritative — "
+            "it is what the school has published."
+        ),
+    ),
+    _document(
+        slug="impact-planning-workbook",
+        title="IMPACT curriculum planning workbook",
+        category="Documentation",
+        author="The IMPACT team",
+        notes=(
+            "The living spreadsheet the team adds to: project ideas, practices to try, and who "
+            "has taken ownership of what. Every project and practice on this platform is "
+            "generated from it, so editing the workbook and re-running the extractor is how "
+            "the menu changes."
+        ),
+    ),
+    _document(
+        slug="logo-standards-artwork-sheet",
+        title="Logo Standards / Artwork Sheet",
+        category="Documentation",
+        author="Ciara Jenkins",
+        year="1 December 2025",
+        notes=(
+            "The brand source: logo configurations, approved colour usage, and the full primary "
+            "and secondary palettes. Every colour on this platform comes from it — nothing is "
+            "invented, and nothing should be added without amending the sheet first."
+        ),
+    ),
+]
+
+# --- Evidence base ---------------------------------------------------------
+# The research the handbook grounds the programme in. Cited exactly as printed,
+# so a coach can go and read the source rather than take it on trust.
+CITATIONS = [
+    _document(
+        slug="how-people-learn",
+        title="How People Learn: Brain, Mind, Experience, and School",
+        category="Evidence base",
+        author="John D. Bransford et al., National Research Council",
+        year="2000",
+        citation="Bransford et al. (2000), National Research Council",
+        notes=(
+            "Deep understanding develops when learners actively construct knowledge through "
+            "experience, reflection and application — the finding the whole programme rests on."
+        ),
+    ),
+    _document(
+        slug="making-learning-whole",
+        title="Making Learning Whole",
+        category="Evidence base",
+        author="David Perkins, Harvard Graduate School of Education",
+        year="2009",
+        citation="Perkins (2009)",
+        notes=(
+            "Knowledge transfers most effectively through \u201cwhole game\u201d learning: applying skills in "
+            "real-world simulations that mirror authentic performance."
+        ),
+    ),
+    _document(
+        slug="mathematical-mindsets",
+        title="Mathematical Mindsets",
+        category="Evidence base",
+        author="Jo Boaler, Stanford Graduate School of Education",
+        year="2016",
+        citation="Boaler (2016)",
+        notes=(
+            "Project-based, applied learning environments significantly improve conceptual "
+            "retention and problem-solving capacity compared with rote instruction."
+        ),
+    ),
+    _document(
+        slug="grit-duckworth",
+        title="Grit: The Power of Passion and Perseverance",
+        category="Evidence base",
+        author="Angela Duckworth",
+        year="2016",
+        citation="Duckworth (2016); Duckworth et al. (2007), Journal of Personality and Social Psychology",
+        notes=(
+            "Sustained engagement in meaningful, challenging projects predicts long-term "
+            "achievement more strongly than IQ alone."
+        ),
+    ),
+    _document(
+        slug="goal-setting-locke-latham",
+        title="Building a Practically Useful Theory of Goal Setting and Task Motivation",
+        category="Evidence base",
+        author="Edwin Locke and Gary Latham",
+        year="2002",
+        citation="Locke & Latham (2002)",
+        notes=(
+            "Specific, challenging goals significantly improve focus, persistence and "
+            "performance. The reason IMPACT goals are SMART rather than aspirational."
+        ),
+    ),
+    _document(
+        slug="kolb-experiential-learning",
+        title="Experiential Learning Theory",
+        category="Evidence base",
+        author="David Kolb",
+        year="1984",
+        citation="Kolb (1984)",
+        notes=(
+            "Learning is strengthened through cycles of action and reflection, improving both "
+            "retention and transfer — the basis of the Plan \u2013 Act \u2013 Reflect cycle."
+        ),
+    ),
+    _document(
+        slug="freeman-active-learning",
+        title="Active learning increases student performance",
+        category="Evidence base",
+        author="Freeman et al., PNAS",
+        year="2014",
+        citation="Freeman et al. (2014), PNAS",
+        notes="Active learning significantly increases performance compared with traditional instruction.",
+    ),
+    _document(
+        slug="transfer-perkins-salomon",
+        title="Research on transfer of learning",
+        category="Evidence base",
+        author="David Perkins and Gavriel Salomon",
+        year="1988; 1992",
+        citation="Perkins & Salomon (1988; 1992)",
+        notes=(
+            "Knowledge transfers more effectively when applied across contexts rather than "
+            "learned in isolation."
+        ),
+    ),
+    _document(
+        slug="boix-mansilla-interdisciplinary",
+        title="Interdisciplinary understanding",
+        category="Evidence base",
+        author="Veronica Boix Mansilla, Harvard",
+        year="2003",
+        citation="Boix Mansilla (2003)",
+        notes=(
+            "Complex problem-solving requires integration across disciplines — why projects are "
+            "expected to span several strands."
+        ),
+    ),
+]
 
 
 def build_people(projects, resources) -> list[dict]:
@@ -423,7 +608,7 @@ def main() -> None:
     unassigned = [p["title"] for p in projects if not p["strand"]]
     print(f"projects        {len(projects):>3}  ({sum(1 for p in projects if p['origin'] == 'handbook')} from the handbook)")
     print(f"  unassigned    {len(unassigned):>3}  {unassigned}")
-    print(f"resources       {len(resources):>3}  ({sum(1 for r in resources if r['corePractice'])} core practices)")
+    print(f"resources       {len(resources):>3}  ({sum(1 for r in resources if r['corePractice'])} core, {sum(1 for r in resources if r['origin'] == 'handbook')} from documents)")
     print(f"people          {len(people):>3}")
     print(f"normalisations  {len(project_norms) + len(resource_norms):>3}")
     for strand in STRANDS:

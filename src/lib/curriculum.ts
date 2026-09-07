@@ -44,6 +44,14 @@ export type Resource = {
   notes: string;
   url: string;
   alsoListedAs: string[];
+  /** Whether this came from the planning workbook or a published document. */
+  origin: "workbook" | "handbook";
+  author: string;
+  year: string;
+  /** Formal citation, for entries in the evidence base. */
+  citation: string;
+  /** Internal route, where the document has a page on this platform. */
+  href: string;
   sourceRow: number;
 };
 
@@ -82,9 +90,16 @@ export function strandFor(project: Project): Strand | null {
   return strandOf(project.strand);
 }
 
-export const corePractices = resources.filter((r) => r.corePractice);
+export const corePractices = resources.filter(
+  (r) => r.corePractice && r.category !== "Documentation",
+);
+
+/** The documents the programme runs on, and the research behind it. */
+export const documents = resources.filter((r) => r.category === "Documentation");
+export const evidenceBase = resources.filter((r) => r.category === "Evidence base");
 
 export const resourceCategories = [
+  "Documentation",
   "Project method",
   "Thinking & inquiry",
   "Assessment & feedback",
@@ -92,6 +107,7 @@ export const resourceCategories = [
   "Studio & making",
   "Logistics & rhythm",
   "Reading & references",
+  "Evidence base",
 ] as const;
 
 export function resourcesByCategory(): { category: string; items: Resource[] }[] {

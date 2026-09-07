@@ -1,5 +1,62 @@
 [
   {
+    "sourceTitle": "The IMPACT Handbook, Vol. 1",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "The published description of the programme, in eleven sections: the rationale, the strands, the four-stage journey, coaching and governance, measurement, progression across grades, external impact, kickoff projects, and outcomes. Where this and the planning workbook disagree, the handbook is authoritative — it is what the school has published.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "Eastwood Montreux",
+    "year": "v8",
+    "citation": "",
+    "href": "/handbook",
+    "sourceRow": 0,
+    "slug": "impact-handbook",
+    "title": "The IMPACT Handbook, Vol. 1",
+    "category": "Documentation"
+  },
+  {
+    "sourceTitle": "IMPACT curriculum planning workbook",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "The living spreadsheet the team adds to: project ideas, practices to try, and who has taken ownership of what. Every project and practice on this platform is generated from it, so editing the workbook and re-running the extractor is how the menu changes.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "The IMPACT team",
+    "year": "",
+    "citation": "",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "impact-planning-workbook",
+    "title": "IMPACT curriculum planning workbook",
+    "category": "Documentation"
+  },
+  {
+    "sourceTitle": "Logo Standards / Artwork Sheet",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "The brand source: logo configurations, approved colour usage, and the full primary and secondary palettes. Every colour on this platform comes from it — nothing is invented, and nothing should be added without amending the sheet first.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "Ciara Jenkins",
+    "year": "1 December 2025",
+    "citation": "",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "logo-standards-artwork-sheet",
+    "title": "Logo Standards / Artwork Sheet",
+    "category": "Documentation"
+  },
+  {
     "slug": "pitch",
     "title": "Pitch",
     "sourceTitle": "pitch",
@@ -13,6 +70,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 2
   },
   {
@@ -29,6 +91,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 3
   },
   {
@@ -47,6 +114,11 @@
     "alsoListedAs": [
       "Harkness"
     ],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 4
   },
   {
@@ -65,6 +137,11 @@
     "alsoListedAs": [
       "art journals"
     ],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 5
   },
   {
@@ -81,6 +158,11 @@
     "alsoListedAs": [
       "definition of done"
     ],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 6
   },
   {
@@ -99,6 +181,11 @@
     "alsoListedAs": [
       "David perkins def of learning"
     ],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 7
   },
   {
@@ -117,6 +204,11 @@
     "alsoListedAs": [
       "plan - do - reflect"
     ],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 8
   },
   {
@@ -133,6 +225,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 9
   },
   {
@@ -149,6 +246,11 @@
     "notes": "Book - A More Beautiful Question",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 10
   },
   {
@@ -165,6 +267,11 @@
     "alsoListedAs": [
       "problem framing"
     ],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 11
   },
   {
@@ -181,6 +288,11 @@
     "alsoListedAs": [
       "systems mapping"
     ],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 12
   },
   {
@@ -195,6 +307,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 13
   },
   {
@@ -211,6 +328,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 14
   },
   {
@@ -225,6 +347,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 15
   },
   {
@@ -241,6 +368,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 16
   },
   {
@@ -255,6 +387,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 17
   },
   {
@@ -269,6 +406,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 18
   },
   {
@@ -283,6 +425,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 19
   },
   {
@@ -297,6 +444,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 20
   },
   {
@@ -311,6 +463,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 21
   },
   {
@@ -325,6 +482,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 22
   },
   {
@@ -339,6 +501,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 23
   },
   {
@@ -353,6 +520,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 24
   },
   {
@@ -367,6 +539,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 25
   },
   {
@@ -381,6 +558,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 26
   },
   {
@@ -395,6 +577,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 28
   },
   {
@@ -409,6 +596,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 29
   },
   {
@@ -423,6 +615,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 30
   },
   {
@@ -437,6 +634,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 31
   },
   {
@@ -451,6 +653,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 32
   },
   {
@@ -465,6 +672,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 33
   },
   {
@@ -479,6 +691,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 34
   },
   {
@@ -493,6 +710,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 35
   },
   {
@@ -507,6 +729,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 36
   },
   {
@@ -521,6 +748,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 37
   },
   {
@@ -535,6 +767,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 38
   },
   {
@@ -549,6 +786,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 39
   },
   {
@@ -563,6 +805,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 40
   },
   {
@@ -577,6 +824,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 41
   },
   {
@@ -591,6 +843,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 42
   },
   {
@@ -605,6 +862,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 43
   },
   {
@@ -619,6 +881,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 45
   },
   {
@@ -633,6 +900,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 46
   },
   {
@@ -647,6 +919,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 48
   },
   {
@@ -661,6 +938,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 49
   },
   {
@@ -675,6 +957,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 50
   },
   {
@@ -689,6 +976,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 52
   },
   {
@@ -703,6 +995,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 53
   },
   {
@@ -717,6 +1014,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 55
   },
   {
@@ -731,6 +1033,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 58
   },
   {
@@ -745,6 +1052,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 59
   },
   {
@@ -759,6 +1071,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 60
   },
   {
@@ -773,6 +1090,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 61
   },
   {
@@ -787,6 +1109,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 62
   },
   {
@@ -801,6 +1128,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 63
   },
   {
@@ -815,6 +1147,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 64
   },
   {
@@ -829,6 +1166,11 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 65
   },
   {
@@ -843,6 +1185,182 @@
     "notes": "",
     "url": "",
     "alsoListedAs": [],
+    "origin": "workbook",
+    "author": "",
+    "year": "",
+    "citation": "",
+    "href": "",
     "sourceRow": 66
+  },
+  {
+    "sourceTitle": "How People Learn: Brain, Mind, Experience, and School",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Deep understanding develops when learners actively construct knowledge through experience, reflection and application — the finding the whole programme rests on.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "John D. Bransford et al., National Research Council",
+    "year": "2000",
+    "citation": "Bransford et al. (2000), National Research Council",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "how-people-learn",
+    "title": "How People Learn: Brain, Mind, Experience, and School",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Making Learning Whole",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Knowledge transfers most effectively through “whole game” learning: applying skills in real-world simulations that mirror authentic performance.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "David Perkins, Harvard Graduate School of Education",
+    "year": "2009",
+    "citation": "Perkins (2009)",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "making-learning-whole",
+    "title": "Making Learning Whole",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Mathematical Mindsets",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Project-based, applied learning environments significantly improve conceptual retention and problem-solving capacity compared with rote instruction.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "Jo Boaler, Stanford Graduate School of Education",
+    "year": "2016",
+    "citation": "Boaler (2016)",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "mathematical-mindsets",
+    "title": "Mathematical Mindsets",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Grit: The Power of Passion and Perseverance",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Sustained engagement in meaningful, challenging projects predicts long-term achievement more strongly than IQ alone.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "Angela Duckworth",
+    "year": "2016",
+    "citation": "Duckworth (2016); Duckworth et al. (2007), Journal of Personality and Social Psychology",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "grit-duckworth",
+    "title": "Grit: The Power of Passion and Perseverance",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Building a Practically Useful Theory of Goal Setting and Task Motivation",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Specific, challenging goals significantly improve focus, persistence and performance. The reason IMPACT goals are SMART rather than aspirational.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "Edwin Locke and Gary Latham",
+    "year": "2002",
+    "citation": "Locke & Latham (2002)",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "goal-setting-locke-latham",
+    "title": "Building a Practically Useful Theory of Goal Setting and Task Motivation",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Experiential Learning Theory",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Learning is strengthened through cycles of action and reflection, improving both retention and transfer — the basis of the Plan – Act – Reflect cycle.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "David Kolb",
+    "year": "1984",
+    "citation": "Kolb (1984)",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "kolb-experiential-learning",
+    "title": "Experiential Learning Theory",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Active learning increases student performance",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Active learning significantly increases performance compared with traditional instruction.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "Freeman et al., PNAS",
+    "year": "2014",
+    "citation": "Freeman et al. (2014), PNAS",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "freeman-active-learning",
+    "title": "Active learning increases student performance",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Research on transfer of learning",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Knowledge transfers more effectively when applied across contexts rather than learned in isolation.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "David Perkins and Gavriel Salomon",
+    "year": "1988; 1992",
+    "citation": "Perkins & Salomon (1988; 1992)",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "transfer-perkins-salomon",
+    "title": "Research on transfer of learning",
+    "category": "Evidence base"
+  },
+  {
+    "sourceTitle": "Interdisciplinary understanding",
+    "strand": null,
+    "focus": "",
+    "leads": [],
+    "corePractice": false,
+    "notes": "Complex problem-solving requires integration across disciplines — why projects are expected to span several strands.",
+    "url": "",
+    "alsoListedAs": [],
+    "origin": "handbook",
+    "author": "Veronica Boix Mansilla, Harvard",
+    "year": "2003",
+    "citation": "Boix Mansilla (2003)",
+    "href": "",
+    "sourceRow": 0,
+    "slug": "boix-mansilla-interdisciplinary",
+    "title": "Interdisciplinary understanding",
+    "category": "Evidence base"
   }
 ]

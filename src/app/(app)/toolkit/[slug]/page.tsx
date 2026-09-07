@@ -63,22 +63,62 @@ export default async function ResourcePage({
           </p>
         ) : (
           <p className="mt-3 text-base leading-relaxed text-muted">
-            This practice is on the team&rsquo;s list but has not been written up
-            yet. If you use it, add what you learned so the next person starts
-            further along.
+            {resource.origin === "handbook"
+              ? "No summary recorded for this reference yet."
+              : "This practice is on the team\u2019s list but has not been written up yet. If you use it, add what you learned so the next person starts further along."}
           </p>
         )}
       </header>
 
+      {resource.href ? (
+        <Link
+          href={resource.href}
+          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-royal-purple px-5 py-2.5 text-sm font-bold text-white hover:bg-deep-blue"
+        >
+          Read it on this platform →
+        </Link>
+      ) : null}
+
       <dl className="mt-8 grid max-w-2xl gap-6 sm:grid-cols-2">
-        <div>
-          <dt className="text-xs font-bold uppercase tracking-wider text-muted">
-            Owner
-          </dt>
-          <dd className="mt-1 font-semibold text-ink">
-            {resource.leads.length ? resource.leads.join(" & ") : "Not yet assigned"}
-          </dd>
-        </div>
+        {resource.author ? (
+          <div>
+            <dt className="text-xs font-bold uppercase tracking-wider text-muted">
+              Author
+            </dt>
+            <dd className="mt-1 font-semibold text-ink">{resource.author}</dd>
+          </div>
+        ) : null}
+
+        {resource.year ? (
+          <div>
+            <dt className="text-xs font-bold uppercase tracking-wider text-muted">
+              {resource.category === "Documentation" ? "Version" : "Published"}
+            </dt>
+            <dd className="mt-1 font-semibold text-ink">{resource.year}</dd>
+          </div>
+        ) : null}
+
+        {resource.citation ? (
+          <div className="sm:col-span-2">
+            <dt className="text-xs font-bold uppercase tracking-wider text-muted">
+              Cited in the handbook as
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-ink">{resource.citation}</dd>
+          </div>
+        ) : null}
+
+        {resource.origin === "workbook" || resource.leads.length > 0 ? (
+          <div>
+            <dt className="text-xs font-bold uppercase tracking-wider text-muted">
+              Owner
+            </dt>
+            <dd className="mt-1 font-semibold text-ink">
+              {resource.leads.length
+                ? resource.leads.join(" & ")
+                : "Not yet assigned"}
+            </dd>
+          </div>
+        ) : null}
 
         {resource.focus ? (
           <div>
