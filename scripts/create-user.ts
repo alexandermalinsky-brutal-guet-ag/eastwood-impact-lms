@@ -28,6 +28,31 @@ function flag(name: string): boolean {
   return process.argv.includes(`--${name}`);
 }
 
+/**
+ * Rejects a --password that is obviously a placeholder copied out of an
+ * instruction, or too weak to be worth storing. Without this the tool will
+ * cheerfully hash "your-choice" and the account is then locked behind a
+ * password nobody meant to set.
+ */
+function assertPasswordUsable(password: string): void {
+  const placeholders =
+    /^(your-choice|your-password|password|passwd|changeme|change-me|paste-.*|pick-a-real-password|.*-here|placeholder|secret|admin|test|123456)$/i;
+
+  if (placeholders.test(password)) {
+    throw new Error(
+      `"${password}" looks like a placeholder, not a password you chose.\n` +
+        "Either pass a real one, or omit --password and a strong one will be generated for you.",
+    );
+  }
+
+  if (password.length < 10) {
+    throw new Error(
+      `Password is only ${password.length} characters. Use at least 10, ` +
+        "or omit --password to have a strong one generated.",
+    );
+  }
+}
+
 /** Readable but high-entropy: 4 groups of 5 from an unambiguous alphabet. */
 function generatePassword(): string {
   const alphabet = "abcdefghijkmnpqrstuvwxyz23456789";
@@ -45,8 +70,10 @@ async function main() {
   const email = arg("email")?.trim().toLowerCase();
   const name = arg("name")?.trim();
   const role = (arg("role") ?? "admin") as Role;
-  const password = arg("password") ?? generatePassword();
-  const generated = !arg("password");
+  const supplied = arg("password");
+  if (supplied) assertPasswordUsable(supplied);
+  const password = supplied ?? generatePassword();
+  const generated = !supplied;
 
   if (!email || !email.includes("@")) {
     console.error('Pass an email: --email you@school.ch [--name "Your Name"] [--role admin]');
