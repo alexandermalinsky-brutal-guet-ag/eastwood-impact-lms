@@ -1,0 +1,38 @@
+{
+  "name": "impact-lms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IMPACT Learning Management System \u2014 Eastwood Montreux International School",
+  "scripts": {
+    "dev": "node node_modules/next/dist/bin/next dev",
+    "build": "node node_modules/next/dist/bin/next build",
+    "start": "node node_modules/next/dist/bin/next start",
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
+    "db:generate": "node node_modules/drizzle-kit/bin.cjs generate",
+    "db:push": "node node_modules/drizzle-kit/bin.cjs push",
+    "db:seed": "node node_modules/tsx/dist/cli.mjs scripts/seed.ts",
+    "data:extract": "python3 scripts/extract_curriculum.py"
+  },
+  "dependencies": {
+    "@auth/drizzle-adapter": "^1.11.3",
+    "@neondatabase/serverless": "^0.10.4",
+    "bcryptjs": "^2.4.3",
+    "drizzle-orm": "^0.45.2",
+    "next": "^16.3.4",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "drizzle-kit": "^0.31.10",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

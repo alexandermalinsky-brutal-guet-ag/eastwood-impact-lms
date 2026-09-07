@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/*
+ * Eastwood Montreux — IMPACT LMS
+ * Colour tokens mirror src/lib/brand.ts, which mirrors the artwork sheet.
+ */
+@theme {
+  --color-deep-blue: #000077;
+  --color-royal-purple: #500591;
+  --color-light-purple: #b494cb;
+
+  --color-apple-green: #ced93b;
+  --color-blue-purple: #5254be;
+  --color-turquoise: #01b6c9;
+  --color-mustard: #cd9c00;
+  --color-forest-green: #006242;
+  --color-moonrock: #65a6ba;
+
+  /* Neutrals tuned to sit under Deep Blue without going flat grey. */
+  --color-paper: #fbfbfd;
+  --color-surface: #ffffff;
+  --color-line: #e5e4ee;
+  --color-ink: #14142b;
+  --color-muted: #5f5f7a;
+
+  --font-sans: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+
+  --radius-card: 14px;
+}
+
+:root {
+  --deep-blue: #000077;
+  --royal-purple: #500591;
+  --light-purple: #b494cb;
+  color-scheme: light;
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The brand's Deep Blue is dense enough to carry a subtle depth gradient. */
+.brand-gradient {
+  background-image: linear-gradient(135deg, #000077 0%, #2a0a80 52%, #500591 100%);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+.focus-ring {
+  outline: 2px solid var(--color-royal-purple);
+  outline-offset: 2px;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-royal-purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduced-motion users get the layout without the entrance animation. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background: var(--color-light-purple);
+  color: #14142b;
+}

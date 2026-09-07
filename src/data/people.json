@@ -1,0 +1,168 @@
+[
+  {
+    "name": "Alex",
+    "slug": "alex",
+    "projects": [
+      "imagination-posters-montreux-jazz",
+      "imagination-film-making",
+      "technology-youtube-channel-with-a-purpose",
+      "imagination-short-movie-the-lore-of-the-school"
+    ],
+    "resources": [
+      "filmmaking-assistance"
+    ]
+  },
+  {
+    "name": "Camila",
+    "slug": "camila",
+    "projects": [
+      "imagination-song-writing",
+      "imagination-mural",
+      "imagination-dance-performance"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Christoph",
+    "slug": "christoph",
+    "projects": [
+      "imagination-public-speaking"
+    ],
+    "resources": [
+      "kanban"
+    ]
+  },
+  {
+    "name": "Daniel",
+    "slug": "daniel",
+    "projects": [
+      "character-building-a-company"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Efe",
+    "slug": "efe",
+    "projects": [
+      "imagination-beatmaking"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Josue",
+    "slug": "josue",
+    "projects": [
+      "imagination-videos",
+      "technology-podcasts",
+      "technology-3d-printing-for-noisy-chairs"
+    ],
+    "resources": [
+      "theatre-in-education-tie"
+    ]
+  },
+  {
+    "name": "Leo",
+    "slug": "leo",
+    "projects": [
+      "imagination-public-speaking",
+      "imagination-film-making",
+      "planet-family-holiday-with-environmental-mission"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Maria",
+    "slug": "maria",
+    "projects": [
+      "action-a-trip-to-annecy",
+      "imagination-designing-the-yearbook",
+      "movement-cheer-team",
+      "imagination-book-club",
+      "imagination-instrument-lessons-students-teaching-students",
+      "imagination-short-movie-the-lore-of-the-school"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Matthias",
+    "slug": "matthias",
+    "projects": [
+      "imagination-maths-scrabble",
+      "action-offline-chess-tournament",
+      "technology-phone-usage-measurement-app"
+    ],
+    "resources": [
+      "pitch"
+    ]
+  },
+  {
+    "name": "Melissa",
+    "slug": "melissa",
+    "projects": [],
+    "resources": [
+      "circle-solutions-harkness"
+    ]
+  },
+  {
+    "name": "Nuria",
+    "slug": "nuria",
+    "projects": [
+      "imagination-documentaries"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Paul",
+    "slug": "paul",
+    "projects": [],
+    "resources": [
+      "david-perkins-def-of-learning",
+      "ask-a-further-question"
+    ]
+  },
+  {
+    "name": "Pedro",
+    "slug": "pedro",
+    "projects": [
+      "action-offline-chess-tournament",
+      "action-online-chess-tournament",
+      "action-a-trip-to-annecy",
+      "technology-youtube-channel-with-a-purpose"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Rémy",
+    "slug": "remy",
+    "projects": [],
+    "resources": [
+      "plan-act-reflect-new-name-coming",
+      "remy-suggested-pics"
+    ]
+  },
+  {
+    "name": "Saishha",
+    "slug": "saishha",
+    "projects": [
+      "open-writing-a-book-on-topic-of-choice",
+      "open-writing-a-psychology-column-for-teenagers-in-a-local-magazine-or-newspaper"
+    ],
+    "resources": []
+  },
+  {
+    "name": "Theo",
+    "slug": "theo",
+    "projects": [],
+    "resources": [
+      "art-journaling"
+    ]
+  },
+  {
+    "name": "Trellia",
+    "slug": "trellia",
+    "projects": [
+      "imagination-book-club"
+    ],
+    "resources": []
+  }
+]
