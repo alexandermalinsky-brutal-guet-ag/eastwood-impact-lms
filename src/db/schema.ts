@@ -24,6 +24,30 @@ export const users = pgTable("user", {
   /** Null for accounts that sign in with Google only. */
   passwordHash: text("passwordHash"),
   role: text("role").$type<Role>().notNull().default("student"),
+
+  /**
+   * Year group — informational only. The handbook is explicit that progression
+   * is by demonstrated readiness, not chronological age, so nothing in the app
+   * gates on this; it is here so a coach can see who they are talking to.
+   */
+  grade: text("grade"),
+
+  /**
+   * Where the student actually is in the programme. This is the field that
+   * carries meaning: a coach moves someone to the next phase when they have
+   * shown they are ready, which may not line up with their grade at all.
+   */
+  phase: text("phase")
+    .$type<"exploration" | "execution" | "legacy">()
+    .notNull()
+    .default("exploration"),
+
+  /** e.g. "2026/27". Lets a cohort be rolled over without deleting history. */
+  academicYear: text("academicYear"),
+
+  /** Soft-archive, so a leaver's record survives without them signing in. */
+  active: boolean("active").notNull().default(true),
+
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
 

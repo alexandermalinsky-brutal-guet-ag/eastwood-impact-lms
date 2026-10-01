@@ -5,8 +5,8 @@ import { auth } from "@/auth";
 import { Card, Empty, SectionHeading, Stat, StrandChip } from "@/components/ui";
 import { STRANDS, strandsOf } from "@/lib/brand";
 import { getProject } from "@/lib/curriculum";
-import { COACH_SCORECARD, STAGES, STUDENT_SCORECARD } from "@/lib/handbook";
-import { enrolmentDetail, myEnrolments } from "@/lib/queries";
+import { COACH_SCORECARD, PHASES, STAGES, STUDENT_SCORECARD } from "@/lib/handbook";
+import { enrolmentDetail, myEnrolments, myProfile } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Impact Profile" };
 export const dynamic = "force-dynamic";
@@ -28,7 +28,11 @@ export default async function ProfilePage() {
   const session = await auth();
   const user = session!.user;
 
-  const enrolments = await myEnrolments(user.id);
+  const [profile, enrolments] = await Promise.all([
+    myProfile(user.id),
+    myEnrolments(user.id),
+  ]);
+  const phase = PHASES.find((p) => p.key === (profile?.phase ?? "exploration"))!;
   const records = await Promise.all(
     enrolments.map(async (enrolment) => ({
       enrolment,
@@ -84,6 +88,58 @@ export default async function ProfilePage() {
         title="Your Impact Profile"
         description="Not a grade. A synthesis of what you committed to, what you delivered, and how you grew — drawn from your goals, scorecards, reflections and project outcomes."
       />
+
+      <section className="mb-10 overflow-hidden rounded-[14px] border border-line bg-surface">
+        <div className="brand-gradient p-6 text-white">
+          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-light-purple">
+            {profile?.role === "student" ? "Student" : profile?.role === "coach" ? "Coach" : "Admin"}
+            {profile?.grade ? ` · Grade ${profile.grade}` : ""}
+            {profile?.academicYear ? ` · ${profile.academicYear}` : ""}
+          </p>
+          <h2 className="mt-1.5 text-2xl font-bold tracking-tight">
+            {profile?.name ?? user.email}
+          </h2>
+          <p className="mt-0.5 text-sm text-white/70">{profile?.email ?? user.email}</p>
+        </div>
+
+        <div className="grid gap-0 sm:grid-cols-3">
+          {PHASES.map((p) => {
+            const current = p.key === phase.key;
+            const passed = PHASES.indexOf(p) < PHASES.indexOf(phase);
+            return (
+              <div
+                key={p.key}
+                aria-current={current ? "step" : undefined}
+                className={`border-t border-line p-5 sm:border-l sm:border-t-0 sm:first:border-l-0 ${
+                  current ? "bg-royal-purple/5" : ""
+                }`}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className={`font-bold ${current ? "text-royal-purple" : passed ? "text-ink" : "text-muted"}`}>
+                    {p.name}
+                  </p>
+                  {current ? (
+                    <span className="rounded-full bg-royal-purple px-2.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wider text-white">
+                      You are here
+                    </span>
+                  ) : passed ? (
+                    <span className="text-xs font-bold text-forest-green">✓</span>
+                  ) : null}
+                </div>
+                <p className="mt-0.5 text-xs font-medium text-muted">{p.typicalGrade}</p>
+                {current ? (
+                  <p className="mt-2 text-sm leading-relaxed text-ink">{p.expectation}</p>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="border-t border-line px-5 py-3 text-xs leading-relaxed text-muted">
+          Phase is set by a coach on demonstrated readiness — not by year group.
+          Growth is developmental, not chronological.
+        </p>
+      </section>
 
       {!hasEvidence ? (
         <Empty title="Nothing to synthesise yet">

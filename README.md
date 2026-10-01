@@ -150,6 +150,40 @@ createdb impact_lms
 Then set `DATABASE_URL="postgres://$USER@localhost:5432/impact_lms"` in
 `.env.local`. Stop it again with `pg_ctl -D /opt/homebrew/var/postgresql@16 stop`.
 
+### Importing a student roster
+
+For a cohort, use a CSV rather than creating accounts one at a time:
+
+```bash
+npm run roster -- --file roster.csv --year "2026/27"            # dry run
+npm run roster -- --file roster.csv --year "2026/27" --commit   # create them
+```
+
+`roster-template.csv` shows the shape. Columns are `email` (required), plus
+optional `name`, `grade`, `phase` and `role`, in any order. The dry run reports
+what it would do and validates every row before anything is written — a bad
+email or an unrecognised phase stops the whole import.
+
+Passwords are generated, never read from the file, and written to a gitignored
+`roster-credentials-<date>.csv`. Hand them out individually and delete it.
+
+Re-running is safe: an existing email is updated rather than duplicated, and
+its password is left alone unless you pass `--reset-existing`. That matters —
+re-importing a roster should never lock the school out mid-term.
+
+Against production: `npm run roster:prod -- …`.
+
+### Student profiles
+
+Accounts carry `grade`, `phase`, `academicYear` and `active`.
+
+**Phase is the field that means something.** The handbook is explicit that
+progression is by demonstrated readiness, not chronological age, so nothing in
+the app gates on `grade` — a coach moves a student between Exploration,
+Execution & Leadership and Legacy from `/staff`, and the student sees where
+they are on `/profile`. `academicYear` lets a cohort be rolled over without
+deleting history; `active` archives a leaver without destroying their record.
+
 ### Creating individual accounts
 
 `npm run db:seed` is for bootstrapping. For one account at a time — which is

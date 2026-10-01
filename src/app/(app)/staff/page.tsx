@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { Empty, SectionHeading, Stat, StrandChip } from "@/components/ui";
+import { PhaseSelect } from "@/components/PhaseSelect";
+import { PHASES } from "@/lib/handbook";
 import { strandOf } from "@/lib/brand";
 import {
   people,
@@ -103,40 +105,68 @@ export default async function StaffPage() {
         <h2 className="mb-4 text-xl font-bold tracking-tight text-ink">People</h2>
         {roster.length === 0 ? (
           <Empty title="No accounts yet">
-            Seed the database to create the first accounts — see{" "}
-            <span className="font-mono text-xs">README.md</span>.
+            Import a roster CSV to create student accounts in bulk —{" "}
+            <span className="font-mono text-xs">npm run roster</span>. See{" "}
+            <span className="font-mono text-xs">roster-template.csv</span>.
           </Empty>
         ) : (
-          <div className="card overflow-hidden p-0">
-            <table className="w-full text-sm">
-              <thead className="bg-paper text-left text-xs uppercase tracking-wider text-muted">
-                <tr>
-                  <th className="px-4 py-3 font-bold">Name</th>
-                  <th className="px-4 py-3 font-bold">Email</th>
-                  <th className="px-4 py-3 font-bold">Role</th>
-                  <th className="px-4 py-3 text-right font-bold">Active</th>
-                  <th className="px-4 py-3 text-right font-bold">Complete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {roster.map((person) => (
-                  <tr key={person.id} className="border-t border-line">
-                    <td className="px-4 py-3 font-semibold text-ink">
-                      {person.name ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-muted">{person.email}</td>
-                    <td className="px-4 py-3 capitalize text-muted">{person.role}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-ink">
-                      {person.active}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-muted">
-                      {person.complete}
-                    </td>
+          <>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {PHASES.map((p) => {
+                const n = roster.filter((r) => r.role === "student" && r.phase === p.key).length;
+                return (
+                  <span key={p.key} className="card px-3.5 py-1.5 text-sm">
+                    <span className="font-semibold text-ink">{n}</span>
+                    <span className="text-muted"> in {p.name.toLowerCase()}</span>
+                  </span>
+                );
+              })}
+            </div>
+
+            <div className="card overflow-x-auto p-0">
+              <table className="w-full min-w-[46rem] text-sm">
+                <thead className="bg-paper text-left text-xs uppercase tracking-wider text-muted">
+                  <tr>
+                    <th className="px-4 py-3 font-bold">Name</th>
+                    <th className="px-4 py-3 font-bold">Email</th>
+                    <th className="px-4 py-3 font-bold">Role</th>
+                    <th className="px-4 py-3 font-bold">Grade</th>
+                    <th className="px-4 py-3 font-bold">Phase</th>
+                    <th className="px-4 py-3 text-right font-bold">Active</th>
+                    <th className="px-4 py-3 text-right font-bold">Done</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {roster.map((person) => (
+                    <tr key={person.id} className={`border-t border-line ${person.enabled ? "" : "opacity-50"}`}>
+                      <td className="px-4 py-3 font-semibold text-ink">
+                        {person.name ?? "—"}
+                        {person.enabled ? null : (
+                          <span className="ml-2 text-xs font-normal text-muted">archived</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-muted">{person.email}</td>
+                      <td className="px-4 py-3 capitalize text-muted">{person.role}</td>
+                      <td className="px-4 py-3 tabular-nums text-muted">{person.grade ?? "—"}</td>
+                      <td className="px-4 py-3">
+                        {person.role === "student" ? (
+                          <PhaseSelect
+                            userId={person.id}
+                            phase={person.phase}
+                            name={person.name ?? person.email}
+                          />
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums text-ink">{person.active}</td>
+                      <td className="px-4 py-3 text-right tabular-nums text-muted">{person.complete}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 

@@ -147,20 +147,55 @@ export async function staffOverview() {
           name: users.name,
           email: users.email,
           role: users.role,
+          grade: users.grade,
+          phase: users.phase,
+          enabled: users.active,
           active: sql<number>`cast(count(*) filter (where ${enrolments.status} = 'active') as int)`,
           complete: sql<number>`cast(count(*) filter (where ${enrolments.status} = 'complete') as int)`,
         })
         .from(users)
         .leftJoin(enrolments, eq(users.id, enrolments.userId))
-        .groupBy(users.id, users.name, users.email, users.role)
+        .groupBy(users.id, users.name, users.email, users.role, users.grade, users.phase, users.active)
         .orderBy(asc(users.name)),
     [] as {
       id: string;
       name: string | null;
       email: string;
       role: "student" | "coach" | "admin";
+      grade: string | null;
+      phase: "exploration" | "execution" | "legacy";
+      enabled: boolean;
       active: number;
       complete: number;
     }[],
   );
+}
+
+
+/** The signed-in person's own profile fields. */
+export async function myProfile(userId: string) {
+  return safe(async () => {
+    const [row] = await db()
+      .select({
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        grade: users.grade,
+        phase: users.phase,
+        academicYear: users.academicYear,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    return row ?? null;
+  }, null as {
+    name: string | null;
+    email: string;
+    role: "student" | "coach" | "admin";
+    grade: string | null;
+    phase: "exploration" | "execution" | "legacy";
+    academicYear: string | null;
+    createdAt: Date;
+  } | null);
 }

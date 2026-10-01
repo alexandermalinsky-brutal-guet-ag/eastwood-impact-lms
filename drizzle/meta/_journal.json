@@ -15,6 +15,13 @@
       "when": 1788794733845,
       "tag": "0001_handbook_alignment",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790862235136,
+      "tag": "0002_student_profiles",
+      "breakpoints": true
     }
   ]
 }

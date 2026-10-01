@@ -10,3 +10,6 @@ build
 next-env.d.ts
 *.tsbuildinfo
 # Migration journal is part of the migration history and must be committed.
+
+# Generated student passwords — never commit
+roster-credentials-*.csv

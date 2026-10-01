@@ -3,9 +3,21 @@
   "configurations": [
     {
       "name": "impact-lms",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "--port", "3111"],
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd \"/Users/alexandermalinsky/Desktop/Eastwood 2026:2027/Projects/IMPACT/IMPACT LMS\" && exec node node_modules/next/dist/bin/next dev --port 3111"
+      ],
       "port": 3111
+    },
+    {
+      "name": "impact-pitch-agent",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd \"$HOME/Projects/impact-pitch-agent\" && exec npx vite --port 3222"
+      ],
+      "port": 3222
     }
   ]
 }

@@ -13,6 +13,7 @@ import {
   reflections,
   scorecards,
   tasks,
+  users,
 } from "@/db/schema";
 import { DEFAULT_CRITERIA, DEFAULT_TASKS, getProject } from "@/lib/curriculum";
 import { STRANDS } from "@/lib/brand";
@@ -476,4 +477,38 @@ export async function saveScorecard(
 
   revalidatePath(`/projects/${row.projectSlug}`);
   revalidatePath("/profile");
+}
+
+
+// --- Student profiles ------------------------------------------------------
+
+/**
+ * Moves a student to a different phase of the programme. This is a coach's
+ * judgement about demonstrated readiness, not an automatic consequence of the
+ * student's year group — so it is deliberately a manual action, and students
+ * cannot do it to themselves.
+ */
+export async function setPhase(
+  userId: string,
+  phase: "exploration" | "execution" | "legacy",
+) {
+  const actor = await requireUser();
+  if (actor.role === "student") {
+    throw new Error("Only a coach can change a student's phase.");
+  }
+
+  await db().update(users).set({ phase }).where(eq(users.id, userId));
+  revalidatePath("/staff");
+  revalidatePath("/profile");
+}
+
+/** Archives a leaver without deleting their record, or brings one back. */
+export async function setActive(userId: string, active: boolean) {
+  const actor = await requireUser();
+  if (actor.role !== "admin") {
+    throw new Error("Only an admin can archive an account.");
+  }
+
+  await db().update(users).set({ active }).where(eq(users.id, userId));
+  revalidatePath("/staff");
 }
