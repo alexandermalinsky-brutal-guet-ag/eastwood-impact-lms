@@ -18,7 +18,9 @@
     "db:migrate:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/migrate.ts",
     "db:seed:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/seed.ts",
     "roster": "node --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs scripts/import-roster.ts",
-    "roster:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/import-roster.ts"
+    "roster:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/import-roster.ts",
+    "demo": "node --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs scripts/seed-demo.ts",
+    "demo:prod": "node --env-file=.env.prod.local node_modules/tsx/dist/cli.mjs scripts/seed-demo.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",

@@ -150,6 +150,27 @@ createdb impact_lms
 Then set `DATABASE_URL="postgres://$USER@localhost:5432/impact_lms"` in
 `.env.local`. Stop it again with `pg_ctl -D /opt/homebrew/var/postgresql@16 stop`.
 
+### The demo cohort
+
+For a walkthrough or a pitch, the platform needs to show a system in use — an
+empty one demonstrates nothing:
+
+```bash
+npm run demo           # local
+npm run demo:prod      # production
+npm run demo -- --clear
+```
+
+Nine accounts and seven projects spread across all four journey stages, so
+every screen has something real on it: a finished Legacy project with two
+reflection cycles and both scorecards, work mid-execution, one proposal
+awaiting a coach's approval, and two Grade 9s exploring.
+
+**The people are fictional.** Every demo account sits on
+`@demo.eastwoodmontreux.ch` so it is distinguishable from a real roster at a
+glance, and `--clear` removes the cohort and all its project data in one go.
+Re-running rebuilds from scratch rather than duplicating.
+
 ### Importing a student roster
 
 For a cohort, use a CSV rather than creating accounts one at a time:
