@@ -44,6 +44,10 @@ export type Resource = {
   notes: string;
   url: string;
   alsoListedAs: string[];
+  /** Which phase of work this practice helps with, where it maps to one. */
+  phase: string;
+  /** False when the page has nothing on it yet — those stay hidden. */
+  written: boolean;
   /** Whether this came from the planning workbook or a published document. */
   origin: "workbook" | "handbook";
   author: string;
@@ -63,11 +67,17 @@ export type Person = {
 };
 
 export const projects = projectsJson as Project[];
-export const resources = resourcesJson as Resource[];
+const allResources = resourcesJson as Resource[];
+
+/** Only practices somebody has actually written up. */
+export const resources = allResources.filter((r) => r.written);
+
+/** Named but not yet written — surfaced to staff so the gap is visible. */
+export const unwrittenResources = allResources.filter((r) => !r.written);
 export const people = peopleJson as Person[];
 
 const projectBySlug = new Map(projects.map((p) => [p.slug, p]));
-const resourceBySlug = new Map(resources.map((r) => [r.slug, r]));
+const resourceBySlug = new Map(allResources.map((r) => [r.slug, r]));
 
 export function getProject(slug: string): Project | undefined {
   return projectBySlug.get(slug);
@@ -141,3 +151,9 @@ export const DEFAULT_TASKS = [
   { title: "Agree success criteria with a coach", status: "backlog" as const },
   { title: "Book the first work session", status: "backlog" as const },
 ];
+
+
+/** Practices grouped by the phase of work they help with. */
+export function practicesByPhase(phase: string): Resource[] {
+  return resources.filter((r) => r.phase === phase);
+}

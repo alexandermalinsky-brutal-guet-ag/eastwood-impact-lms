@@ -1,353 +1,157 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { SectionHeading } from "@/components/ui";
-import { INTEGRATION_NOTE, STRANDS } from "@/lib/brand";
-import { evidenceBase, kickoffProjects } from "@/lib/curriculum";
-import {
-  PHASES_OF_WORK,
-  COACH_ROLES,
-  COACH_SCORECARD,
-  EXTERNAL_CATEGORIES,
-  GOAL_KINDS,
-  PHASES,
-  RHYTHMS,
-  STUDENT_SCORECARD,
-} from "@/lib/handbook";
+import { LEVELS, PHASES_OF_WORK } from "@/lib/handbook";
 
-export const metadata: Metadata = { title: "Handbook" };
+export const metadata: Metadata = { title: "How IMPACT works" };
 
-export default function HandbookPage() {
+/**
+ * One page. The old handbook ran to eight sections describing the programme;
+ * this explains how to run a project, which is the only thing anyone needs
+ * from it while they are working.
+ */
+export default function HowItWorks() {
   return (
-    <>
-      <SectionHeading
-        eyebrow="The IMPACT Handbook · Vol. 1"
-        title="How the programme works"
-        description="The structures every project runs on — the four stages, the strands, how goals and evaluation work, and what changes as students progress."
-        action={
-          <Link
-            href="/toolkit/impact-handbook"
-            className="card px-4 py-2 text-sm font-semibold text-ink hover:border-light-purple"
-          >
-            Source document
-          </Link>
-        }
-      />
+    <div className="mx-auto max-w-3xl">
+      <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-royal-purple">
+        How IMPACT works
+      </p>
+      <h1 className="mt-2 text-4xl font-bold leading-tight tracking-tight text-ink">
+        Pick something that matters. Prove it changed.
+      </h1>
+      <p className="mt-4 text-lg leading-relaxed text-muted">
+        That is the whole idea. Everything below is just the shape of getting there.
+      </p>
 
-      <nav className="mb-12 flex flex-wrap gap-2">
-        {[
-          ["#journey", "The Journey"],
-          ["#strands", "The strands"],
-          ["#goals", "Goals"],
-          ["#evaluation", "Evaluation"],
-          ["#coaching", "Coaching"],
-          ["#progression", "Progression"],
-          ["#external", "External impact"],
-          ["#kickoff", "Kickoff projects"],
-          ["#evidence", "Evidence base"],
-        ].map(([href, label]) => (
-          <a
-            key={href}
-            href={href}
-            className="card px-4 py-2 text-sm font-semibold text-ink hover:border-light-purple"
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
-
-      <section id="journey" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          The IMPACT Journey
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold tracking-tight text-ink">
+          Every project answers three questions
         </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          Four stages, the same at every grade. What changes over time is the
-          scope, the ambition, and how much independence is expected. Projects
-          run over months rather than weeks, because meaningful skill
-          development needs time, iteration and reflection.
-        </p>
-        <ol className="space-y-4">
-          {PHASES_OF_WORK.map((phase) => (
-            <li key={phase.key} className="card p-6">
-              <div className="flex flex-wrap items-baseline gap-3">
-                <span className="rounded-full bg-deep-blue px-3 py-1 text-xs font-bold text-white">
-                  Phase {phase.number}
-                </span>
-                <h3 className="text-xl font-bold tracking-tight text-ink">{phase.name}</h3>
-                <span className="text-sm text-muted">{phase.verb}</span>
-              </div>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{phase.summary}</p>
-              <p className="mt-3 rounded-lg bg-paper p-3 text-sm text-ink">
-                <span className="font-bold">Gate: </span>{phase.gate}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section id="strands" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          The six strands
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          {INTEGRATION_NOTE}
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {STRANDS.map((strand) => (
-            <Link
-              key={strand.slug}
-              href={`/strands/${strand.slug}`}
-              className="rounded-[14px] p-5 transition-transform hover:-translate-y-0.5"
-              style={{ background: strand.colour, color: strand.ink }}
-            >
-              <p className="text-3xl font-bold leading-none opacity-40">
-                {strand.letter}
-              </p>
-              <h3 className="mt-3 text-lg font-bold">{strand.name}</h3>
-              <p className="mt-1 text-sm font-semibold opacity-80">
-                {strand.definition}
-              </p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section id="goals" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          Goals
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          Three to five per project, agreed with a coach. A good set combines all
-          three types below. Goals are reviewed and recalibrated when
-          circumstances change — that preserves ambition rather than penalising
-          it.
-        </p>
-        <div className="grid gap-4 md:grid-cols-3">
-          {GOAL_KINDS.map((kind) => (
-            <div key={kind.key} className="card p-5">
-              <span
-                className="inline-block rounded-full px-3 py-1 text-xs font-bold text-white"
-                style={{ background: kind.colour }}
-              >
-                {kind.label}
-              </span>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                {kind.hint}
-              </p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          {[
+            ["Who benefits?", "A specific group, with a number on it. Not “people”."],
+            ["What changes?", "The situation afterwards — not the activity you ran."],
+            ["How do we know?", "One thing you measure, before and after."],
+          ].map(([q, a]) => (
+            <div key={q} className="rounded-[14px] bg-deep-blue p-5 text-white">
+              <p className="text-lg font-bold">{q}</p>
+              <p className="mt-2 text-sm leading-relaxed text-light-purple">{a}</p>
             </div>
           ))}
         </div>
-        <p className="mt-4 rounded-lg border border-dashed border-line bg-surface p-4 text-sm leading-relaxed text-muted">
-          The qualitative goals are deliberate. Judgment, perseverance and
-          ethical awareness cannot be reduced to numerical targets — they have to
-          be observed, discussed and reflected on.
+        <p className="mt-4 text-sm leading-relaxed text-muted">
+          If you can answer those three, you have a project. If you cannot, you have an activity —
+          which is fine, but it is not what this is for.
         </p>
       </section>
 
-      <section id="evaluation" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          Evaluation
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          There is no single grade. Evidence is aggregated from several sources
-          into an Impact Profile, which becomes part of the Eastwood Passport.
-          Accountability here is developmental, not punitive.
+      <section className="mt-14">
+        <h2 className="text-2xl font-bold tracking-tight text-ink">Four phases</h2>
+        <p className="mt-2 text-base leading-relaxed text-muted">
+          You move to the next phase when a coach says the work is there. Between those gates,
+          the project is yours to run.
         </p>
 
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="card p-5">
-            <h3 className="font-bold text-ink">Student IMPACT Scorecard</h3>
-            <p className="mt-1 text-sm text-muted">
-              Bi-monthly. A reflective tool reviewed by a coach — not a
-              self-grade.
-            </p>
-            <ul className="mt-4 space-y-2">
-              {STUDENT_SCORECARD.map((d) => (
-                <li key={d.key} className="text-sm text-ink">
-                  <span className="font-semibold">{d.label}</span>
-                  <span className="text-muted"> — {d.hint}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="card p-5">
-            <h3 className="font-bold text-ink">Coach Scorecard</h3>
-            <p className="mt-1 text-sm text-muted">
-              Twice monthly, then calibrated in the Coach Council to reduce
-              individual bias.
-            </p>
-            <ul className="mt-4 space-y-2">
-              {COACH_SCORECARD.map((d) => (
-                <li key={d.key} className="text-sm font-semibold text-ink">
-                  {d.label}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <p className="mt-4 rounded-lg bg-royal-purple/5 p-4 text-sm leading-relaxed text-ink">
-          A project that misses its intended external outcome is{" "}
-          <span className="font-semibold">not a failure</span>. Accompanied by
-          honest reflection, it is often the strongest evidence of growth there
-          is.
-        </p>
-      </section>
-
-      <section id="coaching" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          Coaching and rhythm
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          Students are given real autonomy but never left without guidance.
-          Responsibility is real; support is reliable.
-        </p>
-
-        <div className="grid gap-5 md:grid-cols-3">
-          {COACH_ROLES.map((role) => (
-            <div key={role.key} className="card p-5">
-              <h3 className="font-bold text-ink">{role.name}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                {role.responsibility}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="card mt-5 overflow-hidden p-0">
-          <table className="w-full text-sm">
-            <thead className="bg-paper text-left text-xs uppercase tracking-wider text-muted">
-              <tr>
-                <th className="px-4 py-3 font-bold">What</th>
-                <th className="px-4 py-3 font-bold">How often</th>
-              </tr>
-            </thead>
-            <tbody>
-              {RHYTHMS.map((rhythm) => (
-                <tr key={rhythm.what} className="border-t border-line">
-                  <td className="px-4 py-3 font-semibold text-ink">
-                    {rhythm.what}
-                  </td>
-                  <td className="px-4 py-3 text-muted">{rhythm.cadence}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="progression" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          Progression
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          By demonstrated readiness, not age. Growth is developmental, not
-          chronological — the grades below are the typical rhythm, not a rule.
-        </p>
-        <ol className="grid gap-4 md:grid-cols-3">
-          {PHASES.map((phase, i) => (
-            <li key={phase.key} className="card p-5">
-              <span className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-royal-purple">
-                Phase {i + 1} · {phase.typicalGrade}
-              </span>
-              <h3 className="mt-2 text-lg font-bold text-ink">{phase.name}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                {phase.summary}
-              </p>
-              <p className="mt-3 border-t border-line pt-3 text-sm text-ink">
-                {phase.expectation}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section id="external" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          External impact
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          No type of outcome is privileged over another, provided the engagement
-          is genuine and the learning is deep. What matters is being able to
-          articulate the objective of the project and its rationale.
-        </p>
-        <div className="grid gap-4 md:grid-cols-2">
-          {EXTERNAL_CATEGORIES.map((category) => (
-            <div key={category.key} className="card p-5">
-              <h3 className="font-bold text-ink">{category.name}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                {category.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="kickoff" className="mb-16 scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          Kickoff projects
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          Illustrative, not prescriptive. They show the range of ambition and
-          format possible — and each engages several strands at once.
-        </p>
-        <div className="grid gap-4 md:grid-cols-2">
-          {kickoffProjects.map((project) => (
-            <Link key={project.slug} href={`/projects/${project.slug}`}>
-              <div className="card h-full p-5 transition-shadow hover:shadow-md">
-                <h3 className="font-bold leading-snug text-ink">
-                  {project.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
-                  {project.description}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {project.strands.map((name) => {
-                    const strand = STRANDS.find((s) => s.name === name)!;
-                    return (
-                      <span
-                        key={name}
-                        className="rounded-full px-2.5 py-0.5 text-[0.68rem] font-bold"
-                        style={{ background: strand.colour, color: strand.ink }}
-                      >
-                        {name}
-                      </span>
-                    );
-                  })}
+        <ol className="mt-6 space-y-3">
+          {PHASES_OF_WORK.map((phase) => {
+            const levels = LEVELS.filter((l) => l.phase === phase.key);
+            return (
+              <li key={phase.key} className="card overflow-hidden p-0">
+                <div className="flex flex-wrap items-baseline gap-3 border-b border-line bg-paper px-5 py-4">
+                  <span className="rounded-full bg-deep-blue px-3 py-1 text-xs font-bold text-white">
+                    {phase.number}
+                  </span>
+                  <h3 className="text-xl font-bold tracking-tight text-ink">{phase.name}</h3>
+                  <span className="text-sm text-muted">{phase.verb}</span>
                 </div>
-              </div>
-            </Link>
-          ))}
+
+                <div className="px-5 py-4">
+                  <p className="text-sm leading-relaxed text-muted">{phase.summary}</p>
+
+                  <ul className="mt-4 space-y-2">
+                    {levels.map((l) => (
+                      <li key={l.n} className="flex gap-3 text-sm">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-royal-purple text-[0.62rem] font-bold text-white">
+                          {l.n}
+                        </span>
+                        <span>
+                          <span className="font-semibold text-ink">{l.milestone}</span>
+                          <span className="text-muted"> — {l.evidence}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="mt-4 rounded-lg bg-royal-purple/5 px-4 py-2.5 text-sm text-ink">
+                    <span className="font-bold">Moves on when: </span>{phase.gate}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      <section className="mt-14">
+        <h2 className="text-2xl font-bold tracking-tight text-ink">
+          Levels unlock on evidence, not effort
+        </h2>
+        <p className="mt-2 text-base leading-relaxed text-muted">
+          Seven levels across the four phases. You reach the next one by showing something real —
+          a photo, a file, a number, something someone said — and a coach confirming it.
+          There are no points for logging in, and no leaderboard.
+        </p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-[14px] border border-forest-green/40 bg-forest-green/5 p-5">
+            <p className="font-bold text-ink">One strong piece beats ten weak ones</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">
+              “Asked three Year 7s what they thought, here is what they said” is worth more than a
+              week of ticked boxes.
+            </p>
+          </div>
+          <div className="rounded-[14px] border border-mustard/40 bg-mustard/5 p-5">
+            <p className="font-bold text-ink">Sent back is not failed</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">
+              A coach returning your evidence means they told you what is missing. You revise and
+              send it again. Nothing is lost.
+            </p>
+          </div>
         </div>
       </section>
 
-      <section id="evidence" className="scroll-mt-24">
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-ink">
-          Evidence base
-        </h2>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-muted">
-          The research the handbook grounds the programme in, cited as printed —
-          so you can go and read the source rather than take it on trust.
-        </p>
-        <ul className="space-y-3">
-          {evidenceBase.map((work) => (
-            <li key={work.slug}>
-              <Link href={`/toolkit/${work.slug}`} className="card block p-5 hover:border-light-purple">
-                <p className="font-bold leading-snug text-ink">{work.title}</p>
-                <p className="mt-0.5 text-xs text-muted">
-                  {[work.author, work.year].filter(Boolean).join(" · ")}
-                </p>
-                {work.notes ? (
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {work.notes}
-                  </p>
-                ) : null}
-              </Link>
-            </li>
+      <section className="mt-14">
+        <h2 className="text-2xl font-bold tracking-tight text-ink">The words we use</h2>
+        <dl className="mt-5 divide-y divide-line overflow-hidden rounded-[14px] border border-line bg-surface">
+          {[
+            ["Impact Proposal", "The first thing you write. Who it is for, what changes, and the one number you will watch."],
+            ["Indicator", "That number. Where it is today, and where you want it."],
+            ["Definition of done", "Three to five things that must be true for this to count as finished."],
+            ["Milestone", "A dated step. Three to six of them, ending at the showcase."],
+            ["Evidence", "What you show a coach to unlock the next level."],
+            ["Charter", "You signing that you will see it through unless a coach agrees to change course."],
+            ["Plan · Act · Reflect", "A short write-up each cycle: what you planned, what happened, what you would do differently."],
+          ].map(([term, meaning]) => (
+            <div key={term} className="grid gap-1 px-5 py-4 sm:grid-cols-[13rem_1fr] sm:gap-5">
+              <dt className="font-bold text-ink">{term}</dt>
+              <dd className="text-sm leading-relaxed text-muted">{meaning}</dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       </section>
-    </>
+
+      <section className="mt-14 rounded-[14px] bg-deep-blue p-7 text-white">
+        <h2 className="text-2xl font-bold tracking-tight">Stuck on where to begin?</h2>
+        <p className="mt-2 max-w-xl text-base leading-relaxed text-light-purple">
+          Start with something that annoys you about this school, or something you wish existed.
+          Write one sentence about who it affects. That sentence is level one.
+        </p>
+        <Link
+          href="/dashboard"
+          className="mt-5 inline-block rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-deep-blue hover:bg-light-purple"
+        >
+          Start a project
+        </Link>
+      </section>
+    </div>
   );
 }

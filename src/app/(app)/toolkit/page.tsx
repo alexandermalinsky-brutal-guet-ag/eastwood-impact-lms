@@ -1,108 +1,106 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Card, SectionHeading } from "@/components/ui";
-import {
-  corePractices,
-  documents,
-  resources,
-  resourcesByCategory,
-} from "@/lib/curriculum";
+import { Empty, SectionHeading } from "@/components/ui";
+import { documents, practicesByPhase, resources } from "@/lib/curriculum";
+import { PHASES_OF_WORK } from "@/lib/handbook";
 
 export const metadata: Metadata = { title: "Toolkit" };
 
+/**
+ * Practices shown inside the phase where they help, rather than as an A-Z
+ * list. Pages nobody has written are hidden — a menu of blank entries is
+ * worse than a short menu.
+ */
 export default function ToolkitPage() {
-  const groups = resourcesByCategory();
+  const other = resources.filter(
+    (r) => !r.phase && r.category !== "Documentation" && r.category !== "Evidence base",
+  );
 
   return (
     <>
       <SectionHeading
-        eyebrow="Teaching practices"
-        title="The IMPACT toolkit"
-        description={`${resources.length} practices, methods and references the team draws on. The ${corePractices.length} marked as core are the ones being rolled out first, each with a member of staff who owns it.`}
+        eyebrow="Toolkit"
+        title="Ways of working, when you need them"
+        description="Each one is a method you can borrow. They are grouped by the point in a project where they actually help."
       />
 
-      <section className="mb-12">
-        <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.16em] text-royal-purple">
-          Documentation
-        </h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {documents.map((doc) => (
-            <Link
-              key={doc.slug}
-              href={doc.href || `/toolkit/${doc.slug}`}
-              className="card flex h-full flex-col p-5 transition-shadow hover:shadow-md"
-            >
-              <p className="font-bold leading-snug text-ink">{doc.title}</p>
-              <p className="mt-1 text-xs text-muted">
-                {[doc.author, doc.year].filter(Boolean).join(" · ")}
-              </p>
-              <p className="mt-2.5 line-clamp-4 text-sm leading-relaxed text-muted">
-                {doc.notes}
-              </p>
-              {doc.href ? (
-                <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wider text-royal-purple">
-                  Read it here →
+      <div className="space-y-10">
+        {PHASES_OF_WORK.map((phase) => {
+          const items = practicesByPhase(phase.key);
+          if (items.length === 0) return null;
+          return (
+            <section key={phase.key}>
+              <div className="mb-4 flex flex-wrap items-baseline gap-3">
+                <span className="rounded-full bg-deep-blue px-3 py-1 text-xs font-bold text-white">
+                  {phase.number}
                 </span>
-              ) : null}
-            </Link>
-          ))}
-        </div>
-      </section>
+                <h2 className="text-xl font-bold tracking-tight text-ink">{phase.name}</h2>
+                <span className="text-sm text-muted">{phase.verb}</span>
+              </div>
 
-      <section className="mb-12">
-        <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.16em] text-royal-purple">
-          Core practices
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {corePractices.map((practice) => (
-            <Link key={practice.slug} href={`/toolkit/${practice.slug}`}>
-              <Card className="h-full border-l-4 border-l-royal-purple transition-shadow hover:shadow-md">
-                <p className="font-semibold leading-snug text-ink">
-                  {practice.title}
-                </p>
-                <p className="mt-1.5 text-xs text-muted">
-                  {practice.leads.length
-                    ? `Owned by ${practice.leads.join(" & ")}`
-                    : "No owner yet"}
-                </p>
-                {practice.notes ? (
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {practice.notes}
-                  </p>
-                ) : null}
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </section>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {items.map((r) => (
+                  <Link key={r.slug} href={`/toolkit/${r.slug}`} className="card p-5 transition-shadow hover:shadow-md">
+                    <p className="font-bold leading-snug text-ink">{r.title}</p>
+                    {r.notes ? (
+                      <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-muted">{r.notes}</p>
+                    ) : null}
+                    {r.leads.length ? (
+                      <p className="mt-2 text-xs text-muted">Ask {r.leads.join(" or ")}</p>
+                    ) : null}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })}
 
-      {groups
-        .filter((group) => group.category !== "Documentation")
-        .map((group) => (
-        <section key={group.category} className="mb-10">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.16em] text-muted">
-            {group.category}{" "}
-            <span className="tabular-nums opacity-60">{group.items.length}</span>
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {group.items.map((resource) => (
+        {other.length > 0 ? (
+          <section>
+            <h2 className="mb-4 text-xl font-bold tracking-tight text-ink">Anytime</h2>
+            <div className="flex flex-wrap gap-2">
+              {other.map((r) => (
+                <Link
+                  key={r.slug}
+                  href={`/toolkit/${r.slug}`}
+                  className="card px-4 py-2 text-sm font-medium text-ink hover:border-light-purple"
+                >
+                  {r.title}
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <section>
+          <h2 className="mb-1 text-xl font-bold tracking-tight text-ink">Where this comes from</h2>
+          <p className="mb-4 text-sm text-muted">
+            The documents the programme is built on.
+          </p>
+          <div className="grid gap-3 md:grid-cols-3">
+            {documents.map((doc) => (
               <Link
-                key={resource.slug}
-                href={`/toolkit/${resource.slug}`}
-                className="card px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-light-purple hover:text-royal-purple"
+                key={doc.slug}
+                href={doc.href || `/toolkit/${doc.slug}`}
+                className="card p-5 transition-shadow hover:shadow-md"
               >
-                {resource.title}
-                {resource.corePractice ? (
-                  <span className="ml-2 text-[0.6rem] font-bold uppercase tracking-wider text-royal-purple">
-                    core
-                  </span>
-                ) : null}
+                <p className="font-bold leading-snug text-ink">{doc.title}</p>
+                <p className="mt-1 text-xs text-muted">
+                  {[doc.author, doc.year].filter(Boolean).join(" · ")}
+                </p>
               </Link>
             ))}
           </div>
         </section>
-      ))}
+
+        {resources.length === 0 ? (
+          <Empty title="Nothing written up yet">
+            Practices appear here once a coach has written one up — what it is, when to use it,
+            and how to do it in five minutes.
+          </Empty>
+        ) : null}
+      </div>
     </>
   );
 }

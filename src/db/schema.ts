@@ -287,42 +287,6 @@ export const helpRequests = pgTable(
 );
 
 /**
- * SMART goals — three to five per project, agreed with a coach at Stage 2.
- * The handbook requires the set to combine tangible deliverables, process
- * milestones and qualitative growth, so `kind` is not decorative: the UI uses
- * it to check the balance of a goal set before a project is approved.
- */
-export const goals = pgTable(
-  "goal",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    enrolmentId: text("enrolmentId")
-      .notNull()
-      .references(() => enrolments.id, { onDelete: "cascade" }),
-    kind: text("kind")
-      .$type<"deliverable" | "milestone" | "qualitative">()
-      .notNull()
-      .default("deliverable"),
-    statement: text("statement").notNull(),
-    /** How this goal will be judged met — the "measurable" in SMART. */
-    measure: text("measure").notNull().default(""),
-    dueBy: text("dueBy").notNull().default(""),
-    /**
-     * Goals are recalibrated when circumstances change, so that ambition is
-     * preserved rather than penalised. Recording it keeps the history honest.
-     */
-    progress: integer("progress").notNull().default(0),
-    achieved: boolean("achieved").notNull().default(false),
-    recalibratedAt: timestamp("recalibratedAt", { mode: "date" }),
-    recalibrationNote: text("recalibrationNote").notNull().default(""),
-    position: integer("position").notNull().default(0),
-  },
-  (t) => [index("goal_enrolment_idx").on(t.enrolmentId)],
-);
-
-/**
  * Scorecards. Student scorecards are reflective tools reviewed by a coach —
  * explicitly not self-grading. Coach scorecards are completed twice monthly and
  * calibrated in the Coach Council. Both are stored here, distinguished by

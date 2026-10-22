@@ -52,8 +52,9 @@ export function ReflectionCycles({
             Plan · Act · Reflect
           </h2>
           <p className="mt-1.5 max-w-2xl text-sm text-muted">
-            One entry per cycle. This is the record you show at demo time, so
-            write it as you go rather than at the end.
+            A short write-up each time you try something: what you planned, what actually
+            happened, and what you would do differently. Written as you go, not at the end —
+            this is what you show at the final showcase.
           </p>
         </div>
         <button

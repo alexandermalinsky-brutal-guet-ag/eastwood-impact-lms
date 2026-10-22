@@ -12,6 +12,7 @@ import {
   projects,
   resources,
   unassignedProjects,
+  unwrittenResources,
 } from "@/lib/curriculum";
 import { enrolmentCounts, staffOverview } from "@/lib/queries";
 
@@ -179,7 +180,24 @@ export default async function StaffPage() {
           it is work the team has not done yet.
         </p>
 
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-3">
+          <div className="card p-5">
+            <h3 className="font-bold text-ink">
+              Practices not written up{" "}
+              <span className="tabular-nums text-muted">{unwrittenResources.length}</span>
+            </h3>
+            <p className="mt-2 text-sm text-muted">
+              Named by the team but with nothing on the page, so they stay hidden from students.
+              A practice needs what it is, when to use it, and how to do it in five minutes.
+            </p>
+            <details className="mt-3">
+              <summary className="cursor-pointer text-sm font-semibold text-royal-purple">Show all</summary>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                {unwrittenResources.map((r) => r.title).join(" · ")}
+              </p>
+            </details>
+          </div>
+
           <div className="card p-5">
             <h3 className="font-bold text-ink">
               No strand{" "}

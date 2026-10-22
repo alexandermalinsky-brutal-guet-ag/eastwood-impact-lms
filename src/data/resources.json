@@ -16,7 +16,9 @@
     "sourceRow": 0,
     "slug": "impact-handbook",
     "title": "The IMPACT Handbook, Vol. 1",
-    "category": "Documentation"
+    "category": "Documentation",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "IMPACT curriculum planning workbook",
@@ -35,7 +37,9 @@
     "sourceRow": 0,
     "slug": "impact-planning-workbook",
     "title": "IMPACT curriculum planning workbook",
-    "category": "Documentation"
+    "category": "Documentation",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Logo Standards / Artwork Sheet",
@@ -54,7 +58,9 @@
     "sourceRow": 0,
     "slug": "logo-standards-artwork-sheet",
     "title": "Logo Standards / Artwork Sheet",
-    "category": "Documentation"
+    "category": "Documentation",
+    "phase": "",
+    "written": true
   },
   {
     "slug": "pitch",
@@ -75,7 +81,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 2
+    "sourceRow": 2,
+    "phase": "report",
+    "written": false
   },
   {
     "slug": "kanban",
@@ -96,7 +104,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 3
+    "sourceRow": 3,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "circle-solutions-harkness",
@@ -119,7 +129,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 4
+    "sourceRow": 4,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "art-journaling",
@@ -142,7 +154,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 5
+    "sourceRow": 5,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "success-criteria-def-of-done",
@@ -163,7 +177,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 6
+    "sourceRow": 6,
+    "phase": "plan",
+    "written": false
   },
   {
     "slug": "david-perkins-def-of-learning",
@@ -186,11 +202,13 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 7
+    "sourceRow": 7,
+    "phase": "",
+    "written": true
   },
   {
     "slug": "plan-act-reflect-new-name-coming",
-    "title": "Plan - Act - Reflect (new name coming)",
+    "title": "Plan · Act · Reflect",
     "sourceTitle": "Plan - Act - Reflect (new name coming)",
     "category": "Project method",
     "strand": null,
@@ -209,28 +227,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 8
-  },
-  {
-    "slug": "remy-suggested-pics",
-    "title": "Remy ... suggested ... PICS ??",
-    "sourceTitle": "Remy ... suggested ... PICS ??",
-    "category": "Reading & references",
-    "strand": null,
-    "focus": "",
-    "leads": [
-      "Rémy"
-    ],
-    "corePractice": true,
-    "notes": "",
-    "url": "",
-    "alsoListedAs": [],
-    "origin": "workbook",
-    "author": "",
-    "year": "",
-    "citation": "",
-    "href": "",
-    "sourceRow": 9
+    "sourceRow": 8,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "ask-a-further-question",
@@ -251,7 +250,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 10
+    "sourceRow": 10,
+    "phase": "create",
+    "written": true
   },
   {
     "slug": "problem-framing",
@@ -272,7 +273,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 11
+    "sourceRow": 11,
+    "phase": "create",
+    "written": true
   },
   {
     "slug": "systems-mapping",
@@ -293,7 +296,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 12
+    "sourceRow": 12,
+    "phase": "create",
+    "written": true
   },
   {
     "slug": "project-zero",
@@ -312,7 +317,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 13
+    "sourceRow": 13,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "filmmaking-assistance",
@@ -333,7 +340,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 14
+    "sourceRow": 14,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "dragon-s-den-pitch",
@@ -352,7 +361,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 15
+    "sourceRow": 15,
+    "phase": "report",
+    "written": false
   },
   {
     "slug": "theatre-in-education-tie",
@@ -373,7 +384,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 16
+    "sourceRow": 16,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "business-model-canvas",
@@ -392,7 +405,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 17
+    "sourceRow": 17,
+    "phase": "plan",
+    "written": false
   },
   {
     "slug": "bildung",
@@ -411,7 +426,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 18
+    "sourceRow": 18,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "grit",
@@ -430,7 +447,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 19
+    "sourceRow": 19,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "iterative-learning",
@@ -449,7 +468,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 20
+    "sourceRow": 20,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "6-hats-exercise",
@@ -468,7 +489,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 21
+    "sourceRow": 21,
+    "phase": "create",
+    "written": false
   },
   {
     "slug": "flow",
@@ -487,7 +510,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 22
+    "sourceRow": 22,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "stanford-d-lab-feedback",
@@ -506,7 +531,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 23
+    "sourceRow": 23,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "mattias-s-card-games",
@@ -525,7 +552,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 24
+    "sourceRow": 24,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "janusz-korczak",
@@ -544,7 +573,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 25
+    "sourceRow": 25,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "kaizen",
@@ -563,7 +594,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 26
+    "sourceRow": 26,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "the-power-of-yet",
@@ -582,7 +615,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 28
+    "sourceRow": 28,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "pomodoro",
@@ -601,7 +636,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 29
+    "sourceRow": 29,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "project-work-time",
@@ -620,7 +657,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 30
+    "sourceRow": 30,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "design-thinking",
@@ -639,7 +678,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 31
+    "sourceRow": 31,
+    "phase": "create",
+    "written": false
   },
   {
     "slug": "eduscrum",
@@ -658,7 +699,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 32
+    "sourceRow": 32,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "ideation",
@@ -677,7 +720,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 33
+    "sourceRow": 33,
+    "phase": "create",
+    "written": false
   },
   {
     "slug": "exeter-math-hungarian-math",
@@ -696,7 +741,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 34
+    "sourceRow": 34,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "visit-escape-room",
@@ -715,7 +762,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 35
+    "sourceRow": 35,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "impact-agora",
@@ -734,7 +783,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 36
+    "sourceRow": 36,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "retrospective",
@@ -753,7 +804,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 37
+    "sourceRow": 37,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "brainstorming-projects",
@@ -772,7 +825,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 38
+    "sourceRow": 38,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "demo-run-thgroughs",
@@ -791,7 +846,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 39
+    "sourceRow": 39,
+    "phase": "report",
+    "written": false
   },
   {
     "slug": "demo-prep",
@@ -810,7 +867,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 40
+    "sourceRow": 40,
+    "phase": "report",
+    "written": false
   },
   {
     "slug": "coaching-sessions",
@@ -829,7 +888,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 41
+    "sourceRow": 41,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "53-leaders",
@@ -848,7 +909,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 42
+    "sourceRow": 42,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "flipped-classroom",
@@ -867,7 +930,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 43
+    "sourceRow": 43,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "simulation-in-teaching-and-learning",
@@ -886,7 +951,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 45
+    "sourceRow": 45,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "stanford-life-design",
@@ -905,7 +972,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 46
+    "sourceRow": 46,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "single-and-double-loop-learning",
@@ -924,7 +993,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 48
+    "sourceRow": 48,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "feedback-loops",
@@ -943,7 +1014,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 49
+    "sourceRow": 49,
+    "phase": "execute",
+    "written": false
   },
   {
     "slug": "agile-classroom",
@@ -962,7 +1035,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 50
+    "sourceRow": 50,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "complex-adaptive-systems",
@@ -981,7 +1056,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 52
+    "sourceRow": 52,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "krashen-monitor-model",
@@ -1000,7 +1077,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 53
+    "sourceRow": 53,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "smart-goals",
@@ -1019,7 +1098,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 55
+    "sourceRow": 55,
+    "phase": "plan",
+    "written": false
   },
   {
     "slug": "movie-writers",
@@ -1038,7 +1119,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 58
+    "sourceRow": 58,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "ad-to-do",
@@ -1057,7 +1140,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 59
+    "sourceRow": 59,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "fundraise-a-dog-park",
@@ -1076,7 +1161,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 60
+    "sourceRow": 60,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "portfolios",
@@ -1095,7 +1182,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 61
+    "sourceRow": 61,
+    "phase": "report",
+    "written": false
   },
   {
     "slug": "off-campus-visits",
@@ -1114,7 +1203,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 62
+    "sourceRow": 62,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "duolingo-five-central-pillars",
@@ -1133,7 +1224,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 63
+    "sourceRow": 63,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "a3-work-method",
@@ -1152,7 +1245,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 64
+    "sourceRow": 64,
+    "phase": "plan",
+    "written": false
   },
   {
     "slug": "learning-circus-tzbz",
@@ -1171,7 +1266,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 65
+    "sourceRow": 65,
+    "phase": "",
+    "written": false
   },
   {
     "slug": "let-the-learners-lead-book-resource-rachel-thrash-research-and-resources",
@@ -1190,7 +1287,9 @@
     "year": "",
     "citation": "",
     "href": "",
-    "sourceRow": 66
+    "sourceRow": 66,
+    "phase": "",
+    "written": false
   },
   {
     "sourceTitle": "How People Learn: Brain, Mind, Experience, and School",
@@ -1209,7 +1308,9 @@
     "sourceRow": 0,
     "slug": "how-people-learn",
     "title": "How People Learn: Brain, Mind, Experience, and School",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Making Learning Whole",
@@ -1228,7 +1329,9 @@
     "sourceRow": 0,
     "slug": "making-learning-whole",
     "title": "Making Learning Whole",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Mathematical Mindsets",
@@ -1247,7 +1350,9 @@
     "sourceRow": 0,
     "slug": "mathematical-mindsets",
     "title": "Mathematical Mindsets",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Grit: The Power of Passion and Perseverance",
@@ -1266,7 +1371,9 @@
     "sourceRow": 0,
     "slug": "grit-duckworth",
     "title": "Grit: The Power of Passion and Perseverance",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Building a Practically Useful Theory of Goal Setting and Task Motivation",
@@ -1285,7 +1392,9 @@
     "sourceRow": 0,
     "slug": "goal-setting-locke-latham",
     "title": "Building a Practically Useful Theory of Goal Setting and Task Motivation",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Experiential Learning Theory",
@@ -1304,7 +1413,9 @@
     "sourceRow": 0,
     "slug": "kolb-experiential-learning",
     "title": "Experiential Learning Theory",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Active learning increases student performance",
@@ -1323,7 +1434,9 @@
     "sourceRow": 0,
     "slug": "freeman-active-learning",
     "title": "Active learning increases student performance",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Research on transfer of learning",
@@ -1342,7 +1455,9 @@
     "sourceRow": 0,
     "slug": "transfer-perkins-salomon",
     "title": "Research on transfer of learning",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   },
   {
     "sourceTitle": "Interdisciplinary understanding",
@@ -1361,6 +1476,8 @@
     "sourceRow": 0,
     "slug": "boix-mansilla-interdisciplinary",
     "title": "Interdisciplinary understanding",
-    "category": "Evidence base"
+    "category": "Evidence base",
+    "phase": "",
+    "written": true
   }
 ]

@@ -127,8 +127,14 @@ export function Kanban({
                 })}
 
                 {items.length === 0 ? (
-                  <li className="px-3 py-6 text-center text-xs text-muted">
-                    Nothing here
+                  <li className="px-3 py-5 text-center text-xs leading-relaxed text-muted">
+                    {column.key === "backlog"
+                      ? "Milestones you add on the Plan tab land here automatically."
+                      : column.key === "doing"
+                        ? "Drag work here when you start it — one or two at a time."
+                        : column.key === "review"
+                          ? "Things finished but not yet checked by anyone."
+                          : "Finished and checked."}
                   </li>
                 ) : null}
               </ul>
