@@ -9,7 +9,9 @@ import { db } from "@/db";
 import {
   criteria,
   enrolments,
-  goals,
+  evidence,
+  helpRequests,
+  milestones,
   reflections,
   scorecards,
   tasks,
@@ -17,7 +19,7 @@ import {
 } from "@/db/schema";
 import { DEFAULT_CRITERIA, DEFAULT_TASKS, getProject } from "@/lib/curriculum";
 import { STRANDS } from "@/lib/brand";
-import { STAGE_ORDER, type StageKey } from "@/lib/handbook";
+import { LEVEL_BY_N, MAX_LEVEL, PHASE_ORDER, type PhaseKey } from "@/lib/handbook";
 
 async function requireUser() {
   const session = await auth();
@@ -225,210 +227,6 @@ export async function saveReflection(reflectionId: string, formData: FormData) {
   revalidatePath(`/projects/${row.projectSlug}`);
 }
 
-/** Opens the next Plan – Act – Reflect cycle on an enrolment. */
-export async function startNextCycle(enrolmentId: string) {
-  const row = await ownedEnrolment(enrolmentId);
-  const existing = await db()
-    .select({ cycle: reflections.cycle })
-    .from(reflections)
-    .where(eq(reflections.enrolmentId, row.id))
-    .orderBy(asc(reflections.cycle));
-
-  const next = existing.length ? Math.max(...existing.map((r) => r.cycle)) + 1 : 1;
-  await db().insert(reflections).values({ enrolmentId: row.id, cycle: next });
-  revalidatePath(`/projects/${row.projectSlug}`);
-}
-
-
-// --- The IMPACT Journey ----------------------------------------------------
-
-const STRAND_NAMES = STRANDS.map((s) => s.name);
-
-/**
- * A coach or admin may move a project to any stage; a student may only move
- * forward, and only out of stages whose deliverable actually exists. Stage 2 is
- * the approval gate, so a student can never move themselves into it.
- */
-export async function setStage(enrolmentId: string, stage: StageKey) {
-  const user = await requireUser();
-  const row = await ownedOrCoached(enrolmentId);
-
-  if (user.role === "student") {
-    const from = STAGE_ORDER.indexOf(row.stage);
-    const to = STAGE_ORDER.indexOf(stage);
-    if (to !== from + 1) {
-      throw new Error("You can only move to the next stage.");
-    }
-    if (stage === "execution" && !row.approvedAt) {
-      throw new Error("A coach has to approve the proposal first.");
-    }
-    if (stage === "execution" && !row.charterSignedAt) {
-      throw new Error("Sign the Commitment Charter before starting execution.");
-    }
-  }
-
-  await db().update(enrolments).set({ stage }).where(eq(enrolments.id, row.id));
-  revalidatePath(`/projects/${row.projectSlug}`);
-  revalidatePath("/dashboard");
-}
-
-/** Lets a coach act on an enrolment they do not own. */
-async function ownedOrCoached(enrolmentId: string) {
-  const user = await requireUser();
-  const [row] = await db()
-    .select()
-    .from(enrolments)
-    .where(eq(enrolments.id, enrolmentId))
-    .limit(1);
-
-  if (!row) throw new Error("Enrolment not found.");
-  if (row.userId !== user.id && user.role === "student") {
-    throw new Error("Not your project.");
-  }
-  return row;
-}
-
-const proposalSchema = z.object({
-  proposalIdea: z.string().max(4000),
-  proposalInternalImpact: z.string().max(4000),
-  proposalExternalImpact: z.string().max(4000),
-  proposalFeasibility: z.string().max(4000),
-  projectType: z.enum(["internal", "external", "internal-to-external"]),
-});
-
-export async function saveProposal(enrolmentId: string, formData: FormData) {
-  const row = await ownedEnrolment(enrolmentId);
-
-  const values = proposalSchema.parse({
-    proposalIdea: String(formData.get("proposalIdea") ?? ""),
-    proposalInternalImpact: String(formData.get("proposalInternalImpact") ?? ""),
-    proposalExternalImpact: String(formData.get("proposalExternalImpact") ?? ""),
-    proposalFeasibility: String(formData.get("proposalFeasibility") ?? ""),
-    projectType: String(formData.get("projectType") ?? "internal"),
-  });
-
-  // The handbook expects a project to target several strands, chosen here
-  // rather than inherited from whatever the planning workbook happened to say.
-  const targetStrands = formData
-    .getAll("targetStrands")
-    .map(String)
-    .filter((name) => STRAND_NAMES.includes(name as (typeof STRAND_NAMES)[number]));
-
-  await db()
-    .update(enrolments)
-    .set({ ...values, targetStrands, proposalSubmittedAt: new Date() })
-    .where(eq(enrolments.id, row.id));
-
-  revalidatePath(`/projects/${row.projectSlug}`);
-}
-
-/** Stage 2 approval. Coaches and admins only — this is the gate. */
-export async function approveProposal(enrolmentId: string) {
-  const user = await requireUser();
-  if (user.role === "student") throw new Error("Only a coach can approve a proposal.");
-
-  const [row] = await db()
-    .select({ id: enrolments.id, projectSlug: enrolments.projectSlug })
-    .from(enrolments)
-    .where(eq(enrolments.id, enrolmentId))
-    .limit(1);
-  if (!row) throw new Error("Enrolment not found.");
-
-  await db()
-    .update(enrolments)
-    .set({
-      approvedAt: new Date(),
-      approvedBy: user.id,
-      leadCoachId: user.id,
-      stage: "commitment",
-    })
-    .where(eq(enrolments.id, row.id));
-
-  revalidatePath(`/projects/${row.projectSlug}`);
-  revalidatePath("/staff");
-}
-
-/**
- * Signing the Commitment Charter — formally agreeing to see the project through
- * unless a coach-led review determines a pivot is necessary.
- */
-export async function signCharter(enrolmentId: string) {
-  const row = await ownedEnrolment(enrolmentId);
-  if (!row.approvedAt) throw new Error("The proposal has not been approved yet.");
-
-  await db()
-    .update(enrolments)
-    .set({ charterSignedAt: new Date() })
-    .where(eq(enrolments.id, row.id));
-  revalidatePath(`/projects/${row.projectSlug}`);
-}
-
-// --- SMART goals -----------------------------------------------------------
-
-const goalSchema = z.object({
-  kind: z.enum(["deliverable", "milestone", "qualitative"]),
-  statement: z.string().trim().min(1).max(300),
-  measure: z.string().max(300),
-  dueBy: z.string().max(100),
-});
-
-export async function addGoal(enrolmentId: string, formData: FormData) {
-  const row = await ownedOrCoached(enrolmentId);
-  const values = goalSchema.parse({
-    kind: String(formData.get("kind") ?? "deliverable"),
-    statement: String(formData.get("statement") ?? ""),
-    measure: String(formData.get("measure") ?? ""),
-    dueBy: String(formData.get("dueBy") ?? ""),
-  });
-
-  const [{ value }] = await db()
-    .select({ value: max(goals.position) })
-    .from(goals)
-    .where(eq(goals.enrolmentId, row.id));
-
-  await db()
-    .insert(goals)
-    .values({ ...values, enrolmentId: row.id, position: (value ?? 0) + 1 });
-  revalidatePath(`/projects/${row.projectSlug}`);
-}
-
-export async function setGoalProgress(goalId: string, progress: number) {
-  const user = await requireUser();
-  const [row] = await db()
-    .select({ projectSlug: enrolments.projectSlug, userId: enrolments.userId })
-    .from(goals)
-    .innerJoin(enrolments, eq(goals.enrolmentId, enrolments.id))
-    .where(eq(goals.id, goalId))
-    .limit(1);
-  if (!row) throw new Error("Goal not found.");
-  if (row.userId !== user.id && user.role === "student") {
-    throw new Error("Not your project.");
-  }
-
-  const clamped = Math.min(100, Math.max(0, Math.round(progress)));
-  await db()
-    .update(goals)
-    .set({ progress: clamped, achieved: clamped >= 100 })
-    .where(eq(goals.id, goalId));
-  revalidatePath(`/projects/${row.projectSlug}`);
-}
-
-export async function deleteGoal(goalId: string) {
-  const user = await requireUser();
-  const [row] = await db()
-    .select({ projectSlug: enrolments.projectSlug, userId: enrolments.userId })
-    .from(goals)
-    .innerJoin(enrolments, eq(goals.enrolmentId, enrolments.id))
-    .where(eq(goals.id, goalId))
-    .limit(1);
-  if (!row) throw new Error("Goal not found.");
-  if (row.userId !== user.id && user.role === "student") {
-    throw new Error("Not your project.");
-  }
-
-  await db().delete(goals).where(eq(goals.id, goalId));
-  revalidatePath(`/projects/${row.projectSlug}`);
-}
 
 // --- Scorecards ------------------------------------------------------------
 
@@ -511,4 +309,298 @@ export async function setActive(userId: string, active: boolean) {
 
   await db().update(users).set({ active }).where(eq(users.id, userId));
   revalidatePath("/staff");
+}
+
+// --- Release 1: Create, Plan, and the level map ----------------------------
+
+/** A coach or admin acting on a student's project. */
+/** Lets a coach act on an enrolment they do not own. */
+async function ownedOrCoached(enrolmentId: string) {
+  const user = await requireUser();
+  const [row] = await db()
+    .select()
+    .from(enrolments)
+    .where(eq(enrolments.id, enrolmentId))
+    .limit(1);
+  if (!row) throw new Error("Enrolment not found.");
+  if (row.userId !== user.id && user.role === "student") throw new Error("Not your project.");
+  return row;
+}
+
+async function asCoach() {
+  const user = await requireUser();
+  if (user.role === "student") throw new Error("Only a coach can do that.");
+  return user;
+}
+
+const coachName = (u: { name?: string | null; email?: string | null }) =>
+  u.name ?? u.email ?? "A coach";
+
+/** Starts a project from the student's own idea rather than the catalogue. */
+export async function startOwnProject(formData: FormData) {
+  const user = await requireUser();
+  const title = z.string().trim().min(3).max(120).parse(formData.get("title"));
+
+  // Own-idea projects get a slug that cannot collide with a catalogue entry.
+  const slug = `own-${user.id.slice(0, 8)}-${Date.now().toString(36)}`;
+  const [created] = await db()
+    .insert(enrolments)
+    .values({
+      userId: user.id, projectSlug: slug, ownTitle: title, fromCatalogue: false,
+      role: user.role === "student" ? "member" : "lead",
+    })
+    .returning({ id: enrolments.id });
+
+  await db().insert(criteria).values(
+    DEFAULT_CRITERIA.map((label, position) => ({ enrolmentId: created.id, label, position })),
+  );
+  revalidatePath("/dashboard");
+  return slug;
+}
+
+const proposalSchema = z.object({
+  problem: z.string().max(400), whoAffected: z.string().max(400),
+  whatChanges: z.string().max(400), deliverable: z.string().max(400),
+  skills: z.string().max(400), needs: z.string().max(400), risk: z.string().max(400),
+  indicatorName: z.string().max(200), indicatorBaseline: z.string().max(100),
+  indicatorTarget: z.string().max(100),
+});
+
+export async function saveImpactProposal(enrolmentId: string, formData: FormData) {
+  const row = await ownedEnrolment(enrolmentId);
+  const values = proposalSchema.parse(
+    Object.fromEntries(
+      Object.keys(proposalSchema.shape).map((k) => [k, String(formData.get(k) ?? "")]),
+    ),
+  );
+  const strands = formData.getAll("targetStrands").map(String);
+
+  await db().update(enrolments)
+    .set({ ...values, targetStrands: strands, returnedComment: "", returnedAt: null })
+    .where(eq(enrolments.id, row.id));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+/** Sends the proposal to a coach. Level 2 cannot unlock without this. */
+export async function submitProposal(enrolmentId: string) {
+  const row = await ownedEnrolment(enrolmentId);
+  if (!row.problem.trim() || !row.indicatorTarget.trim()) {
+    throw new Error("A proposal needs at least the problem and a target before it can be submitted.");
+  }
+  await db().update(enrolments)
+    .set({ proposalSubmittedAt: new Date(), returnedComment: "", returnedAt: null })
+    .where(eq(enrolments.id, row.id));
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+/** Approving records the coach's name, not just a date (brief, section 8). */
+export async function approveProposal(enrolmentId: string) {
+  const coach = await asCoach();
+  const [row] = await db().select().from(enrolments).where(eq(enrolments.id, enrolmentId)).limit(1);
+  if (!row) throw new Error("Project not found.");
+
+  await db().update(enrolments).set({
+    approvedAt: new Date(), approvedBy: coach.id, approvedByName: coachName(coach),
+    leadCoachId: row.leadCoachId ?? coach.id,
+    phase: "plan", level: Math.max(row.level, 3),
+    returnedComment: "", returnedAt: null,
+  }).where(eq(enrolments.id, enrolmentId));
+
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+/** Returning is not a rejection — the student revises and resubmits. */
+export async function returnProposal(enrolmentId: string, formData: FormData) {
+  const coach = await asCoach();
+  const comment = z.string().trim().min(1).max(2000).parse(formData.get("comment"));
+  const [row] = await db().select({ projectSlug: enrolments.projectSlug })
+    .from(enrolments).where(eq(enrolments.id, enrolmentId)).limit(1);
+  if (!row) throw new Error("Project not found.");
+
+  await db().update(enrolments).set({
+    proposalSubmittedAt: null, returnedComment: `${coachName(coach)}: ${comment}`, returnedAt: new Date(),
+  }).where(eq(enrolments.id, enrolmentId));
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+export async function validatePlan(enrolmentId: string) {
+  const coach = await asCoach();
+  const [row] = await db().select().from(enrolments).where(eq(enrolments.id, enrolmentId)).limit(1);
+  if (!row) throw new Error("Project not found.");
+
+  const ms = await db().select({ id: milestones.id }).from(milestones).where(eq(milestones.enrolmentId, enrolmentId));
+  if (ms.length < 3) throw new Error("A plan needs at least three dated milestones before it can be validated.");
+
+  await db().update(enrolments).set({
+    planValidatedAt: new Date(), planValidatedByName: coachName(coach),
+    phase: "execute", level: Math.max(row.level, 4),
+  }).where(eq(enrolments.id, enrolmentId));
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+export async function signCharterNamed(enrolmentId: string) {
+  const user = await requireUser();
+  const row = await ownedEnrolment(enrolmentId);
+  if (!row.approvedAt) throw new Error("The proposal has not been approved yet.");
+  await db().update(enrolments)
+    .set({ charterSignedAt: new Date(), charterSignedByName: coachName(user) })
+    .where(eq(enrolments.id, row.id));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+// --- Milestones ------------------------------------------------------------
+
+export async function addMilestone(enrolmentId: string, formData: FormData) {
+  const row = await ownedEnrolment(enrolmentId);
+  const title = z.string().trim().min(1).max(200).parse(formData.get("title"));
+  const dueDate = z.string().max(40).parse(formData.get("dueDate") ?? "");
+
+  const [{ value }] = await db().select({ value: max(milestones.position) })
+    .from(milestones).where(eq(milestones.enrolmentId, row.id));
+  await db().insert(milestones).values({
+    enrolmentId: row.id, title, dueDate, position: (value ?? 0) + 1,
+  });
+  // The board is pre-filled from the milestones, so nobody starts on an empty Kanban.
+  await db().insert(tasks).values({
+    enrolmentId: row.id, title, status: "backlog", position: (value ?? 0) + 1,
+  });
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+export async function toggleMilestone(milestoneId: string, done: boolean) {
+  const user = await requireUser();
+  const [row] = await db()
+    .select({ projectSlug: enrolments.projectSlug, userId: enrolments.userId })
+    .from(milestones).innerJoin(enrolments, eq(milestones.enrolmentId, enrolments.id))
+    .where(eq(milestones.id, milestoneId)).limit(1);
+  if (!row) throw new Error("Milestone not found.");
+  if (row.userId !== user.id && user.role === "student") throw new Error("Not your project.");
+
+  await db().update(milestones).set({ done }).where(eq(milestones.id, milestoneId));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+export async function deleteMilestone(milestoneId: string) {
+  const user = await requireUser();
+  const [row] = await db()
+    .select({ projectSlug: enrolments.projectSlug, userId: enrolments.userId })
+    .from(milestones).innerJoin(enrolments, eq(milestones.enrolmentId, enrolments.id))
+    .where(eq(milestones.id, milestoneId)).limit(1);
+  if (!row) throw new Error("Milestone not found.");
+  if (row.userId !== user.id && user.role === "student") throw new Error("Not your project.");
+
+  await db().delete(milestones).where(eq(milestones.id, milestoneId));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+// --- Evidence and the level map -------------------------------------------
+
+/** Evidence unlocks levels — not activity, and never points for logging in. */
+export async function submitEvidence(enrolmentId: string, formData: FormData) {
+  const row = await ownedEnrolment(enrolmentId);
+  const level = z.coerce.number().int().min(1).max(MAX_LEVEL).parse(formData.get("level"));
+  const note = z.string().trim().min(1).max(2000).parse(formData.get("note"));
+
+  await db().insert(evidence).values({
+    enrolmentId: row.id, level, note,
+    url: String(formData.get("url") ?? "").slice(0, 500),
+    value: String(formData.get("value") ?? "").slice(0, 100),
+  });
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+/** Validating evidence is what moves a student up the map. */
+export async function reviewEvidence(
+  evidenceId: string,
+  decision: "validated" | "returned",
+  formData?: FormData,
+) {
+  const coach = await asCoach();
+  const [row] = await db()
+    .select({
+      id: evidence.id, level: evidence.level, enrolmentId: evidence.enrolmentId,
+      projectSlug: enrolments.projectSlug, currentLevel: enrolments.level,
+    })
+    .from(evidence).innerJoin(enrolments, eq(evidence.enrolmentId, enrolments.id))
+    .where(eq(evidence.id, evidenceId)).limit(1);
+  if (!row) throw new Error("Evidence not found.");
+
+  await db().update(evidence).set({
+    status: decision, reviewedAt: new Date(), reviewedByName: coachName(coach),
+    reviewComment: String(formData?.get("comment") ?? "").slice(0, 2000),
+  }).where(eq(evidence.id, evidenceId));
+
+  if (decision === "validated" && row.level >= row.currentLevel) {
+    const next = Math.min(row.level + 1, MAX_LEVEL);
+    const level = LEVEL_BY_N.get(next);
+    await db().update(enrolments)
+      .set({ level: next, ...(level ? { phase: level.phase } : {}) })
+      .where(eq(enrolments.id, row.enrolmentId));
+  }
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+export async function updateIndicator(enrolmentId: string, formData: FormData) {
+  const row = await ownedEnrolment(enrolmentId);
+  const current = z.string().trim().max(100).parse(formData.get("indicatorCurrent"));
+  await db().update(enrolments).set({ indicatorCurrent: current }).where(eq(enrolments.id, row.id));
+  revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+// --- Asking a coach --------------------------------------------------------
+
+export async function askCoach(enrolmentId: string, formData: FormData) {
+  const row = await ownedEnrolment(enrolmentId);
+  const question = z.string().trim().min(3).max(1000).parse(formData.get("question"));
+  await db().insert(helpRequests).values({ enrolmentId: row.id, question });
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+export async function answerHelpRequest(requestId: string, formData: FormData) {
+  const coach = await asCoach();
+  const answer = z.string().trim().min(1).max(2000).parse(formData.get("answer"));
+  const [row] = await db()
+    .select({ projectSlug: enrolments.projectSlug })
+    .from(helpRequests).innerJoin(enrolments, eq(helpRequests.enrolmentId, enrolments.id))
+    .where(eq(helpRequests.id, requestId)).limit(1);
+  if (!row) throw new Error("Request not found.");
+
+  await db().update(helpRequests)
+    .set({ answer, answeredByName: coachName(coach), answeredAt: new Date() })
+    .where(eq(helpRequests.id, requestId));
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/coach");
+}
+
+/** Completing is only possible from Report, after the final level is validated. */
+export async function markComplete(enrolmentId: string) {
+  const row = await ownedEnrolment(enrolmentId);
+  if (row.phase !== "report" || row.level < MAX_LEVEL) {
+    throw new Error("A project can only be completed from Report, once the final level is validated.");
+  }
+  await db().update(enrolments)
+    .set({ status: "complete", completedAt: new Date() })
+    .where(eq(enrolments.id, row.id));
+  revalidatePath(`/projects/${row.projectSlug}`);
+  revalidatePath("/dashboard");
+}
+
+
+/** Opens the next Plan - Act - Reflect cycle. */
+export async function startNextCycle(enrolmentId: string) {
+  const row = await ownedEnrolment(enrolmentId);
+  const existing = await db()
+    .select({ cycle: reflections.cycle })
+    .from(reflections)
+    .where(eq(reflections.enrolmentId, row.id));
+  const next = existing.length ? Math.max(...existing.map((r) => r.cycle)) + 1 : 1;
+  await db().insert(reflections).values({ enrolmentId: row.id, cycle: next });
+  revalidatePath(`/projects/${row.projectSlug}`);
 }

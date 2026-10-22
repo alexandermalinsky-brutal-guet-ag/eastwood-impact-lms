@@ -7,12 +7,12 @@ import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import type { Role } from "@/db/schema";
 
+// Shorter navigation per the brief: Strands are gone and the Handbook moved
+// to a Help link in the footer of the dashboard.
 const LINKS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/strands", label: "Strands" },
-  { href: "/projects", label: "Projects" },
+  { href: "/dashboard", label: "Home" },
+  { href: "/projects", label: "Explore projects" },
   { href: "/toolkit", label: "Toolkit" },
-  { href: "/handbook", label: "Handbook" },
   { href: "/profile", label: "Profile" },
 ];
 
@@ -23,7 +23,10 @@ export function Nav({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const links = user.role === "student" ? LINKS : [...LINKS, { href: "/staff", label: "Staff" }];
+  const links =
+    user.role === "student"
+      ? LINKS
+      : [...LINKS, { href: "/coach", label: "Coach" }, { href: "/staff", label: "Programme" }];
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">

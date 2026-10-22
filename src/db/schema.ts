@@ -94,20 +94,40 @@ export const enrolments = pgTable(
       .notNull()
       .default("active"),
 
-    /** Where this project sits in the four-stage IMPACT Journey. */
-    stage: text("stage")
-      .$type<"ideation" | "commitment" | "execution" | "presentation">()
+    /** Which of the four phases of work the project is in. */
+    phase: text("phase")
+      .$type<"create" | "plan" | "execute" | "report">()
       .notNull()
-      .default("ideation"),
+      .default("create"),
+
+    /** Highest level reached on the level map. A level is unlocked by validated evidence. */
+    level: integer("level").notNull().default(1),
 
     /** The handbook expects projects to span several strands, chosen at proposal. */
     targetStrands: text("targetStrands").array().notNull().default([]),
 
-    // --- Stage 1: the Project Proposal ---
-    proposalIdea: text("proposalIdea").notNull().default(""),
-    proposalInternalImpact: text("proposalInternalImpact").notNull().default(""),
-    proposalExternalImpact: text("proposalExternalImpact").notNull().default(""),
-    proposalFeasibility: text("proposalFeasibility").notNull().default(""),
+    /**
+     * The Impact Proposal. "Who benefits, what will be different, and how we
+     * will know" is the organising question of the platform — it replaced the
+     * strands, which are now an optional tag.
+     */
+    problem: text("problem").notNull().default(""),
+    whoAffected: text("whoAffected").notNull().default(""),
+    whatChanges: text("whatChanges").notNull().default(""),
+    deliverable: text("deliverable").notNull().default(""),
+    skills: text("skills").notNull().default(""),
+    needs: text("needs").notNull().default(""),
+    risk: text("risk").notNull().default(""),
+
+    /** One indicator, measured against a baseline and a target. */
+    indicatorName: text("indicatorName").notNull().default(""),
+    indicatorBaseline: text("indicatorBaseline").notNull().default(""),
+    indicatorTarget: text("indicatorTarget").notNull().default(""),
+    indicatorCurrent: text("indicatorCurrent").notNull().default(""),
+
+    /** Set when the student started from a catalogue entry rather than their own idea. */
+    fromCatalogue: boolean("fromCatalogue").notNull().default(true),
+    ownTitle: text("ownTitle").notNull().default(""),
     projectType: text("projectType")
       .$type<"internal" | "external" | "internal-to-external">()
       .notNull()
@@ -117,6 +137,14 @@ export const enrolments = pgTable(
     // --- Stage 2: approval, coaching and the Commitment Charter ---
     approvedAt: timestamp("approvedAt", { mode: "date" }),
     approvedBy: text("approvedBy").references(() => users.id, { onDelete: "set null" }),
+    /** Denormalised so the record survives the coach's account being removed. */
+    approvedByName: text("approvedByName").notNull().default(""),
+    planValidatedAt: timestamp("planValidatedAt", { mode: "date" }),
+    planValidatedByName: text("planValidatedByName").notNull().default(""),
+    charterSignedByName: text("charterSignedByName").notNull().default(""),
+    /** A returned proposal comes back with a reason, not a rejection. */
+    returnedComment: text("returnedComment").notNull().default(""),
+    returnedAt: timestamp("returnedAt", { mode: "date" }),
     leadCoachId: text("leadCoachId").references(() => users.id, { onDelete: "set null" }),
     /**
      * Signing the Commitment Charter is the student formally agreeing to see the
@@ -180,6 +208,82 @@ export const reflections = pgTable(
     updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => [index("reflection_enrolment_idx").on(t.enrolmentId)],
+);
+
+/**
+ * Dated milestones — three to six per project, shown on a timeline. These and
+ * the definition of done (the `criteria` table) replace the old SMART goals.
+ */
+export const milestones = pgTable(
+  "milestone",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    enrolmentId: text("enrolmentId")
+      .notNull()
+      .references(() => enrolments.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    dueDate: text("dueDate").notNull().default(""),
+    /** Which level on the map this milestone carries, where it maps to one. */
+    level: integer("level"),
+    done: boolean("done").notNull().default(false),
+    position: integer("position").notNull().default(0),
+  },
+  (t) => [index("milestone_enrolment_idx").on(t.enrolmentId)],
+);
+
+/**
+ * Evidence submitted to unlock a level. A coach validates it or returns it
+ * with feedback — a return is not a failure, the student revises and resubmits.
+ */
+export const evidence = pgTable(
+  "evidence",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    enrolmentId: text("enrolmentId")
+      .notNull()
+      .references(() => enrolments.id, { onDelete: "cascade" }),
+    level: integer("level").notNull(),
+    milestoneId: text("milestoneId").references(() => milestones.id, { onDelete: "set null" }),
+    note: text("note").notNull().default(""),
+    /** A link, or a number for an indicator update. File upload comes in Release 2. */
+    url: text("url").notNull().default(""),
+    value: text("value").notNull().default(""),
+    status: text("status")
+      .$type<"submitted" | "validated" | "returned">()
+      .notNull()
+      .default("submitted"),
+    submittedAt: timestamp("submittedAt", { mode: "date" }).notNull().defaultNow(),
+    reviewedAt: timestamp("reviewedAt", { mode: "date" }),
+    reviewedByName: text("reviewedByName").notNull().default(""),
+    reviewComment: text("reviewComment").notNull().default(""),
+  },
+  (t) => [
+    index("evidence_enrolment_idx").on(t.enrolmentId),
+    index("evidence_status_idx").on(t.status),
+  ],
+);
+
+/** A student's request for help, which lands in their coach's queue. */
+export const helpRequests = pgTable(
+  "helpRequest",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    enrolmentId: text("enrolmentId")
+      .notNull()
+      .references(() => enrolments.id, { onDelete: "cascade" }),
+    question: text("question").notNull(),
+    answer: text("answer").notNull().default(""),
+    answeredByName: text("answeredByName").notNull().default(""),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+    answeredAt: timestamp("answeredAt", { mode: "date" }),
+  },
+  (t) => [index("help_enrolment_idx").on(t.enrolmentId)],
 );
 
 /**

@@ -14,7 +14,7 @@ import { eq, inArray, like } from "drizzle-orm";
 import { hash } from "bcryptjs";
 
 import { db, isDatabaseConfigured } from "../src/db";
-import { criteria, enrolments, goals, reflections, scorecards, tasks, users } from "../src/db/schema";
+import { criteria, enrolments, evidence, helpRequests, milestones, reflections, scorecards, tasks, users } from "../src/db/schema";
 
 const DEMO_DOMAIN = "demo.eastwoodmontreux.ch";
 const PASSWORD = process.env.DEMO_PASSWORD ?? "impact-demo-2026";
@@ -41,13 +41,22 @@ const email = (k: string) => `${k}@${DEMO_DOMAIN}`;
 type Seed = {
   who: string;
   project: string;
-  stage: "ideation" | "commitment" | "execution" | "presentation";
+  phase: "create" | "plan" | "execute" | "report";
+  level: number;
   strands: string[];
   type: "internal" | "external" | "internal-to-external";
-  proposal?: { idea: string; internal: string; external: string; feasibility: string };
+  proposal?: {
+    problem: string; whoAffected: string; whatChanges: string; deliverable: string;
+    skills: string; needs: string; risk: string;
+    indicator: string; baseline: string; target: string; current?: string;
+  };
+  submitted?: boolean;
+  planValidated?: boolean;
+  milestones?: { title: string; dueDate: string; done: boolean }[];
+  evidenceLog?: { level: number; note: string; url?: string; value?: string; status: "submitted" | "validated" | "returned"; comment?: string }[];
+  help?: { question: string; answer?: string }[];
   approved?: boolean;
   charter?: boolean;
-  goals?: { kind: "deliverable" | "milestone" | "qualitative"; statement: string; measure: string; dueBy: string; progress: number }[];
   tasks?: { title: string; status: "backlog" | "doing" | "review" | "done" }[];
   criteria?: { label: string; met: boolean }[];
   cycles?: { plan: string; act: string; reflect: string; q: string }[];
@@ -56,112 +65,136 @@ type Seed = {
 };
 
 const SEEDS: Seed[] = [
-  // The walkthrough project: furthest along, every feature populated.
+  // The walkthrough project: level 6, everything populated, one piece of
+  // evidence sitting in the coach's queue so the demo has something to act on.
   {
     who: "s.ferrand",
     project: "kickoff-voices-of-tomorrow",
-    stage: "presentation",
-    strands: ["Imagination", "Action", "Character", "Technologies"],
+    phase: "execute",
+    level: 6,
+    strands: ["Imagination", "Action"],
     type: "external",
+    submitted: true,
+    planValidated: true,
     proposal: {
-      idea: "A fortnightly podcast interviewing young people across the Riviera who have started something — a business, a campaign, a charity. Researched, recorded, edited and published entirely by students.",
-      internal: "Students across year groups get a reason to practise interviewing, and a platform that is theirs rather than the school's. Three Grade 9s have already asked to produce an episode.",
-      external: "Published publicly on the major podcast platforms. Guests reach an audience beyond their own network, and the school is visible in the region as somewhere students make things.",
-      feasibility: "Recording space is the constraint — the music room is free on Thursdays. Equipment is borrowed from the media department. The real risk is guest scheduling, which is why episodes are fortnightly rather than weekly.",
+      problem: "Students here think changemaking is something adults do somewhere else.",
+      whoAffected: "The 180 students in Grades 9-11, and the dozen local founders nobody has thought to ask.",
+      whatChanges: "Students can name three people under 25 in this region who started something, and say how they did it.",
+      deliverable: "Six published podcast episodes with local young founders, plus a handover guide so it runs next year without me.",
+      skills: "Interviewing without a script, audio editing, and asking strangers for things.",
+      needs: "The music room on Thursdays, a borrowed recorder, and introductions to three founders.",
+      risk: "Guests cancel and the schedule collapses. Plan B: keep one episode recorded in reserve at all times.",
+      indicator: "Students who can name 3 young changemakers (surveyed)",
+      baseline: "11 of 180",
+      target: "90 of 180",
+      current: "74 of 180",
     },
-    approved: true,
-    charter: true,
-    goals: [
-      { kind: "deliverable", statement: "Publish six episodes on a public feed", measure: "Six episodes live with named guests and show notes", dueBy: "End of Term 3", progress: 100 },
-      { kind: "milestone", statement: "Run a pilot episode and act on the feedback before episode two", measure: "Pilot recorded, five listeners interviewed, changes written down", dueBy: "End of Term 1", progress: 100 },
-      { kind: "qualitative", statement: "Hand the production process to a younger student who can run it without me", measure: "A Grade 10 produces an episode start to finish while I only observe", dueBy: "End of Term 3", progress: 70 },
-    ],
-    tasks: [
-      { title: "Frame the problem in one sentence", status: "done" },
-      { title: "Agree success criteria with Rémy", status: "done" },
-      { title: "Book the music room for Thursdays", status: "done" },
-      { title: "Record and publish episodes 1–6", status: "done" },
-      { title: "Write the handover guide for next year's producer", status: "review" },
-      { title: "Prepare the panel presentation", status: "doing" },
+    milestones: [
+      { title: "Interview 3 students about what they think a changemaker is", dueDate: "2026-09-18", done: true },
+      { title: "Record and publish the pilot episode", dueDate: "2026-10-02", done: true },
+      { title: "Publish episodes 2-4", dueDate: "2026-11-13", done: true },
+      { title: "Re-run the survey at the halfway point", dueDate: "2026-11-27", done: true },
+      { title: "Publish episodes 5-6", dueDate: "2026-12-11", done: false },
+      { title: "Hand production to a Grade 10 and write the guide", dueDate: "2026-12-18", done: false },
     ],
     criteria: [
-      { label: "The outcome exists and someone outside the project has seen it", met: true },
-      { label: "I can explain the problem I framed and why it mattered", met: true },
-      { label: "I completed at least two Plan – Act – Reflect cycles", met: true },
-      { label: "I acted on feedback from a coach or peer at least once", met: true },
+      { label: "Six episodes are public and someone outside school has listened", met: true },
+      { label: "The survey number moved toward the target", met: true },
+      { label: "A younger student has produced an episode without me", met: false },
+      { label: "The handover guide exists and someone has read it", met: false },
+    ],
+    evidenceLog: [
+      { level: 1, status: "validated", note: "Asked 3 students what a changemaker is. All three named someone famous and nobody local — that is the problem in one line.", comment: "This is exactly the kind of small proof that makes a problem real." },
+      { level: 2, status: "validated", note: "Impact Proposal with the survey baseline: 11 of 180 could name three. Target 90.", comment: "Baseline is specific and you can measure it again. Approved." },
+      { level: 3, status: "validated", note: "Six dated milestones through to the December showcase, charter signed.", comment: "Realistic. The reserve-episode plan B is a good instinct." },
+      { level: 4, status: "validated", note: "Pilot recorded with Nadia from the climate group. Published to 5 listeners first.", url: "https://example.org/voices/pilot", comment: "Testing on five people before publishing was the right call." },
+      { level: 5, status: "validated", note: "Played episode 3 to the Grade 10 assembly and collected feedback on cards. The complaint was that intros are too long.", value: "41 responses" },
+      { level: 6, status: "submitted", note: "Re-ran the survey at the halfway point: 74 of 180 can now name three young changemakers, up from 11. Same question, same form.", value: "74 of 180" },
     ],
     cycles: [
       {
-        plan: "Record a pilot with one guest, publish it to five people only, and ask them what made them stop listening.",
-        act: "Recorded with Nadia from the climate group. The audio was usable but the first six minutes were me explaining the project rather than asking her anything. Three of the five listeners said they nearly switched off.",
-        reflect: "The intro was for me, not the listener. Cut it to twenty seconds and open on the guest's own words. I had assumed the problem would be technical and it was editorial.",
+        plan: "Record a pilot with one guest, publish it to five people only, and ask what made them stop listening.",
+        act: "Recorded with Nadia. The audio was fine but the first six minutes were me explaining the project rather than asking her anything. Three of five said they nearly switched off.",
+        reflect: "The intro was for me, not the listener. Cut it to twenty seconds and open on the guest's own words. I assumed the problem would be technical and it was editorial.",
         q: "What makes someone keep listening past the first minute of something they did not choose?",
       },
       {
-        plan: "Run episodes two to four on the new structure and see whether completion rates improve.",
-        act: "Published three episodes in six weeks. Completion went from roughly 40% to over 70%. Episode four ran long because I did not cut a tangent I liked.",
-        reflect: "I can edit other people's words but not my own. Asked Luca to do a final pass on episode five, which was shorter and better. Being precious about material is the thing to watch.",
+        plan: "Run episodes two to four on the new structure and see whether the survey number moves.",
+        act: "Published three episodes in six weeks. The halfway survey went from 11 to 74. Episode four ran long because I did not cut a tangent I liked.",
+        reflect: "I can edit other people's words but not my own. Asked Luca to do a final pass on five, which was shorter and better. Being precious about material is the thing to watch.",
         q: "Who should have the final cut on something that carries my name?",
       },
     ],
+    help: [
+      { question: "Two founders have stopped replying to emails. Is it reasonable to turn up at their office, or is that overstepping?",
+        answer: "Email once more with a specific 20-minute ask and a date. If nothing, ask me and I will introduce you — turning up unannounced is a lot to put on someone." },
+    ],
     selfCard: {
-      ratings: { progress: 5, effort: 4, challenges: 3, collaborate: 4, adjustments: 5 },
+      ratings: { progress: 4, effort: 4, challenges: 3, collaborate: 4, adjustments: 5 },
       notes: {
-        progress: "Six episodes out, which was the headline goal. The handover is the part still open.",
-        effort: "Roughly four hours a week, more in the fortnight around a release.",
-        challenges: "Guest cancellations twice. Solved by keeping one recorded episode in reserve.",
-        collaborate: "Working with Luca on edits changed the project. I should have asked earlier.",
-        adjustments: "Cut the intro, shortened episodes, handed the final cut to someone else.",
+        progress: "Four of six milestones done and the indicator is most of the way to target.",
+        effort: "About four hours a week, more around a release.",
+        challenges: "Guest cancellations twice. Solved by keeping one episode in reserve.",
+        collaborate: "Working with Luca on edits changed the project. Should have asked earlier.",
+        adjustments: "Cut the intro, shortened episodes, handed final cut to someone else.",
       },
-      comment: "The thing I did not expect was that the hardest part would be giving it away. Teaching someone else to produce it is slower than doing it myself and I keep wanting to take the mouse back.",
-      period: "Term 3, second half",
+      comment: "The hardest part is giving it away. Teaching someone else to produce is slower than doing it and I keep wanting to take the mouse back.",
+      period: "November",
     },
     coachCard: {
       by: "r.chevalley",
       ratings: { initiative: 5, leadership: 4, creativity: 5, resilience: 5, ethics: 5 },
-      comment: "Sofia has run this with almost no intervention from me since October. The pilot-then-change loop was hers, not something I suggested. The handover goal is the right one to be struggling with, and she is struggling with it honestly — she raised it before I did.",
-      period: "Term 3, second half",
+      comment: "Sofia has run this with almost no intervention since September. The pilot-then-change loop was hers. The handover is the right thing to be struggling with and she raised it before I did.",
+      period: "November",
     },
   },
-  // Mid-execution: a board in motion, goals partly met.
+
+  // Mid-execution, one piece of evidence returned — shows the revise loop.
   {
     who: "l.brunner",
     project: "kickoff-sustainable-materials",
-    stage: "execution",
-    strands: ["Planet", "Technologies", "Action"],
+    phase: "execute",
+    level: 4,
+    strands: ["Planet", "Technologies"],
     type: "internal-to-external",
+    submitted: true,
+    planValidated: true,
     proposal: {
-      idea: "Test whether mycelium packaging grown from local agricultural waste can replace the polystyrene the school kitchen receives deliveries in.",
-      internal: "The kitchen throws out roughly two cubic metres of polystyrene a month. If this works it stops.",
-      external: "Present findings at the cantonal sustainability forum in June, with samples.",
-      feasibility: "Growing takes three weeks per batch and needs a warm dark space — the old darkroom works. Substrate from a farm in Villeneuve, free. The unknown is compressive strength.",
+      problem: "The school kitchen throws out roughly two cubic metres of polystyrene packaging a month.",
+      whoAffected: "The kitchen team of six, and everyone downstream of a landfill that does not break it down.",
+      whatChanges: "Deliveries arrive in packaging that composts instead of lasting 500 years.",
+      deliverable: "Five tested mycelium packaging samples with measured compressive strength, and a recommendation the kitchen can act on.",
+      skills: "Running a controlled experiment, sterile technique, and presenting results that disprove my own hypothesis.",
+      needs: "The old darkroom as a grow space, substrate from the farm in Villeneuve, and 20 minutes of the kitchen manager's time.",
+      risk: "Samples keep contaminating and I run out of term. Plan B: report the method honestly as a negative result.",
+      indicator: "Compressive strength of best sample (kg before deforming)",
+      baseline: "0 kg",
+      target: "12 kg",
+      current: "7 kg",
     },
-    approved: true,
-    charter: true,
-    goals: [
-      { kind: "deliverable", statement: "Produce five test samples at different substrate ratios", measure: "Five samples, documented, with compressive strength measured", dueBy: "End of Term 2", progress: 80 },
-      { kind: "milestone", statement: "Complete one full grow-test-document cycle before scaling up", measure: "Cycle finished and written up", dueBy: "February", progress: 100 },
-      { kind: "qualitative", statement: "Get comfortable presenting results that disprove my own hypothesis", measure: "Present a failed batch to the group without defending it", dueBy: "Ongoing", progress: 40 },
-    ],
-    tasks: [
-      { title: "Source substrate from the farm", status: "done" },
-      { title: "Set up the darkroom as a grow space", status: "done" },
-      { title: "Grow batches 1–3", status: "done" },
-      { title: "Compressive strength testing", status: "doing" },
-      { title: "Batch 4 at a higher substrate ratio", status: "doing" },
-      { title: "Write up for the sustainability forum", status: "backlog" },
-      { title: "Ask the kitchen for delivery volume data", status: "backlog" },
+    milestones: [
+      { title: "Source substrate and set up the darkroom", dueDate: "2026-09-25", done: true },
+      { title: "Grow batches 1-3", dueDate: "2026-10-16", done: true },
+      { title: "Compressive strength testing", dueDate: "2026-11-06", done: true },
+      { title: "Batch 4 at a higher substrate ratio", dueDate: "2026-11-27", done: false },
+      { title: "Present to the kitchen manager", dueDate: "2026-12-11", done: false },
     ],
     criteria: [
-      { label: "The outcome exists and someone outside the project has seen it", met: false },
-      { label: "I can explain the problem I framed and why it mattered", met: true },
-      { label: "I completed at least two Plan – Act – Reflect cycles", met: true },
-      { label: "I acted on feedback from a coach or peer at least once", met: true },
+      { label: "Five samples grown and measured with the same method", met: false },
+      { label: "The best sample holds at least 12 kg", met: false },
+      { label: "The kitchen manager has seen the results", met: false },
+      { label: "The method is written up so someone could repeat it", met: true },
+    ],
+    evidenceLog: [
+      { level: 1, status: "validated", note: "Counted the kitchen's polystyrene over two weeks: 11 large boxes, about 2 cubic metres a month.", comment: "Counting it yourself rather than estimating is what makes this solid." },
+      { level: 2, status: "validated", note: "Proposal with compressive strength as the indicator, 0 kg baseline, 12 kg target.", comment: "Good — a number you can actually test." },
+      { level: 3, status: "validated", note: "Five milestones to the December presentation. Charter signed." },
+      { level: 4, status: "returned", note: "Batch 3 held 7 kg.", comment: "The number is good but I cannot see how you got it. Add how you applied the load and what failed first — a photo of the rig would do it." },
     ],
     cycles: [
       {
         plan: "Grow three batches at the ratios the paper recommends and see if any hold weight.",
-        act: "Two contaminated in the first week. The third held 4kg before deforming — the target is 12kg.",
+        act: "Two contaminated in the first week. The third held 7 kg before deforming — the target is 12.",
         reflect: "Sterilisation was the problem, not the ratio. I was treating a biology experiment like a materials one. Changed the process before changing the recipe.",
         q: "How much of what I am measuring is the material, and how much is my technique?",
       },
@@ -169,162 +202,122 @@ const SEEDS: Seed[] = [
     selfCard: {
       ratings: { progress: 3, effort: 4, challenges: 4, collaborate: 3, adjustments: 4 },
       notes: {
-        progress: "Behind on samples because two batches failed, but the process is now reliable.",
+        progress: "Behind on samples because two batches failed, but the process is reliable now.",
         challenges: "Contamination. Fixed by pressure-sterilising the substrate.",
-        adjustments: "Changed the method before changing the formula — that was the right order.",
+        adjustments: "Changed the method before the formula — that was the right order.",
       },
       comment: "Losing two batches felt like losing three weeks. It was not: it taught me the thing the paper did not mention.",
-      period: "Term 2",
+      period: "November",
     },
   },
-  // Just approved: goals being set, board nearly empty — shows Stage 2.
+
+  // Sitting in the approval queue — the coach demo acts on this.
   {
     who: "a.haddad",
     project: "action-tedx",
-    stage: "commitment",
-    strands: ["Action", "Imagination", "Character"],
+    phase: "create",
+    level: 2,
+    strands: ["Action"],
     type: "external",
+    submitted: true,
     proposal: {
-      idea: "A student-run TEDx-format event with eight speakers, half from outside the school, on one theme chosen by the audience in advance.",
-      internal: "Gives students who will never join debate club a reason to learn to hold a room.",
-      external: "Open to parents and the town. Talks published afterwards.",
-      feasibility: "Licence takes eight weeks. The hall is free in May. Biggest unknown is whether external speakers will come for a school event.",
+      problem: "Students who are not already confident speakers never get a stage, so the same six people speak at everything.",
+      whoAffected: "Roughly 40 students in Grades 10-12 who have something to say and no route to saying it.",
+      whatChanges: "Eight students who have never presented publicly have done so, to an audience that is not their class.",
+      deliverable: "A TEDx-format evening with eight speakers, half of them first-timers, filmed and published.",
+      skills: "Running an event to a deadline, coaching nervous speakers, and negotiating with people who outrank me.",
+      needs: "The hall in May, a TEDx licence, and a teacher willing to co-sign the application.",
+      risk: "The licence takes eight weeks and might not come. Plan B: run it unbranded as an Eastwood Talks evening.",
+      indicator: "First-time speakers who present",
+      baseline: "0",
+      target: "4 of 8 speakers",
     },
-    approved: true,
-    charter: false,
-    goals: [
-      { kind: "deliverable", statement: "Run the event with eight speakers and an audience of 100+", measure: "Event happens, attendance counted", dueBy: "May", progress: 10 },
-      { kind: "milestone", statement: "Secure the TEDx licence", measure: "Licence granted in writing", dueBy: "February", progress: 50 },
-    ],
-    tasks: [
-      { title: "Frame the problem in one sentence", status: "done" },
-      { title: "Agree success criteria with a coach", status: "doing" },
-      { title: "Submit the TEDx licence application", status: "doing" },
-      { title: "Draft the speaker shortlist", status: "backlog" },
-    ],
+    milestones: [],
     criteria: [
-      { label: "The outcome exists and someone outside the project has seen it", met: false },
-      { label: "I can explain the problem I framed and why it mattered", met: true },
-      { label: "I completed at least two Plan – Act – Reflect cycles", met: false },
-      { label: "I acted on feedback from a coach or peer at least once", met: true },
+      { label: "The event happened with an audience of 100+", met: false },
+      { label: "At least four speakers had never presented publicly before", met: false },
+      { label: "Talks are published and watchable", met: false },
+    ],
+    evidenceLog: [
+      { level: 1, status: "validated", note: "Asked 12 students why they have never spoken at assembly. Nine said nobody asked them; three said they were never told how.", comment: "Nine of twelve saying 'nobody asked' is a finding. That is your project." },
     ],
   },
-  // Stage 1, awaiting approval — shows the coach's queue.
+
+  // Brand new, nothing written — shows the empty state honestly.
   {
     who: "t.nakamura",
     project: "technologies-3d-printing-for-noisy-chairs",
-    stage: "ideation",
-    strands: ["Technologies", "Planet"],
+    phase: "create",
+    level: 1,
+    strands: ["Technologies"],
     type: "internal",
     proposal: {
-      idea: "Design and print replacement feet for the 200 classroom chairs that scrape. Measure the noise before and after.",
-      internal: "Three teachers have complained about not being heard over chair noise in B-block.",
-      external: "Publish the model file so other schools can print it.",
-      feasibility: "Printer time is the constraint — roughly 20 minutes a foot, 800 feet. Needs a redesign for batch printing, or it takes a year.",
+      problem: "Chairs scraping in B-block make it hard to hear in the back rows.",
+      whoAffected: "",
+      whatChanges: "",
+      deliverable: "",
+      skills: "",
+      needs: "",
+      risk: "",
+      indicator: "",
+      baseline: "",
+      target: "",
     },
-    approved: false,
-    charter: false,
-    tasks: [
-      { title: "Frame the problem in one sentence", status: "done" },
-      { title: "Measure baseline noise in B-block", status: "doing" },
-      { title: "Agree success criteria with a coach", status: "backlog" },
-    ],
+    milestones: [],
     criteria: [
-      { label: "The outcome exists and someone outside the project has seen it", met: false },
-      { label: "I can explain the problem I framed and why it mattered", met: true },
-      { label: "I completed at least two Plan – Act – Reflect cycles", met: false },
-      { label: "I acted on feedback from a coach or peer at least once", met: false },
+      { label: "Measured noise before and after", met: false },
+      { label: "Feet fitted to at least one full classroom", met: false },
+    ],
+    help: [
+      { question: "How do I measure classroom noise in a way that counts as evidence? I only have my phone." },
     ],
   },
-  // Exploration-phase students on smaller things.
+
+  // Exploration-phase student, own idea rather than catalogue.
   {
     who: "e.lindqvist",
     project: "imagination-book-club",
-    stage: "execution",
-    strands: ["Imagination", "Character"],
+    phase: "plan",
+    level: 3,
+    strands: ["Imagination"],
     type: "internal",
+    submitted: true,
     proposal: {
-      idea: "A book club for Grades 9 and 10 that reads one book a month chosen by vote, meeting Fridays.",
-      internal: "Somewhere to talk about books that is not an English lesson.",
-      external: "",
-      feasibility: "Library room on Fridays. Copies are the issue — the library has four of most titles, so we read in rotation.",
+      problem: "There is nowhere to talk about a book unless it is set for English.",
+      whoAffected: "The 20-odd students in Grades 9-10 who read for pleasure and have nobody to discuss it with.",
+      whatChanges: "A group that meets every Friday without me having to chase anyone.",
+      deliverable: "A book club with six meetings, a rotation system for the library's four copies, and a co-lead from Grade 11.",
+      skills: "Running a discussion without doing most of the talking, and handing something over.",
+      needs: "The library room on Fridays, and the librarian's help with the copy rotation.",
+      risk: "Attendance drops after the novelty. Plan B: switch to short stories so nobody has to catch up.",
+      indicator: "Students at each meeting",
+      baseline: "0",
+      target: "8 per meeting by December",
+      current: "6 per meeting",
     },
-    approved: true,
-    charter: true,
-    goals: [
-      { kind: "milestone", statement: "Hold six meetings with at least six people at each", measure: "Attendance recorded", dueBy: "End of Term 2", progress: 60 },
-      { kind: "qualitative", statement: "Learn to run a discussion without doing most of the talking", measure: "A meeting where I speak less than a third of the time", dueBy: "Ongoing", progress: 30 },
-    ],
-    tasks: [
-      { title: "Book the library room", status: "done" },
-      { title: "Run the first vote on a title", status: "done" },
-      { title: "Meetings 1–4", status: "done" },
-      { title: "Sort out the copy rotation", status: "doing" },
-      { title: "Invite a Grade 11 to co-run it", status: "backlog" },
+    milestones: [
+      { title: "Book the library room and run the first vote", dueDate: "2026-10-10", done: true },
+      { title: "Meetings 1-3", dueDate: "2026-11-14", done: true },
+      { title: "Sort out the copy rotation with the librarian", dueDate: "2026-11-28", done: false },
+      { title: "Bring in a Grade 11 co-lead", dueDate: "2026-12-12", done: false },
     ],
     criteria: [
-      { label: "The outcome exists and someone outside the project has seen it", met: true },
-      { label: "I can explain the problem I framed and why it mattered", met: true },
-      { label: "I completed at least two Plan – Act – Reflect cycles", met: false },
-      { label: "I acted on feedback from a coach or peer at least once", met: true },
+      { label: "Six meetings happened", met: false },
+      { label: "At least eight people at a meeting", met: false },
+      { label: "Someone else has run a meeting", met: false },
+    ],
+    evidenceLog: [
+      { level: 1, status: "validated", note: "Asked around: 14 people said they read outside class and 11 said they had never talked to anyone at school about a book.", comment: "Clear problem, and you have the number." },
+      { level: 2, status: "validated", note: "Proposal with attendance as the indicator, target 8 a meeting." },
+      { level: 3, status: "submitted", note: "Four dated milestones through to December, criteria agreed, charter signed." },
     ],
     cycles: [
       {
         plan: "Let the group pick the first book by vote rather than choosing it myself.",
-        act: "They picked something I had not read. Nine people came to the first meeting, four to the second.",
-        reflect: "The drop was not the book. I ran the second meeting like a lesson with questions I had prepared. The first one worked because nobody was in charge.",
+        act: "They picked something I had not read. Nine came to the first meeting, four to the second.",
+        reflect: "The drop was not the book. I ran the second like a lesson with questions I had prepared. The first worked because nobody was in charge.",
         q: "What is the least structure a conversation needs before it stops being a conversation?",
       },
-    ],
-  },
-  {
-    who: "j.moreau",
-    project: "movement-personal-fitness-program",
-    stage: "ideation",
-    strands: ["Movement"],
-    type: "internal",
-    proposal: {
-      idea: "Build and follow a twelve-week conditioning programme for myself, tracking whether it changes anything measurable.",
-      internal: "",
-      external: "",
-      feasibility: "Gym access at lunch. The hard part is knowing what to measure beyond how I feel.",
-    },
-    approved: false,
-    charter: false,
-    tasks: [
-      { title: "Frame the problem in one sentence", status: "doing" },
-      { title: "Decide what to measure", status: "backlog" },
-    ],
-  },
-  // A second person on the podcast, so one project shows a roster > 1.
-  {
-    who: "l.brunner",
-    project: "kickoff-voices-of-tomorrow",
-    stage: "execution",
-    strands: ["Imagination", "Technologies"],
-    type: "external",
-    proposal: {
-      idea: "Edit and sound-design the Voices of Tomorrow podcast, and take over production next year.",
-      internal: "Frees Sofia to focus on guests and keeps the show running after she leaves.",
-      external: "Same audience as the main show.",
-      feasibility: "Editing is roughly three hours an episode. Learning curve on the software was the main unknown and is now behind me.",
-    },
-    approved: true,
-    charter: true,
-    goals: [
-      { kind: "deliverable", statement: "Edit episodes four to six to a standard Sofia does not need to revise", measure: "Three episodes published with no re-edit", dueBy: "End of Term 3", progress: 67 },
-    ],
-    tasks: [
-      { title: "Learn the editing software", status: "done" },
-      { title: "Edit episode 4", status: "done" },
-      { title: "Edit episode 5", status: "done" },
-      { title: "Edit episode 6", status: "doing" },
-    ],
-    criteria: [
-      { label: "The outcome exists and someone outside the project has seen it", met: true },
-      { label: "I can explain the problem I framed and why it mattered", met: true },
-      { label: "I completed at least two Plan – Act – Reflect cycles", met: false },
-      { label: "I acted on feedback from a coach or peer at least once", met: true },
     ],
   },
 ];
@@ -356,40 +349,77 @@ async function main() {
   let n = 0;
   for (const s of SEEDS) {
     const userId = ids.get(s.who)!;
+    const coachId = ids.get("r.chevalley")!;
+    const approved = s.level >= 3;
+
     const [e] = await db().insert(enrolments).values({
-      userId, projectSlug: s.project, role: "member",
-      status: s.stage === "presentation" ? "active" : "active",
-      stage: s.stage, targetStrands: s.strands, projectType: s.type,
-      proposalIdea: s.proposal?.idea ?? "",
-      proposalInternalImpact: s.proposal?.internal ?? "",
-      proposalExternalImpact: s.proposal?.external ?? "",
-      proposalFeasibility: s.proposal?.feasibility ?? "",
-      proposalSubmittedAt: s.proposal ? new Date() : null,
-      approvedAt: s.approved ? new Date() : null,
-      approvedBy: s.approved ? ids.get("r.chevalley")! : null,
-      leadCoachId: s.approved ? ids.get("r.chevalley")! : null,
-      charterSignedAt: s.charter ? new Date() : null,
+      userId, projectSlug: s.project, role: "member", status: "active",
+      phase: s.phase, level: s.level,
+      targetStrands: s.strands, projectType: s.type,
+      problem: s.proposal?.problem ?? "",
+      whoAffected: s.proposal?.whoAffected ?? "",
+      whatChanges: s.proposal?.whatChanges ?? "",
+      deliverable: s.proposal?.deliverable ?? "",
+      skills: s.proposal?.skills ?? "",
+      needs: s.proposal?.needs ?? "",
+      risk: s.proposal?.risk ?? "",
+      indicatorName: s.proposal?.indicator ?? "",
+      indicatorBaseline: s.proposal?.baseline ?? "",
+      indicatorTarget: s.proposal?.target ?? "",
+      indicatorCurrent: s.proposal?.current ?? "",
+      proposalSubmittedAt: s.submitted ? new Date() : null,
+      approvedAt: approved ? new Date() : null,
+      approvedBy: approved ? coachId : null,
+      approvedByName: approved ? "Rémy Chevalley" : "",
+      leadCoachId: coachId,
+      charterSignedAt: approved ? new Date() : null,
+      charterSignedByName: approved ? (PEOPLE.find((p) => p.key === s.who)?.name ?? "") : "",
+      planValidatedAt: s.planValidated ? new Date() : null,
+      planValidatedByName: s.planValidated ? "Rémy Chevalley" : "",
     }).returning({ id: enrolments.id });
 
-    if (s.goals?.length) {
-      await db().insert(goals).values(s.goals.map((g, i) => ({
-        enrolmentId: e.id, kind: g.kind, statement: g.statement, measure: g.measure,
-        dueBy: g.dueBy, progress: g.progress, achieved: g.progress >= 100, position: i,
-      })));
-    }
-    if (s.tasks?.length) {
-      await db().insert(tasks).values(s.tasks.map((t, i) => ({
-        enrolmentId: e.id, title: t.title, status: t.status, position: i,
-      })));
+    const msIds: string[] = [];
+    if (s.milestones?.length) {
+      for (const [i, m] of s.milestones.entries()) {
+        const [row] = await db().insert(milestones).values({
+          enrolmentId: e.id, title: m.title, dueDate: m.dueDate, done: m.done, position: i,
+        }).returning({ id: milestones.id });
+        msIds.push(row.id);
+        // The board is pre-filled from the milestones.
+        await db().insert(tasks).values({
+          enrolmentId: e.id, title: m.title,
+          status: m.done ? "done" : i === s.milestones!.filter((x) => x.done).length ? "doing" : "backlog",
+          position: i,
+        });
+      }
     }
     if (s.criteria?.length) {
       await db().insert(criteria).values(s.criteria.map((c, i) => ({
         enrolmentId: e.id, label: c.label, met: c.met, position: i,
       })));
     }
+    if (s.evidenceLog?.length) {
+      for (const [i, ev] of s.evidenceLog.entries()) {
+        await db().insert(evidence).values({
+          enrolmentId: e.id, level: ev.level, note: ev.note,
+          url: ev.url ?? "", value: ev.value ?? "", status: ev.status,
+          milestoneId: msIds[i] ?? null,
+          reviewedAt: ev.status === "submitted" ? null : new Date(),
+          reviewedByName: ev.status === "submitted" ? "" : "Rémy Chevalley",
+          reviewComment: ev.comment ?? "",
+        });
+      }
+    }
     if (s.cycles?.length) {
       await db().insert(reflections).values(s.cycles.map((c, i) => ({
         enrolmentId: e.id, cycle: i + 1, plan: c.plan, act: c.act, reflect: c.reflect, furtherQuestion: c.q,
+      })));
+    }
+    if (s.help?.length) {
+      await db().insert(helpRequests).values(s.help.map((h) => ({
+        enrolmentId: e.id, question: h.question, answer: h.answer ?? "",
+        answeredByName: h.answer ? "Rémy Chevalley" : "",
+        answeredAt: h.answer ? new Date() : null,
       })));
     }
     if (s.selfCard) {

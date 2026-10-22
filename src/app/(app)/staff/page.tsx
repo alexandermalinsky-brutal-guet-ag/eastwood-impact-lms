@@ -254,12 +254,6 @@ export default async function StaffPage() {
             </div>
           ))}
         </div>
-        <p className="mt-6 text-xs text-muted">
-          Curriculum source: {projects.length} projects and {resources.length}{" "}
-          practices, generated from the IMPACT planning workbook. Edit the
-          workbook and run{" "}
-          <span className="font-mono">npm run data:extract</span> to update.
-        </p>
       </section>
     </>
   );

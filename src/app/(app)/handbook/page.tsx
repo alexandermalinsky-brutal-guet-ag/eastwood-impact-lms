@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { JourneyDetail } from "@/components/JourneyTracker";
 import { SectionHeading } from "@/components/ui";
 import { INTEGRATION_NOTE, STRANDS } from "@/lib/brand";
 import { evidenceBase, kickoffProjects } from "@/lib/curriculum";
 import {
+  PHASES_OF_WORK,
   COACH_ROLES,
   COACH_SCORECARD,
   EXTERNAL_CATEGORIES,
@@ -66,7 +66,23 @@ export default function HandbookPage() {
           run over months rather than weeks, because meaningful skill
           development needs time, iteration and reflection.
         </p>
-        <JourneyDetail />
+        <ol className="space-y-4">
+          {PHASES_OF_WORK.map((phase) => (
+            <li key={phase.key} className="card p-6">
+              <div className="flex flex-wrap items-baseline gap-3">
+                <span className="rounded-full bg-deep-blue px-3 py-1 text-xs font-bold text-white">
+                  Phase {phase.number}
+                </span>
+                <h3 className="text-xl font-bold tracking-tight text-ink">{phase.name}</h3>
+                <span className="text-sm text-muted">{phase.verb}</span>
+              </div>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{phase.summary}</p>
+              <p className="mt-3 rounded-lg bg-paper p-3 text-sm text-ink">
+                <span className="font-bold">Gate: </span>{phase.gate}
+              </p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section id="strands" className="mb-16 scroll-mt-24">

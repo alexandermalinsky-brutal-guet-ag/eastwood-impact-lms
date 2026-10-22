@@ -1,10 +1,12 @@
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { db, isDatabaseConfigured } from "@/db";
 import {
   criteria,
   enrolments,
-  goals,
+  evidence,
+  helpRequests,
+  milestones,
   reflections,
   scorecards,
   tasks,
@@ -73,11 +75,21 @@ export async function enrolmentDetail(enrolmentId: string) {
         .from(reflections)
         .where(eq(reflections.enrolmentId, enrolmentId))
         .orderBy(asc(reflections.cycle)),
-      goals: await db()
+      milestones: await db()
         .select()
-        .from(goals)
-        .where(eq(goals.enrolmentId, enrolmentId))
-        .orderBy(asc(goals.position)),
+        .from(milestones)
+        .where(eq(milestones.enrolmentId, enrolmentId))
+        .orderBy(asc(milestones.position)),
+      evidence: await db()
+        .select()
+        .from(evidence)
+        .where(eq(evidence.enrolmentId, enrolmentId))
+        .orderBy(desc(evidence.submittedAt)),
+      help: await db()
+        .select()
+        .from(helpRequests)
+        .where(eq(helpRequests.enrolmentId, enrolmentId))
+        .orderBy(desc(helpRequests.createdAt)),
       scorecards: await db()
         .select()
         .from(scorecards)
@@ -88,7 +100,9 @@ export async function enrolmentDetail(enrolmentId: string) {
       tasks: [] as (typeof tasks.$inferSelect)[],
       criteria: [] as (typeof criteria.$inferSelect)[],
       reflections: [] as (typeof reflections.$inferSelect)[],
-      goals: [] as (typeof goals.$inferSelect)[],
+      milestones: [] as (typeof milestones.$inferSelect)[],
+      evidence: [] as (typeof evidence.$inferSelect)[],
+      help: [] as (typeof helpRequests.$inferSelect)[],
       scorecards: [] as (typeof scorecards.$inferSelect)[],
     },
   );
@@ -198,4 +212,166 @@ export async function myProfile(userId: string) {
     academicYear: string | null;
     createdAt: Date;
   } | null);
+}
+
+
+/**
+ * The coach's daily view: one line per student project, with everything needed
+ * to decide in a minute who needs attention.
+ *
+ * Stalled is defined by the brief: no evidence for seven days, or a milestone
+ * past its date.
+ */
+export async function coachBoard() {
+  return safe(async () => {
+    const rows = await db()
+      .select({
+        enrolmentId: enrolments.id,
+        projectSlug: enrolments.projectSlug,
+        ownTitle: enrolments.ownTitle,
+        phase: enrolments.phase,
+        level: enrolments.level,
+        status: enrolments.status,
+        submittedAt: enrolments.proposalSubmittedAt,
+        approvedAt: enrolments.approvedAt,
+        planValidatedAt: enrolments.planValidatedAt,
+        charterSignedAt: enrolments.charterSignedAt,
+        indicatorName: enrolments.indicatorName,
+        indicatorCurrent: enrolments.indicatorCurrent,
+        indicatorTarget: enrolments.indicatorTarget,
+        studentName: users.name,
+        studentEmail: users.email,
+        studentPhase: users.phase,
+      })
+      .from(enrolments)
+      .innerJoin(users, eq(enrolments.userId, users.id))
+      .where(eq(users.role, "student"))
+      .orderBy(asc(users.name));
+
+    const ids = rows.map((r) => r.enrolmentId);
+    if (ids.length === 0) return { rows: [], pendingEvidence: [], pendingHelp: [] };
+
+    const lastEvidence = await db()
+      .select({
+        enrolmentId: evidence.enrolmentId,
+        last: sql<string>`max(${evidence.submittedAt})`,
+      })
+      .from(evidence)
+      .where(inArray(evidence.enrolmentId, ids))
+      .groupBy(evidence.enrolmentId);
+    const lastBy = new Map(lastEvidence.map((e) => [e.enrolmentId, e.last]));
+
+    const openMilestones = await db()
+      .select({ enrolmentId: milestones.enrolmentId, title: milestones.title, dueDate: milestones.dueDate })
+      .from(milestones)
+      .where(and(inArray(milestones.enrolmentId, ids), eq(milestones.done, false)))
+      .orderBy(asc(milestones.position));
+    const nextBy = new Map<string, { title: string; dueDate: string }>();
+    for (const m of openMilestones) if (!nextBy.has(m.enrolmentId)) nextBy.set(m.enrolmentId, m);
+
+    const pendingEvidence = await db()
+      .select({
+        id: evidence.id, level: evidence.level, note: evidence.note, url: evidence.url,
+        value: evidence.value, submittedAt: evidence.submittedAt,
+        projectSlug: enrolments.projectSlug, ownTitle: enrolments.ownTitle,
+        studentName: users.name,
+      })
+      .from(evidence)
+      .innerJoin(enrolments, eq(evidence.enrolmentId, enrolments.id))
+      .innerJoin(users, eq(enrolments.userId, users.id))
+      .where(eq(evidence.status, "submitted"))
+      .orderBy(asc(evidence.submittedAt));
+
+    const pendingHelp = await db()
+      .select({
+        id: helpRequests.id, question: helpRequests.question, createdAt: helpRequests.createdAt,
+        projectSlug: enrolments.projectSlug, ownTitle: enrolments.ownTitle, studentName: users.name,
+      })
+      .from(helpRequests)
+      .innerJoin(enrolments, eq(helpRequests.enrolmentId, enrolments.id))
+      .innerJoin(users, eq(enrolments.userId, users.id))
+      .where(sql`${helpRequests.answeredAt} is null`)
+      .orderBy(asc(helpRequests.createdAt));
+
+    const now = Date.now();
+    const WEEK = 7 * 24 * 60 * 60 * 1000;
+
+    return {
+      rows: rows.map((r) => {
+        const next = nextBy.get(r.enrolmentId) ?? null;
+        const last = lastBy.get(r.enrolmentId);
+        const lastDate = last ? new Date(last) : null;
+        const quiet = !lastDate || now - lastDate.getTime() > WEEK;
+        const overdue = Boolean(next?.dueDate && Date.parse(next.dueDate) < now);
+        return {
+          ...r,
+          next,
+          lastEvidenceAt: lastDate,
+          light: (overdue || quiet ? (overdue && quiet ? "stalled" : "at-risk") : "on-track") as
+            "on-track" | "at-risk" | "stalled",
+        };
+      }),
+      pendingEvidence,
+      pendingHelp,
+    };
+  }, { rows: [], pendingEvidence: [], pendingHelp: [] } as Awaited<ReturnType<typeof coachBoardShape>>);
+}
+
+/** Type carrier only — never called. */
+declare function coachBoardShape(): Promise<{
+  rows: {
+    enrolmentId: string; projectSlug: string; ownTitle: string;
+    phase: "create" | "plan" | "execute" | "report"; level: number;
+    status: "active" | "complete" | "withdrawn";
+    submittedAt: Date | null; approvedAt: Date | null; planValidatedAt: Date | null;
+    charterSignedAt: Date | null;
+    indicatorName: string; indicatorCurrent: string; indicatorTarget: string;
+    studentName: string | null; studentEmail: string;
+    studentPhase: "exploration" | "execution" | "legacy";
+    next: { title: string; dueDate: string } | null;
+    lastEvidenceAt: Date | null;
+    light: "on-track" | "at-risk" | "stalled";
+  }[];
+  pendingEvidence: {
+    id: string; level: number; note: string; url: string; value: string;
+    submittedAt: Date; projectSlug: string; ownTitle: string; studentName: string | null;
+  }[];
+  pendingHelp: {
+    id: string; question: string; createdAt: Date;
+    projectSlug: string; ownTitle: string; studentName: string | null;
+  }[];
+}>;
+
+/** Proposals sitting in the approval queue. */
+export async function proposalsAwaitingReview() {
+  return safe(() =>
+    db()
+      .select({
+        enrolmentId: enrolments.id, projectSlug: enrolments.projectSlug,
+        ownTitle: enrolments.ownTitle, problem: enrolments.problem,
+        submittedAt: enrolments.proposalSubmittedAt,
+        studentName: users.name,
+      })
+      .from(enrolments)
+      .innerJoin(users, eq(enrolments.userId, users.id))
+      .where(and(sql`${enrolments.proposalSubmittedAt} is not null`, sql`${enrolments.approvedAt} is null`))
+      .orderBy(asc(enrolments.proposalSubmittedAt)),
+    [] as { enrolmentId: string; projectSlug: string; ownTitle: string; problem: string; submittedAt: Date | null; studentName: string | null }[],
+  );
+}
+
+/** Plans waiting for a coach to validate before Execute can start. */
+export async function plansAwaitingReview() {
+  return safe(() =>
+    db()
+      .select({
+        enrolmentId: enrolments.id, projectSlug: enrolments.projectSlug,
+        ownTitle: enrolments.ownTitle, studentName: users.name,
+      })
+      .from(enrolments)
+      .innerJoin(users, eq(enrolments.userId, users.id))
+      .where(and(eq(enrolments.phase, "plan"), sql`${enrolments.planValidatedAt} is null`, sql`${enrolments.approvedAt} is not null`))
+      .orderBy(asc(enrolments.approvedAt)),
+    [] as { enrolmentId: string; projectSlug: string; ownTitle: string; studentName: string | null }[],
+  );
 }

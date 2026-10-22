@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { auth } from "@/auth";
-import { Card, Empty, SectionHeading, Stat, StrandChip } from "@/components/ui";
-import { STRANDS, strandsOf } from "@/lib/brand";
+import { Card, Empty, SectionHeading, Stat } from "@/components/ui";
 import { getProject } from "@/lib/curriculum";
-import { COACH_SCORECARD, PHASES, STAGES, STUDENT_SCORECARD } from "@/lib/handbook";
+import { COACH_SCORECARD, PHASE_BY_KEY, PHASES, STUDENT_SCORECARD } from "@/lib/handbook";
 import { enrolmentDetail, myEnrolments, myProfile } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Impact Profile" };
@@ -41,7 +40,7 @@ export default async function ProfilePage() {
     })),
   );
 
-  const allGoals = records.flatMap((r) => r.detail.goals);
+  const allMilestones = records.flatMap((r) => r.detail.milestones);
   const allReflections = records.flatMap((r) => r.detail.reflections);
   const coachCards = records.flatMap((r) =>
     r.detail.scorecards.filter((s) => s.kind === "coach"),
@@ -49,17 +48,6 @@ export default async function ProfilePage() {
   const studentCards = records.flatMap((r) =>
     r.detail.scorecards.filter((s) => s.kind === "student"),
   );
-
-  // Strand coverage across every project this student has taken on.
-  const strandCounts = new Map<string, number>();
-  for (const record of records) {
-    const names = record.enrolment.targetStrands.length
-      ? record.enrolment.targetStrands
-      : (record.project?.strands ?? []);
-    for (const name of names) {
-      strandCounts.set(name, (strandCounts.get(name) ?? 0) + 1);
-    }
-  }
 
   /** Mean rating per dimension across all coach scorecards. */
   function averages(cards: typeof coachCards, keys: readonly { key: string; label: string }[]) {
@@ -154,8 +142,8 @@ export default async function ProfilePage() {
           <div className="mb-12 grid gap-4 sm:grid-cols-4">
             <Stat value={records.length} label="Projects" />
             <Stat
-              value={`${allGoals.filter((g) => g.achieved).length}/${allGoals.length}`}
-              label="Goals achieved"
+              value={`${allMilestones.filter((m) => m.done).length}/${allMilestones.length}`}
+              label="Milestones done"
               accent="var(--color-royal-purple)"
             />
             <Stat
@@ -169,55 +157,6 @@ export default async function ProfilePage() {
               accent="var(--color-mustard)"
             />
           </div>
-
-          <section className="mb-12">
-            <h2 className="mb-1 text-xl font-bold tracking-tight text-ink">
-              Strand coverage
-            </h2>
-            <p className="mb-5 max-w-2xl text-sm text-muted">
-              Breadth matters. The programme is designed to prevent narrow
-              specialisation — gaps here are worth a conversation with your
-              coach.
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {STRANDS.map((strand) => {
-                const count = strandCounts.get(strand.name) ?? 0;
-                return (
-                  <div
-                    key={strand.slug}
-                    className={`rounded-[14px] p-4 ${count === 0 ? "border border-dashed border-line bg-surface" : ""}`}
-                    style={
-                      count > 0
-                        ? { background: strand.colour, color: strand.ink }
-                        : undefined
-                    }
-                  >
-                    <div className="flex items-baseline justify-between">
-                      <p
-                        className={`font-bold ${count === 0 ? "text-muted" : ""}`}
-                      >
-                        {strand.name}
-                      </p>
-                      <span
-                        className={`text-2xl font-bold tabular-nums ${
-                          count === 0 ? "text-line" : "opacity-50"
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    </div>
-                    <p
-                      className={`mt-0.5 text-xs font-medium ${
-                        count === 0 ? "text-muted" : "opacity-80"
-                      }`}
-                    >
-                      {count === 0 ? "Not yet engaged" : strand.definition}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
 
           {coachCards.length > 0 ? (
             <section className="mb-12">
@@ -299,12 +238,7 @@ export default async function ProfilePage() {
             </h2>
             <div className="space-y-4">
               {records.map(({ enrolment, project, detail }) => {
-                const stage = STAGES.find((s) => s.key === enrolment.stage)!;
-                const strands = strandsOf(
-                  enrolment.targetStrands.length
-                    ? enrolment.targetStrands
-                    : (project?.strands ?? []),
-                );
+                const phase = PHASE_BY_KEY.get(enrolment.phase)!;
                 return (
                   <Link
                     key={enrolment.id}
@@ -317,21 +251,17 @@ export default async function ProfilePage() {
                           {project?.title ?? enrolment.projectSlug}
                         </h3>
                         <p className="mt-0.5 text-sm text-muted">
-                          Stage {stage.number} · {stage.shortName} ·{" "}
+                          Phase {phase.number} · {phase.name} ·{" "}
                           {enrolment.status}
                         </p>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {strands.map((s) => (
-                          <StrandChip key={s.slug} strand={s} />
-                        ))}
-                      </div>
+
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted">
                       <span>
-                        {detail.goals.filter((g) => g.achieved).length}/
-                        {detail.goals.length} goals
+                        {detail.milestones.filter((m) => m.done).length}/
+                        {detail.milestones.length} milestones
                       </span>
                       <span>{detail.reflections.length} reflection cycles</span>
                       <span>

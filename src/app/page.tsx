@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { Logo, LogoSymbol } from "@/components/Logo";
-import { STRANDS } from "@/lib/brand";
-import { projects, resources } from "@/lib/curriculum";
 
 export default async function Landing() {
   const session = await auth();
@@ -20,7 +18,7 @@ export default async function Landing() {
 
           <div className="mt-20 max-w-3xl">
             <p className="text-[0.72rem] font-bold uppercase tracking-[0.24em] text-light-purple">
-              {STRANDS.map((s) => s.name).join(" · ")}
+              Who benefits · What changes · How we know
             </p>
             <h1 className="mt-5 text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
               Projects that leave
@@ -28,9 +26,9 @@ export default async function Landing() {
               something behind.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/80">
-              IMPACT is where Eastwood Montreux students choose real work, plan
-              it, do it, and show what changed. This is the platform that keeps
-              track of all of it.
+              Students pick something that matters, say who it is for and what
+              would be different, then prove it changed. Every step backed by
+              evidence a coach has seen.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -48,39 +46,16 @@ export default async function Landing() {
 
           <dl className="mt-20 grid max-w-2xl grid-cols-3 gap-6 border-t border-white/15 pt-8">
             {[
-              { value: projects.length, label: "Projects on the menu" },
-              { value: STRANDS.length, label: "IMPACT strands" },
-              { value: resources.length, label: "Teaching practices" },
+              { value: "Create", label: "Say who it is for and what would change" },
+              { value: "Plan", label: "Dated milestones and a definition of done" },
+              { value: "Prove", label: "Evidence a coach validates, level by level" },
             ].map((stat) => (
               <div key={stat.label}>
-                <dt className="text-4xl font-bold tabular-nums">{stat.value}</dt>
+                <dt className="text-3xl font-bold">{stat.value}</dt>
                 <dd className="mt-1 text-sm text-white/65">{stat.label}</dd>
               </div>
             ))}
           </dl>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-royal-purple">
-          The six strands
-        </h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {STRANDS.map((strand) => (
-            <div
-              key={strand.slug}
-              className="rounded-[14px] p-6"
-              style={{ background: strand.colour, color: strand.ink }}
-            >
-              <p className="text-4xl font-bold leading-none opacity-40">
-                {strand.letter}
-              </p>
-              <h3 className="mt-4 text-xl font-bold">{strand.name}</h3>
-              <p className="mt-1.5 text-sm font-medium opacity-80">
-                {strand.definition}
-              </p>
-            </div>
-          ))}
         </div>
       </section>
 
