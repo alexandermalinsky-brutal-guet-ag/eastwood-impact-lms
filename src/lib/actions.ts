@@ -139,17 +139,45 @@ export async function addTask(enrolmentId: string, formData: FormData) {
 export async function moveTask(
   taskId: string,
   status: "backlog" | "doing" | "review" | "done",
+  /** Index within the destination column; appended when omitted. */
+  index?: number,
 ) {
   const user = await requireUser();
   const [row] = await db()
-    .select({ enrolmentId: tasks.enrolmentId, projectSlug: enrolments.projectSlug })
+    .select({
+      enrolmentId: tasks.enrolmentId,
+      projectSlug: enrolments.projectSlug,
+      userId: enrolments.userId,
+    })
     .from(tasks)
     .innerJoin(enrolments, eq(tasks.enrolmentId, enrolments.id))
-    .where(and(eq(tasks.id, taskId), eq(enrolments.userId, user.id)))
+    .where(eq(tasks.id, taskId))
     .limit(1);
   if (!row) throw new Error("Task not found.");
+  if (row.userId !== user.id && user.role === "student") throw new Error("Not your project.");
 
-  await db().update(tasks).set({ status }).where(eq(tasks.id, taskId));
+  // Read the destination column, drop the card in at `index`, and renumber.
+  // Renumbering the whole column keeps positions dense, so repeated drags
+  // cannot drift into collisions.
+  const column = await db()
+    .select({ id: tasks.id })
+    .from(tasks)
+    .where(and(eq(tasks.enrolmentId, row.enrolmentId), eq(tasks.status, status)))
+    .orderBy(asc(tasks.position));
+
+  const without = column.map((t) => t.id).filter((id) => id !== taskId);
+  const at = index === undefined ? without.length : Math.max(0, Math.min(index, without.length));
+  const ordered = [...without.slice(0, at), taskId, ...without.slice(at)];
+
+  await Promise.all(
+    ordered.map((id, i) =>
+      db()
+        .update(tasks)
+        .set(id === taskId ? { status, position: i } : { position: i })
+        .where(eq(tasks.id, id)),
+    ),
+  );
+
   revalidatePath(`/projects/${row.projectSlug}`);
 }
 
