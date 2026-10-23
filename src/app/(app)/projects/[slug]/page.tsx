@@ -14,7 +14,7 @@ import { AskCoach, EvidenceLog, ImpactTracker, ReportDraft } from "@/components/
 import { JoinButton } from "@/components/JoinButton";
 import { Empty } from "@/components/ui";
 import { getProject, projects } from "@/lib/curriculum";
-import { enrolmentDetail, myEnrolmentFor, projectRoster } from "@/lib/queries";
+import { enrolmentBySlug, enrolmentDetail, myEnrolmentFor, projectRoster } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +32,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const session = await auth();
   const user = session!.user;
 
-  const enrolment = await myEnrolmentFor(user.id, slug);
+  const mineHere = await myEnrolmentFor(user.id, slug);
   const catalogue = getProject(slug);
-  // An own-idea project has no catalogue entry; its title lives on the enrolment.
+  const isStaff = user.role !== "student";
+
+  // An own-idea project has no catalogue entry, so a coach opening it from
+  // their queue has nothing to render unless we look it up by slug.
+  const enrolment = mineHere ?? (isStaff ? await enrolmentBySlug(slug) : null);
   if (!catalogue && !enrolment) notFound();
 
   const title = catalogue?.title ?? enrolment?.ownTitle ?? "Project";
@@ -42,7 +46,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     ? await enrolmentDetail(enrolment.id)
     : { tasks: [], criteria: [], reflections: [], milestones: [], evidence: [], help: [], scorecards: [] };
   const roster = await projectRoster(slug);
-  const isStaff = user.role !== "student";
   const mine = Boolean(enrolment) && enrolment!.userId === user.id;
 
   return (

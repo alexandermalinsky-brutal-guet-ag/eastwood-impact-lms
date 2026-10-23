@@ -10,7 +10,7 @@
  * @demo.eastwoodmontreux.ch domain so it can be told apart from a real roster
  * at a glance, and removed in one command.
  */
-import { eq, inArray, like } from "drizzle-orm";
+import { eq, inArray, like, or } from "drizzle-orm";
 import { hash } from "bcryptjs";
 
 import { db, isDatabaseConfigured } from "../src/db";
@@ -22,6 +22,112 @@ const YEAR = "2026/27";
 const flag = (n: string) => process.argv.includes(`--${n}`);
 
 type Phase = "exploration" | "execution" | "legacy";
+
+
+/**
+ * The platform's own project, owned by the person building it.
+ *
+ * Everything here is true: the dates come from the git history, the evidence
+ * from what actually shipped, and the indicator counts the demo cohort rather
+ * than pretending real students are already using it.
+ */
+const OWNER = {
+  email: "alexander.malinsky@eastwood.global",
+  name: "Alexander Malinsky",
+  role: "admin" as const,
+  slug: "own-impact-lms",
+  title: "The IMPACT LMS",
+};
+
+const OWNER_PROJECT = {
+  phase: "execute" as const,
+  level: 6,
+  strands: ["Technologies", "Action"],
+  type: "internal-to-external" as const,
+  problem:
+    "The IMPACT programme is fully designed in a 99-page handbook and run on a spreadsheet. Proposals, goals, reflections and coach assessments live in four places, owned by nobody, and are lost at the end of the year.",
+  whoAffected:
+    "Every student on an IMPACT project — around 180 across Grades 9 to 12 — and the 11 coaches who have no way to see who is stuck without asking each one.",
+  whatChanges:
+    "A student opens one page and knows what to do today. A coach opens one page and knows in a minute who needs them. The record of a project survives the year it was done in.",
+  deliverable:
+    "A live platform running the four-phase journey end to end: Impact Proposal, coach approval, dated plan, a level map that unlocks on validated evidence, and a report assembled from the project itself.",
+  skills:
+    "Shipping something real to a deadline, taking a critical brief without defending the first version, and cutting features that describe the programme instead of helping anyone run a project.",
+  needs:
+    "A Google Workspace admin for twenty minutes to create the OAuth client, a pilot cohort and a lead coach, and a decision on which AI tool the school approves for 13-18s.",
+  risk:
+    "It gets demoed, admired and never used, because nobody owns the content. Plan B: run the pilot with one class and the 16 practices already written, rather than waiting for all 70.",
+  indicatorName: "Student projects tracked end to end in the platform",
+  indicatorBaseline: "0 of 92",
+  indicatorTarget: "25 — one cohort, by the end of the pilot term",
+  indicatorCurrent: "5 (demo projects, not yet real students)",
+  milestones: [
+    { title: "First build live on Vercel with the curriculum imported", dueDate: "2026-09-08", done: true },
+    { title: "Align the platform with the IMPACT Handbook", dueDate: "2026-09-14", done: true },
+    { title: "Production database, accounts, and sign-in working", dueDate: "2026-10-08", done: true },
+    { title: "Release 1 of the Improvement Brief", dueDate: "2026-10-22", done: true },
+    { title: "Demo to the IMPACT team and settle the six open questions", dueDate: "2026-10-30", done: false },
+    { title: "Release 2: weekly check-ins, file evidence, AI kits", dueDate: "2026-12-12", done: false },
+    { title: "Pilot with one cohort and measure the indicator", dueDate: "2027-02-27", done: false },
+  ],
+  criteria: [
+    { label: "A student can create, submit and plan a project without anyone explaining where things are", met: true },
+    { label: "A coach can see in under a minute which students are stalled", met: true },
+    { label: "Every issue listed in the Improvement Brief is closed", met: true },
+    { label: "One real cohort has run a project in it start to finish", met: false },
+    { label: "A finished project produces a report without retyping anything", met: false },
+  ],
+  evidence: [
+    { level: 1, status: "validated" as const,
+      note: "Read the 99-page handbook against the planning workbook. The handbook specifies proposals, approval, SMART goals, a charter, two scorecards and an Impact Profile. None of it had anywhere to live — the workbook held 87 project ideas, 61 with no point person and 6 with no strand.",
+      comment: "Counting the gaps rather than asserting them is what makes this a problem statement and not an opinion." },
+    { level: 2, status: "validated" as const,
+      note: "Proposal with the indicator set at 0 of 92 projects tracked, target one cohort.",
+      comment: "The target is a cohort rather than 'everyone', which is the right size for a first pilot." },
+    { level: 3, status: "validated" as const,
+      note: "Seven dated milestones from first build through to the pilot measurement, with the release plan from the brief as the spine.",
+      comment: "Dates are realistic and the last one is the only one that actually tests the idea." },
+    { level: 4, status: "validated" as const,
+      note: "First real test: live in production on 8 October, one month after the first commit. Sixteen reviewed commits, migrations applied to a clean database, every write ownership-checked.",
+      url: "https://eastwood-impact-lms.vercel.app",
+      comment: "Live is live. The month from nothing to production is the part to lead with." },
+    { level: 5, status: "validated" as const,
+      note: "Mid-showcase: Release 1 presented to the IMPACT team on 22 October. The brief asked for impact to replace strands as the organising idea, five trackers merged into one path, a coach view, and nine beta issues closed. All delivered.",
+      value: "9 of 9 issues closed",
+      comment: "Taking the brief at face value rather than arguing with it is why this moved as fast as it did." },
+  ],
+  cycles: [
+    {
+      plan: "Build the platform from the handbook and the planning workbook, generating the curriculum from the spreadsheet rather than retyping it.",
+      act: "Shipped in a month. The extractor logged 87 normalisations and refused to guess a strand for the six projects that arrived without one, which surfaced gaps nobody had counted.",
+      reflect: "The refusal to guess turned out to be the most useful decision. Showing 61 projects with no lead made a management fact visible that a tidier import would have hidden.",
+      q: "What else is the spreadsheet hiding that nobody has thought to count?",
+    },
+    {
+      plan: "Take the Improvement Brief and build Release 1 without arguing with any of it.",
+      act: "Rebuilt the organising idea around impact, merged five trackers into one path, added the level map and the coach queue, and closed all nine beta issues. Then spent a second pass deleting: 54 blank practice pages hidden, eight handbook sections cut to one, two numbering systems reduced to one.",
+      reflect: "The first version was structurally right and unreadable. The deletion pass changed more than the building pass did. I should have cut earlier rather than adding a feature for every line of the handbook.",
+      q: "How do I tell the difference between a concept the programme needs and one I added because the document mentioned it?",
+    },
+  ],
+  help: [
+    { question: "The 54 unwritten practice pages are the biggest thing blocking Release 3, and they are content work, not code. Who owns writing them, and can we start with the nine core practices rather than all of them?" },
+  ],
+  selfCard: {
+    ratings: { progress: 4, effort: 5, challenges: 4, collaborate: 3, adjustments: 5 },
+    notes: {
+      progress: "Release 1 shipped and live. The pilot — the only thing that actually tests the idea — has not started.",
+      effort: "Most of September and October, alongside the media work.",
+      challenges: "Scope. The handbook describes a whole programme and it was tempting to build all of it instead of the part students touch.",
+      collaborate: "Matthias's brief was the turning point and I should have asked for it a month earlier.",
+      adjustments: "Cut strands from the organising idea, merged the trackers, hid everything unwritten.",
+    },
+    comment:
+      "The hardest part was deleting things I had built. The second pass removed more than the first pass added, and the platform is better for it. The open risk is unchanged: this gets admired in a demo and never used, because the content behind it has no owner.",
+    period: "October",
+  },
+};
 
 const PEOPLE: {
   key: string; name: string; role: "student" | "coach" | "admin"; grade?: string; phase?: Phase;
@@ -323,7 +429,10 @@ const SEEDS: Seed[] = [
 ];
 
 async function clear() {
-  const demo = await db().select({ id: users.id }).from(users).where(like(users.email, `%@${DEMO_DOMAIN}`));
+  const demo = await db()
+    .select({ id: users.id })
+    .from(users)
+    .where(or(like(users.email, `%@${DEMO_DOMAIN}`), eq(users.email, OWNER.email)));
   if (!demo.length) { console.log("No demo accounts to remove."); return; }
   // Enrolments and everything under them cascade from the user row.
   await db().delete(users).where(inArray(users.id, demo.map((d) => d.id)));
@@ -439,11 +548,66 @@ async function main() {
     n += 1;
   }
 
+  // --- The owner's own project ---------------------------------------------
+  const [owner] = await db().insert(users).values({
+    email: OWNER.email, name: OWNER.name, role: OWNER.role,
+    passwordHash, academicYear: YEAR, phase: "legacy",
+  }).returning({ id: users.id });
+
+  const P = OWNER_PROJECT;
+  const coachId = ids.get("coach")!;
+  const [oe] = await db().insert(enrolments).values({
+    userId: owner.id, projectSlug: OWNER.slug, ownTitle: OWNER.title,
+    fromCatalogue: false, role: "lead", status: "active",
+    phase: P.phase, level: P.level, targetStrands: P.strands, projectType: P.type,
+    problem: P.problem, whoAffected: P.whoAffected, whatChanges: P.whatChanges,
+    deliverable: P.deliverable, skills: P.skills, needs: P.needs, risk: P.risk,
+    indicatorName: P.indicatorName, indicatorBaseline: P.indicatorBaseline,
+    indicatorTarget: P.indicatorTarget, indicatorCurrent: P.indicatorCurrent,
+    proposalSubmittedAt: new Date(),
+    approvedAt: new Date(), approvedBy: coachId, approvedByName: "Rémy Chevalley",
+    leadCoachId: coachId,
+    charterSignedAt: new Date(), charterSignedByName: OWNER.name,
+    planValidatedAt: new Date(), planValidatedByName: "Rémy Chevalley",
+  }).returning({ id: enrolments.id });
+
+  for (const [i, m] of P.milestones.entries()) {
+    await db().insert(milestones).values({
+      enrolmentId: oe.id, title: m.title, dueDate: m.dueDate, done: m.done, position: i,
+    });
+    await db().insert(tasks).values({
+      enrolmentId: oe.id, title: m.title,
+      status: m.done ? "done" : i === P.milestones.filter((x) => x.done).length ? "doing" : "backlog",
+      position: i,
+    });
+  }
+  await db().insert(criteria).values(P.criteria.map((c, i) => ({
+    enrolmentId: oe.id, label: c.label, met: c.met, position: i,
+  })));
+  await db().insert(evidence).values(P.evidence.map((e) => ({
+    enrolmentId: oe.id, level: e.level, note: e.note,
+    url: "url" in e ? (e.url as string) : "", value: "value" in e ? (e.value as string) : "",
+    status: e.status, reviewedAt: new Date(), reviewedByName: "Rémy Chevalley",
+    reviewComment: e.comment,
+  })));
+  await db().insert(reflections).values(P.cycles.map((c, i) => ({
+    enrolmentId: oe.id, cycle: i + 1, plan: c.plan, act: c.act, reflect: c.reflect, furtherQuestion: c.q,
+  })));
+  await db().insert(helpRequests).values(P.help.map((h) => ({
+    enrolmentId: oe.id, question: h.question,
+  })));
+  await db().insert(scorecards).values({
+    enrolmentId: oe.id, kind: "student", authorId: owner.id,
+    ratings: JSON.stringify(P.selfCard.ratings), notes: JSON.stringify(P.selfCard.notes),
+    comment: P.selfCard.comment, periodLabel: P.selfCard.period,
+  });
+
   console.log(`\nDemo cohort ready: ${PEOPLE.length} accounts, ${n} projects in flight.`);
   console.log(`\n  Student:  ${email("student")}`);
   console.log(`  Password: ${PASSWORD}`);
   console.log(`  Coach:    ${email("coach")}`);
   console.log(`  Admin:    ${email("admin")}`);
+  console.log(`\n  Your account:  ${OWNER.email}  (admin, owns "${OWNER.title}")`);
   console.log(`\nAll demo accounts are on @${DEMO_DOMAIN}. Remove with: --clear\n`);
 }
 

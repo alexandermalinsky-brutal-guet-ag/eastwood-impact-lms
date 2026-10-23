@@ -409,3 +409,20 @@ export async function upcomingDeadlines(userId: string) {
     [] as { id: string; title: string; dueDate: string; done: boolean; projectSlug: string; ownTitle: string }[],
   );
 }
+
+
+/**
+ * The enrolment for a project by slug, regardless of who owns it. Staff need
+ * this to open an own-idea project from the coach queue — those have no
+ * catalogue entry, so without it the link 404s for everyone but the owner.
+ */
+export async function enrolmentBySlug(projectSlug: string) {
+  return safe(async () => {
+    const [row] = await db()
+      .select()
+      .from(enrolments)
+      .where(eq(enrolments.projectSlug, projectSlug))
+      .limit(1);
+    return row ?? null;
+  }, null as EnrolmentRow | null);
+}
