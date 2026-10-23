@@ -5,6 +5,7 @@ import { useRef, useTransition } from "react";
 import { addMilestone, deleteMilestone, signCharterNamed, toggleMilestone, validatePlan } from "@/lib/actions";
 import { buttonClass } from "@/components/ui";
 import type { criteria as criteriaTable, enrolments as enrolmentsTable, milestones as milestonesTable } from "@/db/schema";
+import { formatDate, formatDueDate } from "@/lib/dates";
 
 type Milestone = typeof milestonesTable.$inferSelect;
 type Criterion = typeof criteriaTable.$inferSelect;
@@ -94,7 +95,7 @@ export function Plan({
                     {m.dueDate ? (
                       <p className={`mt-0.5 text-xs ${overdue ? "font-bold text-mustard" : "text-muted"}`}>
                         {overdue ? "Overdue — " : "Due "}
-                        {new Date(m.dueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                        {formatDueDate(m.dueDate, { day: "numeric", month: "short" })}
                       </p>
                     ) : null}
                   </div>
@@ -140,7 +141,7 @@ export function Plan({
           <h3 className="font-bold text-ink">Commitment Charter</h3>
           <p className="mt-1 text-sm leading-relaxed text-muted">
             {signed
-              ? `Signed by ${enrolment.charterSignedByName || "the student"} on ${enrolment.charterSignedAt!.toLocaleDateString("en-GB")}.`
+              ? `Signed by ${enrolment.charterSignedByName || "the student"} on ${formatDate(enrolment.charterSignedAt!)}.`
               : "By signing, you agree to see this through unless a coach-led review decides to change direction."}
           </p>
           {!signed && canEdit ? (
@@ -158,7 +159,7 @@ export function Plan({
           <h3 className="font-bold text-ink">Plan validated</h3>
           <p className="mt-1 text-sm leading-relaxed text-muted">
             {validated
-              ? `Validated by ${enrolment.planValidatedByName} on ${enrolment.planValidatedAt!.toLocaleDateString("en-GB")}.`
+              ? `Validated by ${enrolment.planValidatedByName} on ${formatDate(enrolment.planValidatedAt!)}.`
               : "A coach checks the plan before Execute starts. Needs at least three dated milestones."}
           </p>
           {canReview && !validated ? (

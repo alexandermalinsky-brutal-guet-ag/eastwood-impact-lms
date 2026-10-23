@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { StartProject } from "@/components/StartProject";
 import { Empty, LinkButton } from "@/components/ui";
 import { getProject } from "@/lib/curriculum";
+import { formatDueDate } from "@/lib/dates";
 import { LEVEL_BY_N, MAX_LEVEL, PHASE_BY_KEY } from "@/lib/handbook";
 import { enrolmentDetail, myEnrolments } from "@/lib/queries";
 
@@ -106,7 +107,7 @@ export default async function Dashboard() {
                   {due ? (
                     <p className={`mt-1 text-xs ${overdue ? "font-bold text-mustard" : "text-muted"}`}>
                       {overdue ? "Overdue — " : "by "}
-                      {new Date(due).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                      {formatDueDate(due, { day: "numeric", month: "short" })}
                     </p>
                   ) : null}
                 </div>

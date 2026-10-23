@@ -6,6 +6,7 @@ import { saveScorecard } from "@/lib/actions";
 import { buttonClass } from "@/components/ui";
 import { COACH_SCORECARD, STUDENT_SCORECARD } from "@/lib/handbook";
 import type { scorecards as scorecardsTable } from "@/db/schema";
+import { formatDate } from "@/lib/dates";
 
 type Scorecard = typeof scorecardsTable.$inferSelect;
 
@@ -182,10 +183,10 @@ export function Scorecards({
               <li key={card.id} className="card p-5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="font-bold text-ink">
-                    {card.periodLabel || card.createdAt.toLocaleDateString("en-GB")}
+                    {card.periodLabel || formatDate(card.createdAt)}
                   </p>
                   <p className="text-xs text-muted">
-                    {card.createdAt.toLocaleDateString("en-GB")}
+                    {formatDate(card.createdAt)}
                   </p>
                 </div>
 

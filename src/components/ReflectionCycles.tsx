@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { saveReflection, startNextCycle } from "@/lib/actions";
 import { buttonClass } from "@/components/ui";
 import type { reflections as reflectionsTable } from "@/db/schema";
+import { formatDateTime } from "@/lib/dates";
 
 type Reflection = typeof reflectionsTable.$inferSelect;
 
@@ -145,7 +146,7 @@ export function ReflectionCycles({
                 {pending ? "Saving…" : "Save cycle"}
               </button>
               <span className="text-xs text-muted">
-                Last saved {reflection.updatedAt.toLocaleString("en-GB")}
+                Last saved {formatDateTime(reflection.updatedAt)}
               </span>
             </div>
           </form>

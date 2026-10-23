@@ -4,6 +4,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { Card, Empty, SectionHeading, Stat } from "@/components/ui";
 import { getProject } from "@/lib/curriculum";
+import { formatLongDate } from "@/lib/dates";
 import { COACH_SCORECARD, PHASE_BY_KEY, PHASES, STUDENT_SCORECARD } from "@/lib/handbook";
 import { enrolmentDetail, myEnrolments, myProfile } from "@/lib/queries";
 
@@ -255,7 +256,7 @@ export default async function ProfilePage() {
                           {withdrawn
                             ? `Withdrawn${
                                 enrolment.withdrawnAt
-                                  ? ` ${enrolment.withdrawnAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`
+                                  ? ` ${formatLongDate(enrolment.withdrawnAt)}`
                                   : ""
                               } · reached ${phase.name}`
                             : `Phase ${phase.number} · ${phase.name} · ${enrolment.status}`}

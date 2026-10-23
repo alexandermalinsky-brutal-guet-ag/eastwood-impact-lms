@@ -44,10 +44,11 @@ function CardBody({
   return (
     <>
       {/* The whole card is the grab handle, so a thumb has a big target —
-          the buttons below stay clickable because dnd-kit ignores them. */}
+          the buttons below stay clickable because dnd-kit ignores them.
+          select-none, or dragging highlights the title instead of moving it. */}
       <p
         {...handle}
-        className={handle ? "cursor-grab touch-none text-sm leading-snug text-ink active:cursor-grabbing" : "text-sm leading-snug text-ink"}
+        className={handle ? "cursor-grab touch-none select-none text-sm leading-snug text-ink active:cursor-grabbing" : "text-sm leading-snug text-ink"}
       >
         {task.title}
       </p>

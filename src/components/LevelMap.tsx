@@ -6,6 +6,7 @@ import { submitEvidence } from "@/lib/actions";
 import { buttonClass } from "@/components/ui";
 import { LEVELS, MAX_LEVEL } from "@/lib/handbook";
 import type { evidence as evidenceTable } from "@/db/schema";
+import { formatDate } from "@/lib/dates";
 
 type Evidence = typeof evidenceTable.$inferSelect;
 
@@ -82,7 +83,7 @@ export function LevelMap({
           <div className="mt-4 rounded-lg bg-paper p-4">
             <p className="text-sm font-semibold text-ink">With your coach</p>
             <p className="mt-1 text-sm text-muted">
-              Submitted {latestFor(level)!.submittedAt.toLocaleDateString("en-GB")}. You will see
+              Submitted {formatDate(latestFor(level)!.submittedAt)}. You will see
               their answer here.
             </p>
           </div>

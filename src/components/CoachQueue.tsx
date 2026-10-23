@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 
 import { answerHelpRequest, approveProposal, returnProposal, reviewEvidence, validatePlan } from "@/lib/actions";
 import { buttonClass } from "@/components/ui";
+import { formatDate } from "@/lib/dates";
 
 type Row = { id: string; title: string; studentName: string | null; when: Date | null; body: string; kind: Kind };
 type Kind = "proposal" | "plan" | "evidence" | "help";
@@ -72,7 +73,7 @@ export function CoachQueue({
                 <p className="mt-1 text-sm leading-relaxed text-muted">{item.body}</p>
               </div>
               {item.when ? (
-                <span className="shrink-0 text-xs text-muted">{item.when.toLocaleDateString("en-GB")}</span>
+                <span className="shrink-0 text-xs text-muted">{formatDate(item.when)}</span>
               ) : null}
             </div>
 

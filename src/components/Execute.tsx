@@ -8,6 +8,7 @@ import { LEVEL_BY_N, MAX_LEVEL, PROPOSAL_FIELDS } from "@/lib/handbook";
 import type {
   enrolments as enrolmentsTable, evidence as evidenceTable, helpRequests as helpTable,
 } from "@/db/schema";
+import { formatDate } from "@/lib/dates";
 
 type Enrolment = typeof enrolmentsTable.$inferSelect;
 type Evidence = typeof evidenceTable.$inferSelect;
@@ -141,7 +142,7 @@ export function EvidenceLog({ evidence, canReview }: { evidence: Evidence[]; can
                 {e.value ? <p className="mt-1 text-sm font-semibold text-ink">Measured: {e.value}</p> : null}
 
                 <p className="mt-2 text-xs text-muted">
-                  {e.submittedAt.toLocaleDateString("en-GB")}
+                  {formatDate(e.submittedAt)}
                   {e.reviewedByName ? ` · reviewed by ${e.reviewedByName}` : ""}
                 </p>
                 {e.reviewComment ? (
@@ -231,7 +232,7 @@ export function AskCoach({
           {requests.map((r) => (
             <li key={r.id} className="card p-4">
               <p className="text-sm leading-relaxed text-ink">{r.question}</p>
-              <p className="mt-1 text-xs text-muted">{r.createdAt.toLocaleDateString("en-GB")}</p>
+              <p className="mt-1 text-xs text-muted">{formatDate(r.createdAt)}</p>
               {r.answer ? (
                 <div className="mt-3 rounded-lg bg-paper p-3">
                   <p className="text-sm leading-relaxed text-ink">{r.answer}</p>

@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { CalendarConnect } from "@/components/CalendarConnect";
 import { Empty, SectionHeading } from "@/components/ui";
 import { getProject } from "@/lib/curriculum";
+import { formatDueDate } from "@/lib/dates";
 import { myCalendarToken, upcomingDeadlines } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Deadlines" };
@@ -14,8 +15,9 @@ export const dynamic = "force-dynamic";
 const DAY = 24 * 60 * 60 * 1000;
 
 /** Groups by how soon, because "when" is the only question this page answers. */
-function bucketOf(dueDate: string): "overdue" | "week" | "month" | "later" {
-  const diff = Date.parse(dueDate) - Date.now();
+function bucketOf(m: { dueDate: string; done: boolean }): typeof BUCKETS[number]["key"] {
+  if (m.done) return "done";
+  const diff = Date.parse(m.dueDate) - Date.now();
   if (diff < 0) return "overdue";
   if (diff < 7 * DAY) return "week";
   if (diff < 31 * DAY) return "month";
@@ -27,6 +29,7 @@ const BUCKETS = [
   { key: "week", label: "This week", tone: "text-royal-purple" },
   { key: "month", label: "This month", tone: "text-ink" },
   { key: "later", label: "Later", tone: "text-muted" },
+  { key: "done", label: "Done", tone: "text-forest-green" },
 ] as const;
 
 export default async function CalendarPage() {
@@ -58,7 +61,7 @@ export default async function CalendarPage() {
       ) : (
         <div className="space-y-8">
           {BUCKETS.map((bucket) => {
-            const items = deadlines.filter((d) => bucketOf(d.dueDate) === bucket.key);
+            const items = deadlines.filter((d) => bucketOf(d) === bucket.key);
             if (items.length === 0) return null;
             return (
               <section key={bucket.key}>
@@ -81,7 +84,7 @@ export default async function CalendarPage() {
                             <p className="mt-0.5 text-xs text-muted">{project}</p>
                           </div>
                           <span className={`shrink-0 text-sm font-semibold tabular-nums ${bucket.key === "overdue" ? "text-mustard" : "text-muted"}`}>
-                            {new Date(d.dueDate).toLocaleDateString("en-GB", {
+                            {formatDueDate(d.dueDate, {
                               weekday: "short", day: "numeric", month: "short",
                             })}
                           </span>

@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { CoachQueue } from "@/components/CoachQueue";
 import { Empty, SectionHeading } from "@/components/ui";
 import { getProject } from "@/lib/curriculum";
+import { formatDate, formatDueDate } from "@/lib/dates";
 import { PHASE_BY_KEY } from "@/lib/handbook";
 import { coachBoard, plansAwaitingReview, proposalsAwaitingReview } from "@/lib/queries";
 
@@ -106,14 +107,14 @@ export default async function CoachPage() {
                               {r.next.title}
                               {r.next.dueDate ? (
                                 <span className="block text-xs">
-                                  {new Date(r.next.dueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                                  {formatDueDate(r.next.dueDate, { day: "numeric", month: "short" })}
                                 </span>
                               ) : null}
                             </>
                           ) : "—"}
                         </td>
                         <td className="px-4 py-3 text-muted">
-                          {r.lastEvidenceAt ? r.lastEvidenceAt.toLocaleDateString("en-GB") : "none yet"}
+                          {r.lastEvidenceAt ? formatDate(r.lastEvidenceAt) : "none yet"}
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center gap-1.5 font-semibold ${light.text}`}>

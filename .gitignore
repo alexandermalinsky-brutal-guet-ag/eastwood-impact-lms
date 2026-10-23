@@ -13,3 +13,6 @@ next-env.d.ts
 
 # Generated student passwords — never commit
 roster-credentials-*.csv
+
+# PowerPoint lock files
+~$*

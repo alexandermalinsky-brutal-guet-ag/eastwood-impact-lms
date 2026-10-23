@@ -14,6 +14,7 @@ import { AskCoach, EvidenceLog, ImpactTracker, ReportDraft } from "@/components/
 import { JoinButton } from "@/components/JoinButton";
 import { Empty } from "@/components/ui";
 import { getProject, projects } from "@/lib/curriculum";
+import { formatDate } from "@/lib/dates";
 import { enrolmentBySlug, enrolmentDetail, myEnrolmentFor, projectRoster } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -167,7 +168,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     <td className="px-4 py-3 font-semibold text-ink">{row.name ?? row.email}</td>
                     <td className="px-4 py-3 capitalize text-muted">{row.role}</td>
                     <td className="px-4 py-3 capitalize text-muted">{row.status}</td>
-                    <td className="px-4 py-3 tabular-nums text-muted">{row.joinedAt.toLocaleDateString("en-GB")}</td>
+                    <td className="px-4 py-3 tabular-nums text-muted">{formatDate(row.joinedAt)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -41,7 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .where(eq(users.email, parsed.data.email.toLowerCase()))
           .limit(1);
 
-        if (!user?.passwordHash) return null;
+        if (!user?.passwordHash || !user.active) return null;
         if (!(await compare(parsed.data.password, user.passwordHash))) return null;
 
         return {
@@ -80,12 +80,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!isDatabaseConfigured()) return false;
 
       const [existing] = await db()
-        .select({ id: users.id, role: users.role })
+        .select({ id: users.id, role: users.role, active: users.active })
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
 
-      if (!existing) return false;
+      if (!existing || !existing.active) return false;
 
       (user as { id?: string }).id = existing.id;
       (user as { role?: Role }).role = existing.role;

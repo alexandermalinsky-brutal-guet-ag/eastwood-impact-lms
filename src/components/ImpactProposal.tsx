@@ -6,6 +6,7 @@ import { approveProposal, returnProposal, saveImpactProposal, submitProposal } f
 import { buttonClass } from "@/components/ui";
 import { INDICATOR_FIELDS, PROPOSAL_FIELDS } from "@/lib/handbook";
 import type { enrolments as enrolmentsTable } from "@/db/schema";
+import { formatDate } from "@/lib/dates";
 
 type Enrolment = typeof enrolmentsTable.$inferSelect;
 
@@ -153,7 +154,7 @@ export function ImpactProposal({
             <>
               <p className="font-bold text-ink">With your coach for approval</p>
               <p className="mt-1 text-sm text-muted">
-                Sent {enrolment.proposalSubmittedAt!.toLocaleDateString("en-GB")}.
+                Sent {formatDate(enrolment.proposalSubmittedAt!)}.
               </p>
             </>
           ) : (
@@ -216,7 +217,7 @@ export function ImpactProposal({
           <p className="font-bold text-ink">Approved</p>
           <p className="mt-1 text-sm text-muted">
             by {enrolment.approvedByName || "a coach"} on{" "}
-            {enrolment.approvedAt!.toLocaleDateString("en-GB")}
+            {formatDate(enrolment.approvedAt!)}
           </p>
         </div>
       )}

@@ -10,7 +10,7 @@
  * @demo.eastwoodmontreux.ch domain so it can be told apart from a real roster
  * at a glance, and removed in one command.
  */
-import { eq, inArray, like, or } from "drizzle-orm";
+import { eq, inArray, like } from "drizzle-orm";
 import { hash } from "bcryptjs";
 
 import { db, isDatabaseConfigured } from "../src/db";
@@ -146,30 +146,55 @@ const PEOPLE: { key: string; email: string; name: string; role: "student" | "coa
 
 const COACH_NAME = "Matthias";
 
-async function clear() {
-  const demo = await db()
+async function clear({ removeAccounts }: { removeAccounts: boolean }) {
+  // Accounts from earlier demo batches go entirely; they are not coming back.
+  const stale = await db()
     .select({ id: users.id })
     .from(users)
-    .where(or(like(users.email, `%@${DEMO_DOMAIN}`), inArray(users.email, PEOPLE.map((p) => p.email))));
-  if (!demo.length) { console.log("No demo accounts to remove."); return; }
-  // Enrolments and everything under them cascade from the user row.
-  await db().delete(users).where(inArray(users.id, demo.map((d) => d.id)));
-  console.log(`Removed ${demo.length} demo account(s) and all their project data.`);
+    .where(like(users.email, `%@${DEMO_DOMAIN}`));
+  if (stale.length) {
+    await db().delete(users).where(inArray(users.id, stale.map((d) => d.id)));
+    console.log(`Removed ${stale.length} account(s) from an earlier demo domain.`);
+  }
+
+  const current = await db()
+    .select({ id: users.id })
+    .from(users)
+    .where(inArray(users.email, PEOPLE.map((p) => p.email)));
+  if (!current.length) return;
+
+  if (removeAccounts) {
+    // Enrolments and everything under them cascade from the user row.
+    await db().delete(users).where(inArray(users.id, current.map((d) => d.id)));
+    console.log(`Removed ${current.length} demo account(s) and all their project data.`);
+    return;
+  }
+
+  // Everything under an enrolment cascades from it, so this is the whole project.
+  await db().delete(enrolments).where(inArray(enrolments.userId, current.map((d) => d.id)));
+  console.log(`Cleared project data for ${current.length} demo account(s); sessions stay valid.`);
 }
 
 async function main() {
   if (!isDatabaseConfigured()) { console.error("No DATABASE_URL."); process.exit(1); }
-  if (flag("clear")) return clear();
+  if (flag("clear")) return clear({ removeAccounts: true });
 
-  await clear(); // idempotent: always rebuild from scratch
+  await clear({ removeAccounts: false }); // idempotent: always rebuild the project
   const passwordHash = await hash(PASSWORD, 10);
   const ids = new Map<string, string>();
 
   for (const person of PEOPLE) {
-    const [row] = await db().insert(users).values({
-      email: person.email, name: person.name, role: person.role, passwordHash,
-      grade: person.grade ?? null, phase: person.phase ?? "exploration", academicYear: YEAR,
-    }).returning({ id: users.id });
+    const fields = {
+      name: person.name, role: person.role, passwordHash,
+      grade: person.grade ?? null, phase: person.phase ?? "exploration",
+      academicYear: YEAR, active: true,
+    };
+    // Upsert so an account keeps its id, and with it anyone's live session.
+    const [row] = await db()
+      .insert(users)
+      .values({ email: person.email, ...fields })
+      .onConflictDoUpdate({ target: users.email, set: fields })
+      .returning({ id: users.id });
     ids.set(person.key, row.id);
   }
 
