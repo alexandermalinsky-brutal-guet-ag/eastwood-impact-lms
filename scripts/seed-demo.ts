@@ -10,13 +10,19 @@
  * @demo.eastwoodmontreux.ch domain so it can be told apart from a real roster
  * at a glance, and removed in one command.
  */
-import { eq, inArray, like } from "drizzle-orm";
+import { eq, inArray, like, or } from "drizzle-orm";
 import { hash } from "bcryptjs";
 
 import { db, isDatabaseConfigured } from "../src/db";
 import { criteria, enrolments, evidence, helpRequests, milestones, reflections, scorecards, tasks, users } from "../src/db/schema";
 
 const DEMO_DOMAIN = "demo.eastwoodmontreux.ch"; // legacy cohort, cleared on reseed
+
+/**
+ * Accounts from earlier batches that kept showing up on the Programme roster
+ * and contradicting "three accounts". None of them owned a project.
+ */
+const RETIRED_EMAILS = ["alexandermalinsky@icloud.com", "melissa@eastwoodmontreux.ch"];
 const PASSWORD = process.env.DEMO_PASSWORD ?? "impact-demo-2026";
 const YEAR = "2026/27";
 const flag = (n: string) => process.argv.includes(`--${n}`);
@@ -151,7 +157,10 @@ async function clear({ removeAccounts }: { removeAccounts: boolean }) {
   const stale = await db()
     .select({ id: users.id })
     .from(users)
-    .where(like(users.email, `%@${DEMO_DOMAIN}`));
+    .where(or(
+      like(users.email, `%@${DEMO_DOMAIN}`),
+      inArray(users.email, RETIRED_EMAILS),
+    ));
   if (stale.length) {
     await db().delete(users).where(inArray(users.id, stale.map((d) => d.id)));
     console.log(`Removed ${stale.length} account(s) from an earlier demo domain.`);
