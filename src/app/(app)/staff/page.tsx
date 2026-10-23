@@ -60,8 +60,10 @@ export default async function StaffPage() {
           Take-up by project
         </h2>
         {takenUp.length === 0 ? (
-          <Empty title="No enrolments yet">
-            Once students start joining projects, the popular ones surface here.
+          <Empty title="No catalogue project taken up yet">
+            This counts the 92 suggested projects. A student working on their own
+            idea has no catalogue entry, so they are in the enrolment count above
+            but not in this table.
           </Empty>
         ) : (
           <div className="card overflow-hidden p-0">

@@ -110,13 +110,13 @@ const OWNER_PROJECT = {
     },
     {
       plan: "Take the Improvement Brief and build Release 1 without arguing with any of it.",
-      act: "Rebuilt the organising idea around impact, merged five trackers into one path, added the level map and the coach queue, and closed all nine beta issues. Then spent a second pass deleting: 54 blank practice pages hidden, eight handbook sections cut to one, two numbering systems reduced to one.",
+      act: "Rebuilt the organising idea around impact, merged five trackers into one path, added the level map and the coach queue, and closed all nine beta issues. Then spent a second pass deleting: 53 blank practice pages hidden, eight handbook sections cut to one, two numbering systems reduced to one.",
       reflect: "The first version was structurally right and unreadable. The deletion pass changed more than the building pass did. I should have cut earlier rather than adding a feature for every line of the handbook.",
       q: "How do I tell the difference between a concept the programme needs and one I added because the document mentioned it?",
     },
   ],
   help: [
-    { question: "The 54 unwritten practice pages are the biggest thing blocking Release 3, and they are content work, not code. Who owns writing them, and can we start with the nine core practices rather than all of them?" },
+    { question: "The 53 unwritten practice pages are the biggest thing blocking Release 3, and they are content work, not code. Who owns writing them, and can we start with the nine core practices rather than all of them?" },
   ],
   selfCard: {
     ratings: { progress: 4, effort: 5, challenges: 4, collaborate: 3, adjustments: 5 },
