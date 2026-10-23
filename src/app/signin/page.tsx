@@ -9,6 +9,21 @@ import { SignInForm } from "./SignInForm";
 export const metadata: Metadata = { title: "Sign in" };
 export const dynamic = "force-dynamic";
 
+/**
+ * Where to send someone once they are in. The proxy only ever puts a path
+ * here, but anyone can write the URL by hand, and the value is handed to
+ * router.push — so an unchecked ?next= turns a real sign-in page on the
+ * school's domain into an open redirect. Only same-site paths are allowed.
+ *
+ * "//evil.example" and "/\evil.example" are protocol-relative and leave the
+ * site, so a leading slash on its own is not enough.
+ */
+function safeNext(value: string | undefined): string {
+  if (!value || value[0] !== "/") return "/dashboard";
+  if (value[1] === "/" || value[1] === "\\") return "/dashboard";
+  return value;
+}
+
 export default async function SignInPage({
   searchParams,
 }: {
@@ -61,7 +76,7 @@ export default async function SignInPage({
           ) : null}
 
           <SignInForm
-            next={params.next ?? "/dashboard"}
+            next={safeNext(params.next)}
             googleEnabled={isGoogleEnabled}
             disabled={!ready}
             initialError={params.error ? "Sign in failed. Check your details and try again." : ""}
