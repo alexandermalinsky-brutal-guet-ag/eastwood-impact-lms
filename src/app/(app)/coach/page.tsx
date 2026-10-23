@@ -16,6 +16,8 @@ const LIGHT = {
   "on-track": { label: "On track", dot: "bg-forest-green", text: "text-forest-green" },
   "at-risk": { label: "At risk", dot: "bg-mustard", text: "text-mustard" },
   stalled: { label: "Stalled", dot: "bg-red-600", text: "text-red-700" },
+  complete: { label: "Complete", dot: "bg-forest-green", text: "text-muted" },
+  withdrawn: { label: "Withdrawn", dot: "bg-line", text: "text-muted" },
 } as const;
 
 /**
@@ -34,7 +36,7 @@ export default async function CoachPage() {
 
   const title = (slug: string, own: string) => own || getProject(slug)?.title || slug;
   const waiting = proposals.length + plans.length + board.pendingEvidence.length + board.pendingHelp.length;
-  const needAttention = board.rows.filter((r) => r.light !== "on-track");
+  const needAttention = board.rows.filter((r) => r.light === "at-risk" || r.light === "stalled");
 
   return (
     <>
@@ -118,6 +120,11 @@ export default async function CoachPage() {
                             <span className={`h-2 w-2 rounded-full ${light.dot}`} />
                             {light.label}
                           </span>
+                          {r.status === "withdrawn" && r.withdrawnReason ? (
+                            <span className="mt-1 block max-w-[16rem] text-xs font-normal text-muted">
+                              {r.withdrawnReason}
+                            </span>
+                          ) : null}
                         </td>
                       </tr>
                     );

@@ -50,6 +50,13 @@
       "when": 1792738196294,
       "tag": "0006_calendar_feed",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792746170119,
+      "tag": "0007_withdrawal",
+      "breakpoints": true
     }
   ]
 }

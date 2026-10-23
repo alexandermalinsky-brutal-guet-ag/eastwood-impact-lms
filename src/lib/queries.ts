@@ -232,6 +232,7 @@ export async function coachBoard() {
         phase: enrolments.phase,
         level: enrolments.level,
         status: enrolments.status,
+        withdrawnReason: enrolments.withdrawnReason,
         submittedAt: enrolments.proposalSubmittedAt,
         approvedAt: enrolments.approvedAt,
         planValidatedAt: enrolments.planValidatedAt,
@@ -279,7 +280,7 @@ export async function coachBoard() {
       .from(evidence)
       .innerJoin(enrolments, eq(evidence.enrolmentId, enrolments.id))
       .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(eq(evidence.status, "submitted"))
+      .where(and(eq(evidence.status, "submitted"), eq(enrolments.status, "active")))
       .orderBy(asc(evidence.submittedAt));
 
     const pendingHelp = await db()
@@ -290,7 +291,7 @@ export async function coachBoard() {
       .from(helpRequests)
       .innerJoin(enrolments, eq(helpRequests.enrolmentId, enrolments.id))
       .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(sql`${helpRequests.answeredAt} is null`)
+      .where(and(sql`${helpRequests.answeredAt} is null`, eq(enrolments.status, "active")))
       .orderBy(asc(helpRequests.createdAt));
 
     const now = Date.now();
@@ -303,13 +304,12 @@ export async function coachBoard() {
         const lastDate = last ? new Date(last) : null;
         const quiet = !lastDate || now - lastDate.getTime() > WEEK;
         const overdue = Boolean(next?.dueDate && Date.parse(next.dueDate) < now);
-        return {
-          ...r,
-          next,
-          lastEvidenceAt: lastDate,
-          light: (overdue || quiet ? (overdue && quiet ? "stalled" : "at-risk") : "on-track") as
-            "on-track" | "at-risk" | "stalled",
-        };
+        const light =
+          r.status === "withdrawn" ? "withdrawn"
+          : r.status === "complete" ? "complete"
+          : overdue || quiet ? (overdue && quiet ? "stalled" : "at-risk")
+          : "on-track";
+        return { ...r, next, lastEvidenceAt: lastDate, light: light as CoachLight };
       }),
       pendingEvidence,
       pendingHelp,
@@ -317,12 +317,15 @@ export async function coachBoard() {
   }, { rows: [], pendingEvidence: [], pendingHelp: [] } as Awaited<ReturnType<typeof coachBoardShape>>);
 }
 
+export type CoachLight = "on-track" | "at-risk" | "stalled" | "complete" | "withdrawn";
+
 /** Type carrier only — never called. */
 declare function coachBoardShape(): Promise<{
   rows: {
     enrolmentId: string; projectSlug: string; ownTitle: string;
     phase: "create" | "plan" | "execute" | "report"; level: number;
     status: "active" | "complete" | "withdrawn";
+    withdrawnReason: string;
     submittedAt: Date | null; approvedAt: Date | null; planValidatedAt: Date | null;
     charterSignedAt: Date | null;
     indicatorName: string; indicatorCurrent: string; indicatorTarget: string;
@@ -330,7 +333,7 @@ declare function coachBoardShape(): Promise<{
     studentPhase: "exploration" | "execution" | "legacy";
     next: { title: string; dueDate: string } | null;
     lastEvidenceAt: Date | null;
-    light: "on-track" | "at-risk" | "stalled";
+    light: CoachLight;
   }[];
   pendingEvidence: {
     id: string; level: number; note: string; url: string; value: string;
@@ -354,7 +357,11 @@ export async function proposalsAwaitingReview() {
       })
       .from(enrolments)
       .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(and(sql`${enrolments.proposalSubmittedAt} is not null`, sql`${enrolments.approvedAt} is null`))
+      .where(and(
+        eq(enrolments.status, "active"),
+        sql`${enrolments.proposalSubmittedAt} is not null`,
+        sql`${enrolments.approvedAt} is null`,
+      ))
       .orderBy(asc(enrolments.proposalSubmittedAt)),
     [] as { enrolmentId: string; projectSlug: string; ownTitle: string; problem: string; submittedAt: Date | null; studentName: string | null }[],
   );
@@ -370,7 +377,12 @@ export async function plansAwaitingReview() {
       })
       .from(enrolments)
       .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(and(eq(enrolments.phase, "plan"), sql`${enrolments.planValidatedAt} is null`, sql`${enrolments.approvedAt} is not null`))
+      .where(and(
+        eq(enrolments.status, "active"),
+        eq(enrolments.phase, "plan"),
+        sql`${enrolments.planValidatedAt} is null`,
+        sql`${enrolments.approvedAt} is not null`,
+      ))
       .orderBy(asc(enrolments.approvedAt)),
     [] as { enrolmentId: string; projectSlug: string; ownTitle: string; studentName: string | null }[],
   );
@@ -404,7 +416,11 @@ export async function upcomingDeadlines(userId: string) {
         })
         .from(milestones)
         .innerJoin(enrolments, eq(milestones.enrolmentId, enrolments.id))
-        .where(and(eq(enrolments.userId, userId), sql`${milestones.dueDate} <> ''`))
+        .where(and(
+          eq(enrolments.userId, userId),
+          eq(enrolments.status, "active"),
+          sql`${milestones.dueDate} <> ''`,
+        ))
         .orderBy(asc(milestones.dueDate)),
     [] as { id: string; title: string; dueDate: string; done: boolean; projectSlug: string; ownTitle: string }[],
   );

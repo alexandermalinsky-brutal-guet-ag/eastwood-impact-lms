@@ -239,21 +239,32 @@ export default async function ProfilePage() {
             <div className="space-y-4">
               {records.map(({ enrolment, project, detail }) => {
                 const phase = PHASE_BY_KEY.get(enrolment.phase)!;
+                const withdrawn = enrolment.status === "withdrawn";
                 return (
                   <Link
                     key={enrolment.id}
                     href={`/projects/${enrolment.projectSlug}`}
-                    className="card block p-5 transition-shadow hover:shadow-md"
+                    className={`card block p-5 transition-shadow hover:shadow-md ${withdrawn ? "border-dashed" : ""}`}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <h3 className="text-lg font-bold leading-snug text-ink">
-                          {project?.title ?? enrolment.projectSlug}
+                          {enrolment.ownTitle || project?.title || enrolment.projectSlug}
                         </h3>
                         <p className="mt-0.5 text-sm text-muted">
-                          Phase {phase.number} · {phase.name} ·{" "}
-                          {enrolment.status}
+                          {withdrawn
+                            ? `Withdrawn${
+                                enrolment.withdrawnAt
+                                  ? ` ${enrolment.withdrawnAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`
+                                  : ""
+                              } · reached ${phase.name}`
+                            : `Phase ${phase.number} · ${phase.name} · ${enrolment.status}`}
                         </p>
+                        {withdrawn && enrolment.withdrawnReason ? (
+                          <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted">
+                            {enrolment.withdrawnReason}
+                          </p>
+                        ) : null}
                       </div>
 
                     </div>

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db, isDatabaseConfigured } from "@/db";
 import { enrolments, milestones, users } from "@/db/schema";
@@ -81,7 +81,7 @@ export async function GET(
     })
     .from(milestones)
     .innerJoin(enrolments, eq(milestones.enrolmentId, enrolments.id))
-    .where(eq(enrolments.userId, user.id));
+    .where(and(eq(enrolments.userId, user.id), eq(enrolments.status, "active")));
 
   const now = stamp(new Date());
   const lines: string[] = [

@@ -2,6 +2,7 @@
 
 import { and, asc, eq, max } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { auth } from "@/auth";
@@ -96,24 +97,51 @@ export async function joinProject(projectSlug: string) {
   revalidatePath("/dashboard");
 }
 
-export async function leaveProject(enrolmentId: string) {
+/**
+ * Leaving a project.
+ *
+ * Before the charter is signed there is nothing to keep — it is an abandoned
+ * draft, so it goes. After it is signed the handbook is explicit that
+ * withdrawals are discouraged and that a coach-led review decides, so the
+ * project leaves the dashboard but the record and the reason survive.
+ */
+export async function leaveProject(enrolmentId: string, formData?: FormData) {
   const row = await ownedEnrolment(enrolmentId);
-  await db().delete(enrolments).where(eq(enrolments.id, row.id));
+
+  if (!row.charterSignedAt) {
+    await db().delete(enrolments).where(eq(enrolments.id, row.id));
+  } else {
+    const reason = z
+      .string()
+      .trim()
+      .min(10, "Say what happened — your coach sees this.")
+      .max(2000)
+      .parse(formData?.get("reason"));
+
+    await db()
+      .update(enrolments)
+      .set({ status: "withdrawn", withdrawnAt: new Date(), withdrawnReason: reason })
+      .where(eq(enrolments.id, row.id));
+  }
+
   revalidatePath(`/projects/${row.projectSlug}`);
   revalidatePath("/dashboard");
+  revalidatePath("/profile");
+  revalidatePath("/coach");
+  redirect("/dashboard");
 }
 
-export async function setEnrolmentStatus(
-  enrolmentId: string,
-  status: "active" | "complete" | "withdrawn",
-) {
+/** Brings a withdrawn project back, after a coach-led review. */
+export async function rejoinProject(enrolmentId: string) {
   const row = await ownedEnrolment(enrolmentId);
   await db()
     .update(enrolments)
-    .set({ status, completedAt: status === "complete" ? new Date() : null })
+    .set({ status: "active", withdrawnAt: null, withdrawnReason: "" })
     .where(eq(enrolments.id, row.id));
   revalidatePath(`/projects/${row.projectSlug}`);
   revalidatePath("/dashboard");
+  revalidatePath("/profile");
+  revalidatePath("/coach");
 }
 
 export async function addTask(enrolmentId: string, formData: FormData) {

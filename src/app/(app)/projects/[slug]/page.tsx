@@ -80,9 +80,19 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             status={enrolment.status}
             phase={enrolment.phase}
             level={enrolment.level}
+            charterSigned={Boolean(enrolment.charterSignedAt)}
+            withdrawnReason={enrolment.withdrawnReason}
           />
         ) : (
-          <JoinButton projectSlug={slug} enrolmentId={null} status={null} phase="create" level={1} />
+          <JoinButton
+            projectSlug={slug}
+            enrolmentId={null}
+            status={null}
+            phase="create"
+            level={1}
+            charterSigned={false}
+            withdrawnReason=""
+          />
         )}
       </header>
 

@@ -161,6 +161,15 @@ export const enrolments = pgTable(
 
     joinedAt: timestamp("joinedAt", { mode: "date" }).notNull().defaultNow(),
     completedAt: timestamp("completedAt", { mode: "date" }),
+
+    /**
+     * Withdrawing is not deleting. The charter binds a student to finish
+     * unless a coach-led review decides otherwise, so once it is signed the
+     * project leaves their dashboard but the record — and the reason — stays
+     * for the coach and the student's own profile.
+     */
+    withdrawnAt: timestamp("withdrawnAt", { mode: "date" }),
+    withdrawnReason: text("withdrawnReason").notNull().default(""),
   },
   (t) => [
     uniqueIndex("enrolment_user_project_idx").on(t.userId, t.projectSlug),
