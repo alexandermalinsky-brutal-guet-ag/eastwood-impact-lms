@@ -4,7 +4,7 @@ import { authConfig } from "@/auth.config";
 
 const { auth } = NextAuth(authConfig);
 
-const PUBLIC_PREFIXES = ["/signin", "/api/auth"];
+const PUBLIC_PREFIXES = ["/signin", "/api/auth", "/api/calendar"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;

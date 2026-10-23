@@ -11,6 +11,7 @@ import type { Role } from "@/db/schema";
 // to a Help link in the footer of the dashboard.
 const LINKS = [
   { href: "/dashboard", label: "Home" },
+  { href: "/calendar", label: "Deadlines" },
   { href: "/projects", label: "Explore projects" },
   { href: "/toolkit", label: "Toolkit" },
   { href: "/profile", label: "Profile" },

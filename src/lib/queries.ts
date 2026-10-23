@@ -375,3 +375,37 @@ export async function plansAwaitingReview() {
     [] as { enrolmentId: string; projectSlug: string; ownTitle: string; studentName: string | null }[],
   );
 }
+
+
+/** The secret in the student's calendar feed URL. */
+export async function myCalendarToken(userId: string) {
+  return safe(async () => {
+    const [row] = await db()
+      .select({ token: users.calendarToken })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    return row?.token ?? null;
+  }, null as string | null);
+}
+
+/** Every dated milestone across a student's projects, soonest first. */
+export async function upcomingDeadlines(userId: string) {
+  return safe(
+    () =>
+      db()
+        .select({
+          id: milestones.id,
+          title: milestones.title,
+          dueDate: milestones.dueDate,
+          done: milestones.done,
+          projectSlug: enrolments.projectSlug,
+          ownTitle: enrolments.ownTitle,
+        })
+        .from(milestones)
+        .innerJoin(enrolments, eq(milestones.enrolmentId, enrolments.id))
+        .where(and(eq(enrolments.userId, userId), sql`${milestones.dueDate} <> ''`))
+        .orderBy(asc(milestones.dueDate)),
+    [] as { id: string; title: string; dueDate: string; done: boolean; projectSlug: string; ownTitle: string }[],
+  );
+}

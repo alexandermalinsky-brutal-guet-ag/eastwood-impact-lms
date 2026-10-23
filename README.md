@@ -150,6 +150,27 @@ createdb impact_lms
 Then set `DATABASE_URL="postgres://$USER@localhost:5432/impact_lms"` in
 `.env.local`. Stop it again with `pg_ctl -D /opt/homebrew/var/postgresql@16 stop`.
 
+### Calendar
+
+Each account has a private iCalendar feed at `/api/calendar/<token>` carrying
+every dated milestone across their projects. Students subscribe from
+`/calendar` — one button for Google Calendar, one for Apple/Outlook.
+
+It is a **subscription, not an export**: Google re-fetches it, so moving a
+milestone date moves it in the student's calendar too. A downloaded `.ics`
+would go stale the first time anything changed.
+
+Two things to know about the route:
+
+- It sits **outside the auth proxy**, because Google's servers fetch it with
+  no session. The UUID in the path is the only credential, which is why it is
+  a `calendarToken` on the user rather than the user id.
+- Line folding is **octet-based**, not character-based. A tick or an accent is
+  multiple bytes in UTF-8, and Google rejects lines over 75 octets.
+
+Two-way sync (events created from Google, writing back) needs Workspace OAuth
+— the same `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` as Google sign-in.
+
 ### The demo cohort
 
 For a walkthrough or a pitch, the platform needs to show a system in use — an

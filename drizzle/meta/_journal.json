@@ -43,6 +43,13 @@
       "when": 1792702921576,
       "tag": "0005_drop_goals",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792738196294,
+      "tag": "0006_calendar_feed",
+      "breakpoints": true
     }
   ]
 }

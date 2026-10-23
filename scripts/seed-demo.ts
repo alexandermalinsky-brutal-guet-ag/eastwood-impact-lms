@@ -26,10 +26,10 @@ type Phase = "exploration" | "execution" | "legacy";
 const PEOPLE: {
   key: string; name: string; role: "student" | "coach" | "admin"; grade?: string; phase?: Phase;
 }[] = [
-  { key: "demo", name: "Demo Account", role: "admin" },
-  { key: "r.chevalley", name: "Rémy Chevalley", role: "coach" },
+  { key: "admin", name: "Demo Admin", role: "admin" },
+  { key: "coach", name: "Rémy Chevalley", role: "coach" },
   { key: "m.okonkwo", name: "Melissa Okonkwo", role: "coach" },
-  { key: "s.ferrand", name: "Sofia Ferrand", role: "student", grade: "12", phase: "legacy" },
+  { key: "student", name: "Sofia Ferrand", role: "student", grade: "12", phase: "legacy" },
   { key: "l.brunner", name: "Luca Brunner", role: "student", grade: "11", phase: "execution" },
   { key: "a.haddad", name: "Amira Haddad", role: "student", grade: "11", phase: "execution" },
   { key: "t.nakamura", name: "Tomás Nakamura", role: "student", grade: "10", phase: "execution" },
@@ -68,7 +68,7 @@ const SEEDS: Seed[] = [
   // The walkthrough project: level 6, everything populated, one piece of
   // evidence sitting in the coach's queue so the demo has something to act on.
   {
-    who: "s.ferrand",
+    who: "student",
     project: "kickoff-voices-of-tomorrow",
     phase: "execute",
     level: 6,
@@ -90,12 +90,12 @@ const SEEDS: Seed[] = [
       current: "74 of 180",
     },
     milestones: [
-      { title: "Interview 3 students about what they think a changemaker is", dueDate: "2026-09-18", done: true },
-      { title: "Record and publish the pilot episode", dueDate: "2026-10-02", done: true },
-      { title: "Publish episodes 2-4", dueDate: "2026-11-13", done: true },
-      { title: "Re-run the survey at the halfway point", dueDate: "2026-11-27", done: true },
-      { title: "Publish episodes 5-6", dueDate: "2026-12-11", done: false },
-      { title: "Hand production to a Grade 10 and write the guide", dueDate: "2026-12-18", done: false },
+      { title: "Interview 3 students about what they think a changemaker is", dueDate: "2026-08-21", done: true },
+      { title: "Record and publish the pilot episode", dueDate: "2026-09-04", done: true },
+      { title: "Publish episodes 2-4", dueDate: "2026-10-16", done: true },
+      { title: "Re-run the survey at the halfway point", dueDate: "2026-10-30", done: true },
+      { title: "Publish episodes 5-6", dueDate: "2026-11-13", done: false },
+      { title: "Hand production to a Grade 10 and write the guide", dueDate: "2026-11-20", done: false },
     ],
     criteria: [
       { label: "Six episodes are public and someone outside school has listened", met: true },
@@ -142,7 +142,7 @@ const SEEDS: Seed[] = [
       period: "November",
     },
     coachCard: {
-      by: "r.chevalley",
+      by: "coach",
       ratings: { initiative: 5, leadership: 4, creativity: 5, resilience: 5, ethics: 5 },
       comment: "Sofia has run this with almost no intervention since September. The pilot-then-change loop was hers. The handover is the right thing to be struggling with and she raised it before I did.",
       period: "November",
@@ -173,11 +173,11 @@ const SEEDS: Seed[] = [
       current: "7 kg",
     },
     milestones: [
-      { title: "Source substrate and set up the darkroom", dueDate: "2026-09-25", done: true },
-      { title: "Grow batches 1-3", dueDate: "2026-10-16", done: true },
-      { title: "Compressive strength testing", dueDate: "2026-11-06", done: true },
-      { title: "Batch 4 at a higher substrate ratio", dueDate: "2026-11-27", done: false },
-      { title: "Present to the kitchen manager", dueDate: "2026-12-11", done: false },
+      { title: "Source substrate and set up the darkroom", dueDate: "2026-08-28", done: true },
+      { title: "Grow batches 1-3", dueDate: "2026-09-18", done: true },
+      { title: "Compressive strength testing", dueDate: "2026-10-09", done: true },
+      { title: "Batch 4 at a higher substrate ratio", dueDate: "2026-10-30", done: false },
+      { title: "Present to the kitchen manager", dueDate: "2026-11-13", done: false },
     ],
     criteria: [
       { label: "Five samples grown and measured with the same method", met: false },
@@ -296,10 +296,10 @@ const SEEDS: Seed[] = [
       current: "6 per meeting",
     },
     milestones: [
-      { title: "Book the library room and run the first vote", dueDate: "2026-10-10", done: true },
-      { title: "Meetings 1-3", dueDate: "2026-11-14", done: true },
-      { title: "Sort out the copy rotation with the librarian", dueDate: "2026-11-28", done: false },
-      { title: "Bring in a Grade 11 co-lead", dueDate: "2026-12-12", done: false },
+      { title: "Book the library room and run the first vote", dueDate: "2026-09-12", done: true },
+      { title: "Meetings 1-3", dueDate: "2026-10-17", done: true },
+      { title: "Sort out the copy rotation with the librarian", dueDate: "2026-10-31", done: false },
+      { title: "Bring in a Grade 11 co-lead", dueDate: "2026-11-14", done: false },
     ],
     criteria: [
       { label: "Six meetings happened", met: false },
@@ -349,7 +349,7 @@ async function main() {
   let n = 0;
   for (const s of SEEDS) {
     const userId = ids.get(s.who)!;
-    const coachId = ids.get("r.chevalley")!;
+    const coachId = ids.get("coach")!;
     const approved = s.level >= 3;
 
     const [e] = await db().insert(enrolments).values({
@@ -440,10 +440,10 @@ async function main() {
   }
 
   console.log(`\nDemo cohort ready: ${PEOPLE.length} accounts, ${n} projects in flight.`);
-  console.log(`\n  Sign in:  ${email("demo")}`);
+  console.log(`\n  Student:  ${email("student")}`);
   console.log(`  Password: ${PASSWORD}`);
-  console.log(`\n  Student view:  ${email("s.ferrand")}  (same password)`);
-  console.log(`  Coach view:    ${email("r.chevalley")}`);
+  console.log(`  Coach:    ${email("coach")}`);
+  console.log(`  Admin:    ${email("admin")}`);
   console.log(`\nAll demo accounts are on @${DEMO_DOMAIN}. Remove with: --clear\n`);
 }
 

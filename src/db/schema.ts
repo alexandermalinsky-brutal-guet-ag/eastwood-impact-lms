@@ -48,6 +48,13 @@ export const users = pgTable("user", {
   /** Soft-archive, so a leaver's record survives without them signing in. */
   active: boolean("active").notNull().default(true),
 
+  /**
+   * Secret in the calendar feed URL. Google's servers fetch the .ics without
+   * a session, so the token is what authenticates the request — it is the
+   * only thing standing between a guessed URL and someone's deadlines.
+   */
+  calendarToken: text("calendarToken").$defaultFn(() => crypto.randomUUID()),
+
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
 });
 
