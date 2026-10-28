@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { auth } from "@/auth";
+import { AttendanceSummary } from "@/components/AttendanceSummary";
 import { StartProject } from "@/components/StartProject";
 import { Empty, LinkButton } from "@/components/ui";
 import { getProject } from "@/lib/curriculum";
 import { formatDueDate } from "@/lib/dates";
 import { LEVEL_BY_N, MAX_LEVEL, PHASE_BY_KEY } from "@/lib/handbook";
-import { enrolmentDetail, myEnrolments } from "@/lib/queries";
+import { enrolmentDetail, myAttendance, myEnrolments } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Home" };
 export const dynamic = "force-dynamic";
@@ -21,7 +22,10 @@ export default async function Dashboard() {
   const session = await auth();
   const user = session!.user;
 
-  const enrolments = await myEnrolments(user.id);
+  const [enrolments, attendance] = await Promise.all([
+    myEnrolments(user.id),
+    myAttendance(user.id),
+  ]);
   const cards = await Promise.all(
     enrolments
       .filter((e) => e.status === "active")
@@ -84,7 +88,7 @@ export default async function Dashboard() {
               <Link
                 key={enrolment.id}
                 href={`/projects/${enrolment.projectSlug}`}
-                className="card block p-5 transition-shadow hover:shadow-md"
+                className="card block min-w-0 p-5 transition-shadow hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-[0.65rem] font-bold uppercase tracking-wider text-muted">
@@ -134,6 +138,8 @@ export default async function Dashboard() {
           })}
         </div>
       )}
+
+      <AttendanceSummary tally={attendance.tally} sessions={attendance.sessions} />
 
       <p className="mt-10 text-sm text-muted">
         New to this?{" "}

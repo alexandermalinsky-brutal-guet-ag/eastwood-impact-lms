@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, eq, max } from "drizzle-orm";
+import { and, asc, eq, max, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -8,6 +8,8 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import {
+  attendance,
+  attendanceSessions,
   criteria,
   enrolments,
   evidence,
@@ -17,6 +19,7 @@ import {
   scorecards,
   tasks,
   users,
+  type AttendanceStatus,
 } from "@/db/schema";
 import { DEFAULT_CRITERIA, DEFAULT_TASKS, getProject } from "@/lib/curriculum";
 import { STRANDS } from "@/lib/brand";
@@ -659,4 +662,101 @@ export async function startNextCycle(enrolmentId: string) {
   const next = existing.length ? Math.max(...existing.map((r) => r.cycle)) + 1 : 1;
   await db().insert(reflections).values({ enrolmentId: row.id, cycle: next });
   revalidatePath(`/projects/${row.projectSlug}`);
+}
+
+// ── Attendance ──────────────────────────────────────────────────────────────
+
+const ATTENDANCE_STATUSES = ["present", "late", "excused", "absent"] as const;
+const statusSchema = z.enum(ATTENDANCE_STATUSES);
+/** "2026-10-28" — a register belongs to a day, not a moment. */
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Pick a date.");
+
+/** Opens a register for one of the weekly structured work sessions. */
+export async function createAttendanceSession(formData: FormData) {
+  const coach = await asCoach();
+  const date = dateSchema.parse(formData.get("date"));
+  const title = z.string().trim().max(120).parse(formData.get("title") ?? "");
+
+  const [created] = await db()
+    .insert(attendanceSessions)
+    .values({ date, title, createdByName: coachName(coach) })
+    .returning({ id: attendanceSessions.id });
+
+  revalidatePath("/attendance");
+  redirect(`/attendance/${created.id}`);
+}
+
+/** Marks one student, or changes a mark already made. */
+export async function markAttendance(
+  sessionId: string,
+  userId: string,
+  status: AttendanceStatus,
+  note = "",
+) {
+  const coach = await asCoach();
+  const value = statusSchema.parse(status);
+  const comment = z.string().trim().max(500).parse(note);
+
+  await db()
+    .insert(attendance)
+    .values({
+      sessionId, userId, status: value, note: comment,
+      markedByName: coachName(coach), markedAt: new Date(),
+    })
+    // Re-marking is an edit, not a second row: the unique index decides.
+    .onConflictDoUpdate({
+      target: [attendance.sessionId, attendance.userId],
+      set: {
+        status: value, note: comment,
+        markedByName: coachName(coach), markedAt: new Date(),
+      },
+    });
+
+  revalidatePath(`/attendance/${sessionId}`);
+  revalidatePath("/attendance");
+  revalidatePath("/dashboard");
+}
+
+/**
+ * Fills in everyone still unmarked as present. A register of 25 should not
+ * take 25 clicks — but this writes real rows with the coach's name on them,
+ * so "present" is always something somebody actually said.
+ */
+export async function markRestPresent(sessionId: string) {
+  const coach = await asCoach();
+
+  const unmarked = await db()
+    .select({ id: users.id })
+    .from(users)
+    .leftJoin(
+      attendance,
+      and(eq(attendance.userId, users.id), eq(attendance.sessionId, sessionId)),
+    )
+    .where(and(
+      eq(users.role, "student"),
+      eq(users.active, true),
+      sql`${attendance.id} is null`,
+    ));
+
+  if (unmarked.length > 0) {
+    await db().insert(attendance).values(
+      unmarked.map((u) => ({
+        sessionId, userId: u.id, status: "present" as const,
+        markedByName: coachName(coach), markedAt: new Date(),
+      })),
+    );
+  }
+
+  revalidatePath(`/attendance/${sessionId}`);
+  revalidatePath("/attendance");
+  revalidatePath("/dashboard");
+}
+
+/** Removes a register opened by mistake, and every mark on it. */
+export async function deleteAttendanceSession(sessionId: string) {
+  await asCoach();
+  await db().delete(attendanceSessions).where(eq(attendanceSessions.id, sessionId));
+  revalidatePath("/attendance");
+  revalidatePath("/dashboard");
+  redirect("/attendance");
 }

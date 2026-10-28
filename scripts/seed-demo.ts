@@ -10,11 +10,11 @@
  * @demo.eastwoodmontreux.ch domain so it can be told apart from a real roster
  * at a glance, and removed in one command.
  */
-import { eq, inArray, like, or } from "drizzle-orm";
+import { eq, inArray, like, or, sql } from "drizzle-orm";
 import { hash } from "bcryptjs";
 
 import { db, isDatabaseConfigured } from "../src/db";
-import { criteria, enrolments, evidence, helpRequests, milestones, reflections, scorecards, tasks, users } from "../src/db/schema";
+import { attendance, attendanceSessions, criteria, enrolments, evidence, helpRequests, milestones, reflections, scorecards, tasks, users } from "../src/db/schema";
 
 const DEMO_DOMAIN = "demo.eastwoodmontreux.ch"; // legacy cohort, cleared on reseed
 
@@ -179,6 +179,13 @@ async function clear({ removeAccounts }: { removeAccounts: boolean }) {
     return;
   }
 
+  // Attendance hangs off the user, not the enrolment, so it survives the
+  // cascade below. Clear the marks, then any register left with nobody on it.
+  await db().delete(attendance).where(inArray(attendance.userId, current.map((d) => d.id)));
+  await db().delete(attendanceSessions).where(
+    sql`not exists (select 1 from attendance a where a."sessionId" = ${attendanceSessions.id})`,
+  );
+
   // Everything under an enrolment cascades from it, so this is the whole project.
   await db().delete(enrolments).where(inArray(enrolments.userId, current.map((d) => d.id)));
   console.log(`Cleared project data for ${current.length} demo account(s); sessions stay valid.`);
@@ -266,13 +273,48 @@ async function main() {
     comment: P.selfCard.comment, periodLabel: P.selfCard.period,
   });
 
+  // Attendance at the weekly work sessions, ending last week so the register
+  // for this week is still the coach's to open during a demo.
+  const sessionDays = 7 * 24 * 60 * 60 * 1000;
+  const monday = new Date();
+  monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7) - 7);
+
+  const register: { back: number; status: "present" | "late" | "excused" | "absent"; note?: string }[] = [
+    { back: 7, status: "present" },
+    { back: 6, status: "late", note: "Came from the server migration running long." },
+    { back: 5, status: "present" },
+    { back: 4, status: "excused", note: "Open day — presenting the platform to parents." },
+    { back: 3, status: "present" },
+    { back: 2, status: "late", note: "Ten minutes — bus." },
+    { back: 1, status: "present" },
+    { back: 0, status: "present" },
+  ];
+
+  for (const entry of register) {
+    const day = new Date(monday.getTime() - entry.back * sessionDays);
+    const [row] = await db()
+      .insert(attendanceSessions)
+      .values({
+        date: day.toISOString().slice(0, 10),
+        title: "Structured work session",
+        createdByName: COACH_NAME,
+      })
+      .returning({ id: attendanceSessions.id });
+
+    await db().insert(attendance).values({
+      sessionId: row.id, userId: studentId, status: entry.status,
+      note: entry.note ?? "", markedByName: COACH_NAME,
+    });
+  }
+
   console.log(`\nDemo ready: ${PEOPLE.length} accounts, 1 project.\n`);
   for (const person of PEOPLE) {
     console.log(`  ${person.role.padEnd(8)} ${person.email}`);
   }
   console.log(`\n  Password: ${PASSWORD}`);
   console.log(`\n  ${OWNER.name} owns "${OWNER.title}" at level ${P.level} of 7.`);
-  console.log(`  ${COACH_NAME} has evidence waiting and a question to answer.\n`);
+  console.log(`  ${COACH_NAME} has evidence waiting and a question to answer.`);
+  console.log(`  ${register.length} work sessions marked: late twice, excused once.\n`);
 }
 
 main().then(() => process.exit(0)).catch((err) => { console.error(err); process.exit(1); });

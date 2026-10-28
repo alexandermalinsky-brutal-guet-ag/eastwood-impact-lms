@@ -2,6 +2,8 @@ import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { db, isDatabaseConfigured } from "@/db";
 import {
+  attendance,
+  attendanceSessions,
   criteria,
   enrolments,
   evidence,
@@ -11,6 +13,7 @@ import {
   scorecards,
   tasks,
   users,
+  type AttendanceStatus,
 } from "@/db/schema";
 
 export type EnrolmentRow = typeof enrolments.$inferSelect;
@@ -441,4 +444,118 @@ export async function enrolmentBySlug(projectSlug: string) {
       .limit(1);
     return row ?? null;
   }, null as EnrolmentRow | null);
+}
+
+// ── Attendance ──────────────────────────────────────────────────────────────
+
+export type AttendanceTally = {
+  present: number; late: number; excused: number; absent: number; marked: number;
+};
+
+const EMPTY_TALLY: AttendanceTally = {
+  present: 0, late: 0, excused: 0, absent: 0, marked: 0,
+};
+
+/**
+ * A student's own record. Counts for the dashboard, plus the sessions
+ * themselves — a number you cannot see the workings of is a number you
+ * cannot dispute with your coach.
+ */
+export async function myAttendance(userId: string) {
+  return safe(async () => {
+    const rows = await db()
+      .select({
+        status: attendance.status,
+        note: attendance.note,
+        markedByName: attendance.markedByName,
+        date: attendanceSessions.date,
+        title: attendanceSessions.title,
+      })
+      .from(attendance)
+      .innerJoin(attendanceSessions, eq(attendance.sessionId, attendanceSessions.id))
+      .where(eq(attendance.userId, userId))
+      .orderBy(desc(attendanceSessions.date));
+
+    const tally = { ...EMPTY_TALLY };
+    for (const row of rows) {
+      tally[row.status] += 1;
+      tally.marked += 1;
+    }
+    return { tally, sessions: rows };
+  }, { tally: { ...EMPTY_TALLY }, sessions: [] as {
+    status: AttendanceStatus; note: string; markedByName: string;
+    date: string; title: string;
+  }[] });
+}
+
+/** Every session, newest first, with how much of the register is filled in. */
+export async function attendanceSessionList() {
+  return safe(async () => {
+    const sessions = await db()
+      .select()
+      .from(attendanceSessions)
+      .orderBy(desc(attendanceSessions.date), desc(attendanceSessions.createdAt));
+    if (sessions.length === 0) return [];
+
+    const counts = await db()
+      .select({
+        sessionId: attendance.sessionId,
+        status: attendance.status,
+        n: sql<number>`cast(count(*) as int)`,
+      })
+      .from(attendance)
+      .where(inArray(attendance.sessionId, sessions.map((s) => s.id)))
+      .groupBy(attendance.sessionId, attendance.status);
+
+    const by = new Map<string, AttendanceTally>();
+    for (const row of counts) {
+      const tally = by.get(row.sessionId) ?? { ...EMPTY_TALLY };
+      tally[row.status] += row.n;
+      tally.marked += row.n;
+      by.set(row.sessionId, tally);
+    }
+    return sessions.map((s) => ({ ...s, tally: by.get(s.id) ?? { ...EMPTY_TALLY } }));
+  }, [] as (typeof attendanceSessions.$inferSelect & { tally: AttendanceTally })[]);
+}
+
+/**
+ * One session's register: every active student, with their mark if they have
+ * one. Unmarked is a real state, not a silent "present" — a coach who opens a
+ * register and closes it again has not marked anybody.
+ */
+export async function attendanceRegister(sessionId: string) {
+  return safe(async () => {
+    const [session] = await db()
+      .select()
+      .from(attendanceSessions)
+      .where(eq(attendanceSessions.id, sessionId))
+      .limit(1);
+    if (!session) return null;
+
+    const roster = await db()
+      .select({
+        userId: users.id,
+        name: users.name,
+        email: users.email,
+        grade: users.grade,
+        status: attendance.status,
+        note: attendance.note,
+        markedByName: attendance.markedByName,
+      })
+      .from(users)
+      .leftJoin(
+        attendance,
+        and(eq(attendance.userId, users.id), eq(attendance.sessionId, sessionId)),
+      )
+      .where(and(eq(users.role, "student"), eq(users.active, true)))
+      .orderBy(asc(users.name));
+
+    return { session, roster };
+  }, null as {
+    session: typeof attendanceSessions.$inferSelect;
+    roster: {
+      userId: string; name: string | null; email: string; grade: string | null;
+      status: AttendanceStatus | null; note: string | null; markedByName: string | null;
+    }[];
+  } | null);
 }

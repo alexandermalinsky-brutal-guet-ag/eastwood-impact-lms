@@ -27,7 +27,12 @@ export function Nav({
   const links =
     user.role === "student"
       ? LINKS
-      : [...LINKS, { href: "/coach", label: "Coach" }, { href: "/staff", label: "Programme" }];
+      : [
+          ...LINKS,
+          { href: "/coach", label: "Coach" },
+          { href: "/attendance", label: "Attendance" },
+          { href: "/staff", label: "Programme" },
+        ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">

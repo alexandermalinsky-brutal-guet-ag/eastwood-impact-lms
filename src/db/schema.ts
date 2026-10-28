@@ -355,3 +355,55 @@ export const criteria = pgTable(
   },
   (t) => [index("criterion_enrolment_idx").on(t.enrolmentId)],
 );
+
+/**
+ * Attendance at the weekly structured work session the handbook fixes as the
+ * programme's rhythm. There are no classes or groups in the system — one
+ * session, one register, the whole active student roster.
+ */
+export type AttendanceStatus = "present" | "late" | "excused" | "absent";
+
+export const attendanceSessions = pgTable(
+  "attendanceSession",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    /** Calendar day, "2026-10-28". No time of day: a register is for a date. */
+    date: text("date").notNull(),
+    /** What it was, if the coach wants to say. "Week 4 workshop". */
+    title: text("title").notNull().default(""),
+    createdByName: text("createdByName").notNull().default(""),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [index("attendance_session_date_idx").on(t.date)],
+);
+
+export const attendance = pgTable(
+  "attendance",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    sessionId: text("sessionId")
+      .notNull()
+      .references(() => attendanceSessions.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").$type<AttendanceStatus>().notNull(),
+    /** Why — the thing that makes "excused" mean anything to the student. */
+    note: text("note").notNull().default(""),
+    /**
+     * Who marked it. The beta flagged an approval that showed a date and no
+     * name; an attendance mark a student may want to dispute needs both.
+     */
+    markedByName: text("markedByName").notNull().default(""),
+    markedAt: timestamp("markedAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [
+    // One mark per student per session — re-marking updates, never duplicates.
+    uniqueIndex("attendance_session_user_idx").on(t.sessionId, t.userId),
+    index("attendance_user_idx").on(t.userId),
+  ],
+);
