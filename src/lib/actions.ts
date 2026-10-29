@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { hash } from "bcryptjs";
+
 import { auth } from "@/auth";
+import { canManageUsers } from "@/lib/access";
+import { generatePassword, passwordProblem } from "@/lib/passwords";
 import { db } from "@/db";
 import {
   attendance,
@@ -361,13 +365,13 @@ export async function setPhase(
 
 /** Archives a leaver without deleting their record, or brings one back. */
 export async function setActive(userId: string, active: boolean) {
-  const actor = await requireUser();
-  if (actor.role !== "admin") {
-    throw new Error("Only an admin can archive an account.");
-  }
+  const actor = await requireAccountManager();
+  // Archiving yourself locks you out of the page that could undo it.
+  if (userId === actor.id) throw new Error("You cannot archive your own account.");
 
   await db().update(users).set({ active }).where(eq(users.id, userId));
   revalidatePath("/staff");
+  revalidatePath("/admin/users");
 }
 
 // --- Release 1: Create, Plan, and the level map ----------------------------
@@ -759,4 +763,96 @@ export async function deleteAttendanceSession(sessionId: string) {
   revalidatePath("/attendance");
   revalidatePath("/dashboard");
   redirect("/attendance");
+}
+
+// ── Accounts ────────────────────────────────────────────────────────────────
+
+async function requireAccountManager() {
+  const user = await requireUser();
+  if (!canManageUsers(user)) throw new Error("Not allowed to manage accounts.");
+  return user;
+}
+
+const ROLES = ["student", "coach", "admin"] as const;
+const PHASES = ["exploration", "execution", "legacy"] as const;
+
+const newUserSchema = z.object({
+  email: z.string().trim().toLowerCase().email("That is not an email address.").max(200),
+  name: z.string().trim().min(1, "Give them a name.").max(120),
+  role: z.enum(ROLES),
+  grade: z.string().trim().max(10),
+  phase: z.enum(PHASES),
+  password: z.string().max(200),
+});
+
+/**
+ * Creates an account and returns its password once, for the admin to hand
+ * over. The plaintext is never stored and never logged — the hash goes to the
+ * database and the string goes back up the wire to the person who asked for
+ * it, and nowhere else.
+ */
+export async function createUser(formData: FormData) {
+  await requireAccountManager();
+
+  const input = newUserSchema.parse({
+    email: formData.get("email"),
+    name: formData.get("name"),
+    role: formData.get("role"),
+    grade: formData.get("grade") ?? "",
+    phase: formData.get("phase") ?? "exploration",
+    password: formData.get("password") ?? "",
+  });
+
+  const [existing] = await db()
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, input.email))
+    .limit(1);
+  if (existing) throw new Error(`${input.email} already has an account.`);
+
+  const chosen = input.password.trim();
+  if (chosen) {
+    const problem = passwordProblem(chosen);
+    if (problem) throw new Error(problem);
+  }
+  const password = chosen || generatePassword();
+
+  await db().insert(users).values({
+    email: input.email,
+    name: input.name,
+    role: input.role,
+    passwordHash: await hash(password, 10),
+    grade: input.role === "student" ? input.grade || null : null,
+    phase: input.phase,
+    academicYear: process.env.ACADEMIC_YEAR ?? "2026/27",
+  });
+
+  revalidatePath("/admin/users");
+  revalidatePath("/staff");
+  return { email: input.email, password, generated: !chosen };
+}
+
+/** Changes what someone can do. Not to yourself — that is how you get locked out. */
+export async function setRole(userId: string, role: (typeof ROLES)[number]) {
+  const actor = await requireAccountManager();
+  if (userId === actor.id) throw new Error("You cannot change your own role.");
+
+  await db().update(users).set({ role: z.enum(ROLES).parse(role) }).where(eq(users.id, userId));
+  revalidatePath("/admin/users");
+  revalidatePath("/staff");
+}
+
+/** Issues a new password and hands it back once. Does not email anyone. */
+export async function resetPassword(userId: string) {
+  await requireAccountManager();
+  const password = generatePassword();
+
+  const [row] = await db()
+    .update(users)
+    .set({ passwordHash: await hash(password, 10) })
+    .where(eq(users.id, userId))
+    .returning({ email: users.email });
+  if (!row) throw new Error("Account not found.");
+
+  return { email: row.email, password, generated: true };
 }

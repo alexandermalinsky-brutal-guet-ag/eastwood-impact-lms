@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { Logo } from "@/components/Logo";
+import { canManageUsers } from "@/lib/access";
 import type { Role } from "@/db/schema";
 
 // Shorter navigation per the brief: Strands are gone and the Handbook moved
@@ -24,15 +25,18 @@ export function Nav({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const links =
-    user.role === "student"
-      ? LINKS
+  const links = [
+    ...LINKS,
+    ...(user.role === "student"
+      ? []
       : [
-          ...LINKS,
           { href: "/coach", label: "Coach" },
           { href: "/attendance", label: "Attendance" },
           { href: "/staff", label: "Programme" },
-        ];
+        ]),
+    // The owner holds a student account but still manages who can get in.
+    ...(canManageUsers(user) ? [{ href: "/admin/users", label: "Accounts" }] : []),
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">

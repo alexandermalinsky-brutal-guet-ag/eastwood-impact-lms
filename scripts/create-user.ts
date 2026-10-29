@@ -9,13 +9,12 @@
  *
  * Add --prod to run against .env.prod.local instead of .env.local.
  */
-import { randomBytes } from "node:crypto";
-
 import { hash } from "bcryptjs";
 import { eq } from "drizzle-orm";
 
 import { db, isDatabaseConfigured } from "../src/db";
 import { users, type Role } from "../src/db/schema";
+import { assertPasswordUsable, generatePassword } from "../src/lib/passwords";
 
 const ROLES: Role[] = ["student", "coach", "admin"];
 
@@ -26,39 +25,6 @@ function arg(name: string): string | undefined {
 
 function flag(name: string): boolean {
   return process.argv.includes(`--${name}`);
-}
-
-/**
- * Rejects a --password that is obviously a placeholder copied out of an
- * instruction, or too weak to be worth storing. Without this the tool will
- * cheerfully hash "your-choice" and the account is then locked behind a
- * password nobody meant to set.
- */
-function assertPasswordUsable(password: string): void {
-  const placeholders =
-    /^(your-choice|your-password|password|passwd|changeme|change-me|paste-.*|pick-a-real-password|.*-here|placeholder|secret|admin|test|123456)$/i;
-
-  if (placeholders.test(password)) {
-    throw new Error(
-      `"${password}" looks like a placeholder, not a password you chose.\n` +
-        "Either pass a real one, or omit --password and a strong one will be generated for you.",
-    );
-  }
-
-  if (password.length < 10) {
-    throw new Error(
-      `Password is only ${password.length} characters. Use at least 10, ` +
-        "or omit --password to have a strong one generated.",
-    );
-  }
-}
-
-/** Readable but high-entropy: 4 groups of 5 from an unambiguous alphabet. */
-function generatePassword(): string {
-  const alphabet = "abcdefghijkmnpqrstuvwxyz23456789";
-  const bytes = randomBytes(20);
-  const chars = Array.from(bytes, (b) => alphabet[b % alphabet.length]);
-  return [0, 5, 10, 15].map((i) => chars.slice(i, i + 5).join("")).join("-");
 }
 
 async function main() {
