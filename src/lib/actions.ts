@@ -403,13 +403,16 @@ const coachName = (u: { name?: string | null; email?: string | null }) =>
 export async function startOwnProject(formData: FormData) {
   const user = await requireUser();
   const title = z.string().trim().min(3).max(120).parse(formData.get("title"));
+  // Optional: a working title alone is enough to get started.
+  const summary = z.string().trim().max(300).parse(formData.get("summary") ?? "");
 
   // Own-idea projects get a slug that cannot collide with a catalogue entry.
   const slug = `own-${user.id.slice(0, 8)}-${Date.now().toString(36)}`;
   const [created] = await db()
     .insert(enrolments)
     .values({
-      userId: user.id, projectSlug: slug, ownTitle: title, fromCatalogue: false,
+      userId: user.id, projectSlug: slug, ownTitle: title, ownSummary: summary,
+      fromCatalogue: false,
       role: user.role === "student" ? "member" : "lead",
     })
     .returning({ id: enrolments.id });

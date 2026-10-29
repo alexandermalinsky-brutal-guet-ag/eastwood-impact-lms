@@ -1,0 +1,1 @@
+ALTER TABLE "enrolment" ADD COLUMN "ownSummary" text DEFAULT '' NOT NULL;

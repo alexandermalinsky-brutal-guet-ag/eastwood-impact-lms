@@ -135,6 +135,12 @@ export const enrolments = pgTable(
     /** Set when the student started from a catalogue entry rather than their own idea. */
     fromCatalogue: boolean("fromCatalogue").notNull().default(true),
     ownTitle: text("ownTitle").notNull().default(""),
+    /**
+     * The student's own one-line description, given when they start the
+     * project. Deliberately not the proposal's `problem` — that is a worked
+     * statement a coach approves, this is just "what is it" on day one.
+     */
+    ownSummary: text("ownSummary").notNull().default(""),
     projectType: text("projectType")
       .$type<"internal" | "external" | "internal-to-external">()
       .notNull()

@@ -58,10 +58,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <header className="mt-4 flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-ink">{title}</h1>
-          {enrolment?.problem ? (
-            <p className="mt-3 text-base leading-relaxed text-muted">{enrolment.problem}</p>
-          ) : catalogue?.description ? (
-            <p className="mt-3 text-base leading-relaxed text-muted">{catalogue.description}</p>
+          {/* The proposal's problem statement supersedes whatever was written
+              on day one, which in turn stands in for a catalogue brief. */}
+          {enrolment?.problem || catalogue?.description || enrolment?.ownSummary ? (
+            <p className="mt-3 text-base leading-relaxed text-muted">
+              {enrolment?.problem || catalogue?.description || enrolment?.ownSummary}
+            </p>
           ) : null}
 
           {enrolment?.indicatorName ? (
