@@ -20,6 +20,7 @@ export const dynamic = "force-dynamic";
 export default async function CoachPage() {
   const session = await auth();
   if (session!.user.role === "student") redirect("/dashboard");
+  const meId = session!.user.id;
 
   const [proposals, rows] = await Promise.all([
     proposalsAwaitingReview(),
@@ -41,6 +42,7 @@ export default async function CoachPage() {
       />
 
       <CoachQueue
+        meId={meId}
         proposals={proposals.map((p) => ({ ...p, title: title(p.projectSlug, p.ownTitle) }))}
       />
 
@@ -61,6 +63,7 @@ export default async function CoachPage() {
                 <tr>
                   <th className="px-4 py-3 font-bold">Student</th>
                   <th className="px-4 py-3 font-bold">Project</th>
+                  <th className="px-4 py-3 font-bold">Coach</th>
                   <th className="px-4 py-3 font-bold">Started</th>
                   <th className="px-4 py-3 font-bold">Proposal</th>
                 </tr>
@@ -76,6 +79,7 @@ export default async function CoachPage() {
                           {title(r.projectSlug, r.ownTitle)}
                         </Link>
                       </td>
+                      <td className="px-4 py-3 text-muted">{r.coachName || "—"}</td>
                       <td className="px-4 py-3 tabular-nums text-muted">{formatDate(r.joinedAt)}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center gap-1.5 font-semibold ${state.text}`}>

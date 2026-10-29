@@ -9,7 +9,7 @@ import { Empty } from "@/components/ui";
 import { getProject, projects } from "@/lib/curriculum";
 import { formatDate } from "@/lib/dates";
 import { PROPOSAL_STATES, proposalState } from "@/lib/proposal";
-import { enrolmentBySlug, myEnrolmentFor, projectRoster } from "@/lib/queries";
+import { coachList, enrolmentBySlug, myEnrolmentFor, projectRoster } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +42,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   if (!catalogue && !enrolment) notFound();
 
   const title = catalogue?.title ?? enrolment?.ownTitle ?? "Project";
-  const roster = await projectRoster(slug);
+  const [roster, coaches] = await Promise.all([projectRoster(slug), coachList()]);
   const mine = Boolean(enrolment) && enrolment!.userId === user.id;
   const state = enrolment ? PROPOSAL_STATES[proposalState(enrolment)] : null;
 
@@ -70,6 +70,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               {enrolment?.problem || catalogue?.description || enrolment?.ownSummary}
             </p>
           ) : null}
+
+          {enrolment ? (
+            <p className="mt-3 text-sm text-muted">
+              Coached by{" "}
+              <span className="font-semibold text-ink">
+                {enrolment.coachName || "nobody yet"}
+              </span>
+            </p>
+          ) : null}
         </div>
 
         <JoinButton
@@ -78,6 +87,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           status={enrolment?.status ?? null}
           approved={Boolean(enrolment?.approvedAt)}
           withdrawnReason={enrolment?.withdrawnReason ?? ""}
+          coaches={coaches}
         />
       </header>
 

@@ -27,12 +27,35 @@ export function ImpactProposal({
   const [editing, setEditing] = useState(!enrolment.problem && canEdit);
   const [showExamples, setShowExamples] = useState<string | null>(null);
   const [returning, setReturning] = useState(false);
+  const [error, setError] = useState("");
+
+  /**
+   * Every action here used to be awaited bare inside the transition, so a
+   * rejection — a stale enrolment, a proposal missing its target — took the
+   * whole page down with a server error instead of saying what was wrong.
+   */
+  function run(work: () => Promise<void>) {
+    start(async () => {
+      setError("");
+      try {
+        await work();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "That did not work.");
+      }
+    });
+  }
 
   const submitted = Boolean(enrolment.proposalSubmittedAt);
   const approved = Boolean(enrolment.approvedAt);
 
   return (
     <section className="space-y-5">
+      {error ? (
+        <p className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+          {error}
+        </p>
+      ) : null}
+
       {enrolment.returnedComment ? (
         <div className="rounded-[14px] border border-mustard/50 bg-mustard/10 p-5">
           <p className="font-bold text-ink">Your coach sent this back</p>
@@ -43,7 +66,7 @@ export function ImpactProposal({
 
       {editing ? (
         <form
-          action={(fd) => start(async () => { await saveImpactProposal(enrolment.id, fd); setEditing(false); })}
+          action={(fd) => run(async () => { await saveImpactProposal(enrolment.id, fd); setEditing(false); })}
           className="card space-y-5 p-5"
         >
           {PROPOSAL_FIELDS.map((f) => (
@@ -152,7 +175,9 @@ export function ImpactProposal({
         <div className="card p-5">
           {submitted ? (
             <>
-              <p className="font-bold text-ink">With your coach for approval</p>
+              <p className="font-bold text-ink">
+                With {enrolment.coachName || "your coach"} for approval
+              </p>
               <p className="mt-1 text-sm text-muted">
                 Sent {formatDate(enrolment.proposalSubmittedAt!)}.
               </p>
@@ -161,13 +186,13 @@ export function ImpactProposal({
             <>
               <p className="font-bold text-ink">Ready to send?</p>
               <p className="mt-1 text-sm text-muted">
-                A coach reads it and either approves it or sends it back with comments.
-                You need at least the problem and a target.
+                {enrolment.coachName || "A coach"} reads it and either approves it or sends it
+                back with comments. You need at least the problem and a target.
               </p>
               {canEdit ? (
                 <button
                   type="button" disabled={pending}
-                  onClick={() => start(() => void submitProposal(enrolment.id))}
+                  onClick={() => run(() => submitProposal(enrolment.id))}
                   className={`${buttonClass("primary")} mt-3`}
                 >
                   Submit for approval
@@ -180,7 +205,7 @@ export function ImpactProposal({
             <div className="mt-4 border-t border-line pt-4">
               {returning ? (
                 <form
-                  action={(fd) => start(async () => { await returnProposal(enrolment.id, fd); setReturning(false); })}
+                  action={(fd) => run(async () => { await returnProposal(enrolment.id, fd); setReturning(false); })}
                   className="space-y-2"
                 >
                   <label htmlFor="return-comment" className="block text-sm font-bold text-ink">
@@ -199,7 +224,7 @@ export function ImpactProposal({
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button" disabled={pending}
-                    onClick={() => start(() => void approveProposal(enrolment.id))}
+                    onClick={() => run(() => approveProposal(enrolment.id))}
                     className={buttonClass("primary")}
                   >
                     Approve

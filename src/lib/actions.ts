@@ -15,6 +15,7 @@ import {
   attendance,
   attendanceSessions,
   enrolments,
+  projectIdeas,
   users,
   type AttendanceStatus,
 } from "@/db/schema";
@@ -44,10 +45,31 @@ async function ownedEnrolment(enrolmentId: string) {
 
 const slugSchema = z.string().min(1).max(120);
 
-export async function joinProject(projectSlug: string) {
+/**
+ * Resolves the coach a student picked. The id comes off a form, so it is
+ * checked here rather than trusted: it has to be a real, active coach. The
+ * name is stored alongside it so the record still reads properly if the
+ * account is later archived or removed.
+ */
+async function assignedCoach(coachId: unknown) {
+  const id = z.string().trim().max(60).parse(coachId ?? "");
+  if (!id) return { coachId: null, coachName: "" };
+
+  const [coach] = await db()
+    .select({ id: users.id, name: users.name, email: users.email })
+    .from(users)
+    .where(and(eq(users.id, id), eq(users.role, "coach"), eq(users.active, true)))
+    .limit(1);
+  if (!coach) throw new Error("Pick a coach from the list.");
+
+  return { coachId: coach.id, coachName: coach.name ?? coach.email };
+}
+
+export async function joinProject(projectSlug: string, coachId?: string) {
   const user = await requireUser();
   const slug = slugSchema.parse(projectSlug);
   if (!getProject(slug)) throw new Error("Unknown project.");
+  const coach = await assignedCoach(coachId);
 
   const existing = await db()
     .select({ id: enrolments.id })
@@ -62,6 +84,7 @@ export async function joinProject(projectSlug: string) {
       userId: user.id,
       projectSlug: slug,
       role: user.role === "student" ? "member" : "lead",
+      ...coach,
     });
   }
 
@@ -179,6 +202,7 @@ export async function startOwnProject(formData: FormData) {
   const title = z.string().trim().min(3).max(120).parse(formData.get("title"));
   // Optional: a working title alone is enough to get started.
   const summary = z.string().trim().max(300).parse(formData.get("summary") ?? "");
+  const coach = await assignedCoach(formData.get("coachId"));
 
   // Own-idea projects get a slug that cannot collide with a catalogue entry.
   const slug = `own-${user.id.slice(0, 8)}-${Date.now().toString(36)}`;
@@ -186,10 +210,50 @@ export async function startOwnProject(formData: FormData) {
     userId: user.id, projectSlug: slug, ownTitle: title, ownSummary: summary,
     fromCatalogue: false,
     role: user.role === "student" ? "member" : "lead",
+    ...coach,
   });
 
   revalidatePath("/dashboard");
+  revalidatePath("/coach");
   return slug;
+}
+
+/**
+ * Puts an idea on the noticeboard instead of starting it. No coach, because
+ * nobody has taken it on — it is a suggestion, not a commitment.
+ */
+export async function addProjectIdea(formData: FormData) {
+  const user = await requireUser();
+  const title = z.string().trim().min(3, "Give the idea a title.").max(120).parse(formData.get("title"));
+  const summary = z.string().trim().max(300).parse(formData.get("summary") ?? "");
+
+  await db().insert(projectIdeas).values({
+    title, summary,
+    suggestedById: user.id,
+    suggestedByName: user.name ?? user.email ?? "Someone",
+  });
+
+  revalidatePath("/projects");
+}
+
+/** Taking an idea down. Yours, or anyone's if you are staff. */
+export async function removeProjectIdea(ideaId: string) {
+  const user = await requireUser();
+  const id = z.string().trim().max(60).parse(ideaId);
+
+  const [idea] = await db()
+    .select({ suggestedById: projectIdeas.suggestedById })
+    .from(projectIdeas)
+    .where(eq(projectIdeas.id, id))
+    .limit(1);
+  if (!idea) throw new Error("That idea is already gone.");
+
+  if (idea.suggestedById !== user.id && user.role === "student") {
+    throw new Error("That is not your idea to remove.");
+  }
+
+  await db().delete(projectIdeas).where(eq(projectIdeas.id, id));
+  revalidatePath("/projects");
 }
 
 const proposalSchema = z.object({

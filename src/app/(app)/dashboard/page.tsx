@@ -7,7 +7,7 @@ import { StartProject } from "@/components/StartProject";
 import { Empty, LinkButton } from "@/components/ui";
 import { getProject } from "@/lib/curriculum";
 import { PROPOSAL_STATES, proposalState } from "@/lib/proposal";
-import { myAttendance, myEnrolments } from "@/lib/queries";
+import { coachList, myAttendance, myEnrolments } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Home" };
 export const dynamic = "force-dynamic";
@@ -20,9 +20,10 @@ export default async function Dashboard() {
   const session = await auth();
   const user = session!.user;
 
-  const [enrolments, attendance] = await Promise.all([
+  const [enrolments, attendance, coaches] = await Promise.all([
     myEnrolments(user.id),
     myAttendance(user.id),
+    coachList(),
   ]);
   const cards = enrolments
     .filter((e) => e.status === "active")
@@ -39,7 +40,7 @@ export default async function Dashboard() {
             {cards.length === 0 ? `Let's start something, ${firstName}.` : `Here's today, ${firstName}.`}
           </h1>
         </div>
-        <StartProject />
+        <StartProject coaches={coaches} />
       </div>
 
       {cards.length === 0 ? (

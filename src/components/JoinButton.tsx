@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 
 import { joinProject, leaveProject, rejoinProject } from "@/lib/actions";
+import { CoachChoice, type Coach } from "@/components/CoachChoice";
+import { Modal } from "@/components/Modal";
 import { Button, buttonClass } from "@/components/ui";
 
 /**
@@ -16,21 +18,82 @@ export function JoinButton({
   status,
   approved,
   withdrawnReason,
+  coaches,
 }: {
   projectSlug: string;
   enrolmentId: string | null;
   status: "active" | "withdrawn" | null;
   approved: boolean;
   withdrawnReason: string;
+  coaches: Coach[];
 }) {
   const [pending, start] = useTransition();
   const [leaving, setLeaving] = useState(false);
+  const [choosing, setChoosing] = useState(false);
+  const [coachId, setCoachId] = useState("");
+  const [error, setError] = useState("");
 
   if (!enrolmentId) {
+    // The catalogue gives the title, so joining only has the second question
+    // of the two the Start a project dialog asks.
     return (
-      <Button disabled={pending} onClick={() => start(() => void joinProject(projectSlug))} className="px-6 py-2.5">
-        {pending ? "Starting…" : "Start this project"}
-      </Button>
+      <>
+        <Button onClick={() => setChoosing(true)} className="px-6 py-2.5">
+          Start this project
+        </Button>
+
+        <Modal
+          open={choosing}
+          onClose={() => { setChoosing(false); setError(""); }}
+          title="Who is coaching you?"
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              start(async () => {
+                setError("");
+                try {
+                  await joinProject(projectSlug, coachId);
+                  setChoosing(false);
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "That did not work.");
+                }
+              });
+            }}
+            className="space-y-3"
+          >
+            <p className="text-sm leading-relaxed text-muted">
+              Pick the coach you have been assigned to. They are the one who
+              reads your proposal and approves it or sends it back.
+            </p>
+
+            <CoachChoice coaches={coaches} value={coachId} onChange={setCoachId} />
+
+            {error ? (
+              <p className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
+                {error}
+              </p>
+            ) : null}
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              <button
+                type="submit"
+                disabled={pending || (coaches.length > 0 && !coachId)}
+                className={buttonClass("primary")}
+              >
+                {pending ? "Starting…" : "Start this project"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setChoosing(false); setError(""); }}
+                className={buttonClass("ghost")}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </Modal>
+      </>
     );
   }
 

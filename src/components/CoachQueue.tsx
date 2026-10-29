@@ -13,6 +13,7 @@ import { formatDate } from "@/lib/dates";
  */
 export function CoachQueue({
   proposals,
+  meId,
 }: {
   proposals: {
     enrolmentId: string;
@@ -21,7 +22,11 @@ export function CoachQueue({
     problem: string;
     submittedAt: Date | null;
     projectSlug: string;
+    coachId: string | null;
+    coachName: string;
   }[];
+  /** Whoever is reading, so their own students are obvious at a glance. */
+  meId: string;
 }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState("");
@@ -68,6 +73,11 @@ export function CoachQueue({
               <div className="min-w-0">
                 <p className="text-[0.65rem] font-bold uppercase tracking-wider text-royal-purple">
                   Proposal to approve
+                  {item.coachId === meId ? (
+                    <span className="ml-1.5 text-forest-green">· yours</span>
+                  ) : item.coachName ? (
+                    <span className="ml-1.5 font-semibold text-muted">· {item.coachName}&rsquo;s</span>
+                  ) : null}
                 </p>
                 <p className="mt-1 font-bold text-ink">
                   {item.studentName ?? "A student"}

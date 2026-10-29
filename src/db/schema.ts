@@ -123,6 +123,15 @@ export const enrolments = pgTable(
     ownSummary: text("ownSummary").notNull().default(""),
     proposalSubmittedAt: timestamp("proposalSubmittedAt", { mode: "date" }),
 
+    /**
+     * The coach the student is assigned to, chosen when the project starts.
+     * Set null rather than cascading if the account goes, because the name
+     * below is the part that has to survive — a record of who approved what
+     * is no use once the only reference to them is an orphaned id.
+     */
+    coachId: text("coachId").references(() => users.id, { onDelete: "set null" }),
+    coachName: text("coachName").notNull().default(""),
+
     // --- The approval gate ---
     approvedAt: timestamp("approvedAt", { mode: "date" }),
     approvedBy: text("approvedBy").references(() => users.id, { onDelete: "set null" }),
@@ -145,6 +154,27 @@ export const enrolments = pgTable(
     uniqueIndex("enrolment_user_project_idx").on(t.userId, t.projectSlug),
     index("enrolment_project_idx").on(t.projectSlug),
   ],
+);
+
+/**
+ * The ideas noticeboard. Somewhere to put a project worth doing that you are
+ * not going to run yourself — the catalogue is written by staff, this is what
+ * students put up for each other.
+ */
+export const projectIdeas = pgTable(
+  "projectIdea",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    title: text("title").notNull(),
+    summary: text("summary").notNull().default(""),
+    /** Null once the account goes; the name below is what has to survive. */
+    suggestedById: text("suggestedById").references(() => users.id, { onDelete: "set null" }),
+    suggestedByName: text("suggestedByName").notNull().default(""),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => [index("project_idea_created_idx").on(t.createdAt)],
 );
 
 /**

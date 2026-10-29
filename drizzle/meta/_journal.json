@@ -78,6 +78,20 @@
       "when": 1793268909346,
       "tag": "0010_low_triathlon",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793269725330,
+      "tag": "0011_tidy_makkari",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793270103062,
+      "tag": "0012_magenta_doctor_doom",
+      "breakpoints": true
     }
   ]
 }

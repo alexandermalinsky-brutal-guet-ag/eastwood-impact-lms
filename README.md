@@ -16,7 +16,7 @@ attendance register.
 | --- | --- | --- |
 | Landing | `/` | Public front page; redirects to the dashboard once signed in |
 | Dashboard | `/dashboard` | Your projects, where each proposal stands, your attendance |
-| Projects | `/projects` | The catalogue, filterable by strand and searchable |
+| Projects | `/projects` | The ideas board, plus the catalogue, filterable and searchable |
 | Project workspace | `/projects/[slug]` | The Impact Proposal, and its approval |
 | Toolkit | `/toolkit` | Teaching practices, grouped by the phase they help with |
 | Handbook | `/handbook` | How to run a project here, in one page |
@@ -27,9 +27,14 @@ attendance register.
 
 ### What it does, and what it does not
 
-**One loop.** A student starts a project, writes an Impact Proposal, and sends
-it to a coach, who approves it or sends it back with a reason. That is the
-whole platform.
+**One loop.** A student starts a project, picks the coach they are assigned
+to, writes an Impact Proposal, and sends it to that coach, who approves it or
+sends it back with a reason. That is the whole platform.
+
+Starting a project is two steps — what it is, then who is coaching you. The
+first step has a second way out: an idea worth doing that you are not going to
+run yourself goes on the **project ideas** board on `/projects` instead, with
+no coach attached, for someone else to take on.
 
 The rest of the programme — the dated plan, the kanban board, reflection
 cycles, evidence, the level map, scorecards and the final report — was built

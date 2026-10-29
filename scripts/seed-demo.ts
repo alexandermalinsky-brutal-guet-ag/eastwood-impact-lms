@@ -14,7 +14,7 @@ import { eq, inArray, like, or, sql } from "drizzle-orm";
 import { hash } from "bcryptjs";
 
 import { db, isDatabaseConfigured } from "../src/db";
-import { attendance, attendanceSessions, enrolments, users } from "../src/db/schema";
+import { attendance, attendanceSessions, enrolments, projectIdeas, users } from "../src/db/schema";
 
 const DEMO_DOMAIN = "demo.eastwoodmontreux.ch"; // legacy cohort, cleared on reseed
 
@@ -106,11 +106,15 @@ async function clear({ removeAccounts }: { removeAccounts: boolean }) {
     return;
   }
 
-  // Attendance hangs off the user, not the enrolment, so it survives the
-  // cascade below. Clear the marks, then any register left with nobody on it.
+  // Attendance and ideas hang off the user, not the enrolment, so they
+  // survive the cascade below. Clear the marks, then any register left with
+  // nobody on it, then the noticeboard.
   await db().delete(attendance).where(inArray(attendance.userId, current.map((d) => d.id)));
   await db().delete(attendanceSessions).where(
     sql`not exists (select 1 from attendance a where a."sessionId" = ${attendanceSessions.id})`,
+  );
+  await db().delete(projectIdeas).where(
+    inArray(projectIdeas.suggestedById, current.map((d) => d.id)),
   );
 
   // Everything under an enrolment cascades from it, so this is the whole project.
@@ -152,6 +156,7 @@ async function main() {
     deliverable: P.deliverable, skills: P.skills, needs: P.needs, risk: P.risk,
     indicatorName: P.indicatorName, indicatorBaseline: P.indicatorBaseline,
     indicatorTarget: P.indicatorTarget,
+    coachId, coachName: COACH_NAME,
     proposalSubmittedAt: new Date(),
     approvedAt: new Date(), approvedBy: coachId, approvedByName: COACH_NAME,
   });

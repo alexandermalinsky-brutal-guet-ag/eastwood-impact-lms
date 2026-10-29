@@ -5,6 +5,7 @@ import {
   attendance,
   attendanceSessions,
   enrolments,
+  projectIdeas,
   users,
   type AttendanceStatus,
 } from "@/db/schema";
@@ -160,6 +161,32 @@ export async function myProfile(userId: string) {
 }
 
 
+/**
+ * The coaches a student can be assigned to. Archived accounts are left out —
+ * assigning someone to a coach who cannot sign in is assigning them to nobody.
+ */
+export async function coachList() {
+  return safe(() =>
+    db()
+      .select({ id: users.id, name: users.name, email: users.email })
+      .from(users)
+      .where(and(eq(users.role, "coach"), eq(users.active, true)))
+      .orderBy(asc(users.name)),
+    [] as { id: string; name: string | null; email: string }[],
+  );
+}
+
+/** The ideas noticeboard, newest first. */
+export async function projectIdeaList() {
+  return safe(() =>
+    db()
+      .select()
+      .from(projectIdeas)
+      .orderBy(desc(projectIdeas.createdAt)),
+    [] as (typeof projectIdeas.$inferSelect)[],
+  );
+}
+
 /** Proposals sitting in the approval queue. */
 export async function proposalsAwaitingReview() {
   return safe(() =>
@@ -168,6 +195,7 @@ export async function proposalsAwaitingReview() {
         enrolmentId: enrolments.id, projectSlug: enrolments.projectSlug,
         ownTitle: enrolments.ownTitle, problem: enrolments.problem,
         submittedAt: enrolments.proposalSubmittedAt,
+        coachId: enrolments.coachId, coachName: enrolments.coachName,
         studentName: users.name,
       })
       .from(enrolments)
@@ -178,7 +206,11 @@ export async function proposalsAwaitingReview() {
         sql`${enrolments.approvedAt} is null`,
       ))
       .orderBy(asc(enrolments.proposalSubmittedAt)),
-    [] as { enrolmentId: string; projectSlug: string; ownTitle: string; problem: string; submittedAt: Date | null; studentName: string | null }[],
+    [] as {
+      enrolmentId: string; projectSlug: string; ownTitle: string; problem: string;
+      submittedAt: Date | null; coachId: string | null; coachName: string;
+      studentName: string | null;
+    }[],
   );
 }
 
@@ -199,6 +231,7 @@ export async function studentProjects() {
         approvedAt: enrolments.approvedAt,
         returnedAt: enrolments.returnedAt,
         withdrawnReason: enrolments.withdrawnReason,
+        coachName: enrolments.coachName,
         joinedAt: enrolments.joinedAt,
         studentName: users.name,
         studentEmail: users.email,
@@ -211,7 +244,7 @@ export async function studentProjects() {
       enrolmentId: string; projectSlug: string; ownTitle: string;
       status: "active" | "withdrawn"; problem: string;
       proposalSubmittedAt: Date | null; approvedAt: Date | null; returnedAt: Date | null;
-      withdrawnReason: string; joinedAt: Date;
+      withdrawnReason: string; coachName: string; joinedAt: Date;
       studentName: string | null; studentEmail: string;
     }[],
   );

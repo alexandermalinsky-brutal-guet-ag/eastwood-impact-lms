@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
 
+import { auth } from "@/auth";
 import { ProjectFilters } from "@/components/ProjectFilters";
+import { ProjectIdeas } from "@/components/ProjectIdeas";
 import { StartProject } from "@/components/StartProject";
 import { SectionHeading } from "@/components/ui";
 import { projects } from "@/lib/curriculum";
-import { enrolmentCounts } from "@/lib/queries";
+import { coachList, enrolmentCounts, projectIdeaList } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Projects" };
 export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
-  const counts = await enrolmentCounts();
+  const session = await auth();
+  const user = session!.user;
+  const [counts, coaches, ideas] = await Promise.all([
+    enrolmentCounts(),
+    coachList(),
+    projectIdeaList(),
+  ]);
   const withCounts = projects.map((project) => ({
     ...project,
     members: counts.get(project.slug) ?? 0,
@@ -25,8 +33,22 @@ export default async function ProjectsPage() {
           inspiration when you are stuck — not a menu you have to pick from.
         </p>
         <div className="mt-4">
-          <StartProject />
+          <StartProject coaches={coaches} />
         </div>
+      </section>
+
+      <section id="ideas" className="mb-12 scroll-mt-20">
+        <SectionHeading
+          eyebrow="From other students"
+          title="Project ideas"
+          description="Things people thought were worth doing but are not running themselves. Take one on and it becomes your project, with your coach."
+        />
+        <ProjectIdeas
+          ideas={ideas}
+          coaches={coaches}
+          meId={user.id}
+          canModerate={user.role !== "student"}
+        />
       </section>
 
       <SectionHeading
