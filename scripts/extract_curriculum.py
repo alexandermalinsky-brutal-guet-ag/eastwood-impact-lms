@@ -3,7 +3,7 @@
 Extract and normalise the IMPACT curriculum workbook into typed JSON for the LMS.
 
 Source: Data RAW/IMPACT curriculum resources and projects.xlsx
-Output: src/data/projects.json, src/data/resources.json, src/data/people.json
+Output: src/data/resources.json, src/data/normalisations.json
 
 The workbook is a living planning document, so this script is deliberately
 conservative: it preserves the original wording in `sourceTitle`, applies only
@@ -111,163 +111,6 @@ def read_rows(ws) -> list[list[str]]:
     return rows
 
 
-def extract_projects(wb) -> tuple[list[dict], list[dict]]:
-    rows = read_rows(wb["Log"])[1:]  # drop header
-    projects: list[dict] = []
-    normalisations: list[dict] = []
-    seen: dict[str, int] = {}
-
-    for index, row in enumerate(rows, start=2):
-        source_title = row[0] if row else ""
-        if not source_title:
-            continue
-
-        raw_strand = row[2] if len(row) > 2 else ""
-        strand = STRAND_LOOKUP.get(raw_strand.lower(), "") if raw_strand else ""
-        if raw_strand and not strand:
-            normalisations.append(
-                {"row": index, "field": "strand", "from": raw_strand, "to": "(unrecognised)"}
-            )
-        elif raw_strand and raw_strand != strand:
-            normalisations.append(
-                {"row": index, "field": "strand", "from": raw_strand, "to": strand}
-            )
-
-        title = SPELLING.get(source_title, sentence_case(source_title))
-        if title != source_title:
-            normalisations.append(
-                {"row": index, "field": "title", "from": source_title, "to": title}
-            )
-
-        # `point person` sits in col D, but a few rows put the name in the
-        # "Name 1" column (col G) instead.
-        person_cell = row[3] if len(row) > 3 else ""
-        if not person_cell and len(row) > 6:
-            person_cell = row[6]
-        people, person_note = parse_people(person_cell)
-
-        base = slugify(f"{strand or 'open'}-{title}")
-        seen[base] = seen.get(base, 0) + 1
-        slug = base if seen[base] == 1 else f"{base}-{seen[base]}"
-
-        notes = [n for n in [clean(row[5]) if len(row) > 5 else "", person_note] if n]
-
-        projects.append(
-            {
-                "slug": slug,
-                "title": title,
-                "sourceTitle": source_title,
-                # The workbook records one strand per project, so that is the
-                # lead strand. The handbook expects projects to span several —
-                # students choose the full set in their proposal rather than
-                # having one guessed for them here.
-                "strand": strand or None,
-                "strands": [strand] if strand else [],
-                "leads": people,
-                "description": clean(row[4]) if len(row) > 4 else "",
-                "notes": " · ".join(notes),
-                "origin": "workbook",
-                "projectType": None,
-                "sourceRow": index,
-            }
-        )
-
-    projects.extend(KICKOFF_PROJECTS)
-    return projects, normalisations
-
-
-# --- Kickoff projects from The IMPACT Handbook, section 9 -------------------
-# Illustrative, not prescriptive. Strand sets and internal/external types are
-# exactly as printed; these are the only projects with a real multi-strand
-# assignment, because they are the only ones the handbook assigns.
-KICKOFF_PROJECTS = [
-    {
-        "slug": "kickoff-voices-of-tomorrow",
-        "title": "Student-led podcast: Voices of Tomorrow",
-        "sourceTitle": "PROJECT EXAMPLE 1 – STUDENT-LED PODCAST: VOICES OF TOMORROW",
-        "strand": "Imagination",
-        "strands": ["Imagination", "Action", "Character", "Technologies"],
-        "leads": [],
-        "description": (
-            "A student team conceptualises, produces and publishes a podcast featuring "
-            "interviews with young changemakers, entrepreneurs or activists. Students manage "
-            "research, outreach, recording, editing and distribution, while reflecting on "
-            "communication, ethics and audience responsibility."
-        ),
-        "notes": "Develops storytelling, collaboration, discipline and public engagement.",
-        "origin": "handbook",
-        "projectType": "external",
-        "sourceRow": 0,
-    },
-    {
-        "slug": "kickoff-sustainable-materials",
-        "title": "Sustainable materials research initiative",
-        "sourceTitle": "PROJECT EXAMPLE 2 – SUSTAINABLE MATERIALS RESEARCH INITIATIVE",
-        "strand": "Planet",
-        "strands": ["Planet", "Technologies", "Action"],
-        "leads": [],
-        "description": (
-            "Students research biodegradable materials and prototype small-scale applications. "
-            "The project involves experimentation, documentation, and presentation of findings "
-            "to external audiences such as exhibitions or sustainability forums."
-        ),
-        "notes": "Emphasises scientific rigour, systems thinking and responsible innovation.",
-        "origin": "handbook",
-        "projectType": "internal-to-external",
-        "sourceRow": 0,
-    },
-    {
-        "slug": "kickoff-wellbeing-campaign",
-        "title": "School-wide wellbeing campaign",
-        "sourceTitle": "PROJECT EXAMPLE 3 – SCHOOL-WIDE WELLBEING CAMPAIGN",
-        "strand": "Character",
-        "strands": ["Character", "Movement", "Action"],
-        "leads": [],
-        "description": (
-            "A campaign contributing to the life of the school through storytelling, "
-            "performance, media or artistic production, shared publicly."
-        ),
-        "notes": "Emphasises communication, creativity and audience engagement.",
-        "origin": "handbook",
-        "projectType": "external",
-        "sourceRow": 0,
-    },
-    {
-        "slug": "kickoff-digital-heritage-archive",
-        "title": "Digital heritage archive",
-        "sourceTitle": "PROJECT EXAMPLE 4 – DIGITAL HERITAGE ARCHIVE",
-        "strand": "Technologies",
-        "strands": ["Technologies", "Imagination", "Planet", "Action"],
-        "leads": [],
-        "description": (
-            "Students collaborate to create a digital archive preserving local history or "
-            "cultural narratives. The project blends research, technology and storytelling, "
-            "often in partnership with community organisations."
-        ),
-        "notes": "",
-        "origin": "handbook",
-        "projectType": "external",
-        "sourceRow": 0,
-    },
-    {
-        "slug": "kickoff-ai-study-support",
-        "title": "AI study support tool",
-        "sourceTitle": "PROJECT EXAMPLE 5 – AI STUDY SUPPORT TOOL",
-        "strand": "Technologies",
-        "strands": ["Technologies", "Character", "Action"],
-        "leads": [],
-        "description": (
-            "Students design a digital tool to support peer learning and wellbeing, accompanied "
-            "by reflection on data ethics and responsible AI use."
-        ),
-        "notes": "",
-        "origin": "handbook",
-        "projectType": "internal",
-        "sourceRow": 0,
-    },
-]
-
-
 # Resources that are the same practice recorded twice under different names.
 RESOURCE_ALIASES = {
     "harkness": "circle-solutions-harkness",
@@ -277,6 +120,13 @@ RESOURCE_ALIASES = {
     "systems mapping": "systems-mapping",
     "plan - do - reflect": "plan-act-reflect-new-name-coming",
     "david perkins def of learning": "david-perkins-def-of-learning",
+}
+
+# Workbook titles that carry an editorial aside rather than a name. Kept here
+# so the displayed title is derived, not patched into the JSON by hand where a
+# regeneration would quietly undo it. `sourceTitle` still records the original.
+TITLE_OVERRIDES = {
+    "plan-act-reflect-new-name-coming": "Plan · Act · Reflect",
 }
 
 # Editorial grouping of the practice library. The `corePractice` flag below is
@@ -376,7 +226,7 @@ def extract_resources(wb) -> tuple[list[dict], list[dict]]:
 
         resources[slug] = {
             "slug": slug,
-            "title": title,
+            "title": TITLE_OVERRIDES.get(slug, title),
             "sourceTitle": source_title,
             "category": CATEGORY_OF.get(slug, "Reading & references"),
             "strand": strand or None,
@@ -577,42 +427,47 @@ CITATIONS = [
 ]
 
 
-def build_people(projects, resources) -> list[dict]:
-    people: dict[str, dict] = {}
-    for project in projects:
-        for name in project["leads"]:
-            entry = people.setdefault(name, {"name": name, "slug": slugify(name), "projects": [], "resources": []})
-            entry["projects"].append(project["slug"])
+# Fields nobody can derive from the workbook: which phase of work a practice
+# helps with, and whether its page has actually been written. They are edited
+# by hand in resources.json, so a regeneration carries them across by slug
+# rather than resetting them — without this, running the extractor empties the
+# toolkit, because only `written` practices are shown.
+EDITORIAL_FIELDS = {"phase": "", "written": False}
+
+
+def carry_editorial(resources: list[dict]) -> list[dict]:
+    existing: dict[str, dict] = {}
+    path = OUT / "resources.json"
+    if path.exists():
+        existing = {r["slug"]: r for r in json.loads(path.read_text())}
+
+    kept = 0
     for resource in resources:
-        for name in resource["leads"]:
-            entry = people.setdefault(name, {"name": name, "slug": slugify(name), "projects": [], "resources": []})
-            entry["resources"].append(resource["slug"])
-    return sorted(people.values(), key=lambda p: p["name"])
+        previous = existing.get(resource["slug"], {})
+        for field, default in EDITORIAL_FIELDS.items():
+            resource[field] = previous.get(field, default)
+        if previous:
+            kept += 1
+    new = len(resources) - kept
+    if new:
+        print(f"  {new} practice(s) not in the previous file, defaulted to unwritten")
+    return resources
 
 
 def main() -> None:
     wb = openpyxl.load_workbook(WORKBOOK, data_only=True)
-    projects, project_norms = extract_projects(wb)
     resources, resource_norms = extract_resources(wb)
-    people = build_people(projects, resources)
+    resources = carry_editorial(resources)
 
     OUT.mkdir(parents=True, exist_ok=True)
     for name, payload in [
-        ("projects", projects),
         ("resources", resources),
-        ("people", people),
-        ("normalisations", {"projects": project_norms, "resources": resource_norms}),
+        ("normalisations", {"resources": resource_norms}),
     ]:
         (OUT / f"{name}.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
 
-    unassigned = [p["title"] for p in projects if not p["strand"]]
-    print(f"projects        {len(projects):>3}  ({sum(1 for p in projects if p['origin'] == 'handbook')} from the handbook)")
-    print(f"  unassigned    {len(unassigned):>3}  {unassigned}")
     print(f"resources       {len(resources):>3}  ({sum(1 for r in resources if r['corePractice'])} core, {sum(1 for r in resources if r['origin'] == 'handbook')} from documents)")
-    print(f"people          {len(people):>3}")
-    print(f"normalisations  {len(project_norms) + len(resource_norms):>3}")
-    for strand in STRANDS:
-        print(f"  {strand:<12} {sum(1 for p in projects if p['strand'] == strand):>3}")
+    print(f"normalisations  {len(resource_norms):>3}")
 
 
 if __name__ == "__main__":

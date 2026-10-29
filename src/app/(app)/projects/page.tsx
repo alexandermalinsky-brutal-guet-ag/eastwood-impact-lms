@@ -1,62 +1,52 @@
 import type { Metadata } from "next";
 
 import { auth } from "@/auth";
-import { ProjectFilters } from "@/components/ProjectFilters";
+import { PostIdea } from "@/components/PostIdea";
 import { ProjectIdeas } from "@/components/ProjectIdeas";
 import { StartProject } from "@/components/StartProject";
 import { SectionHeading } from "@/components/ui";
-import { projects } from "@/lib/curriculum";
-import { coachList, enrolmentCounts, projectIdeaList } from "@/lib/queries";
+import { formatRelative } from "@/lib/dates";
+import { coachList, projectIdeaList } from "@/lib/queries";
 
-export const metadata: Metadata = { title: "Projects" };
+export const metadata: Metadata = { title: "Project Hub" };
 export const dynamic = "force-dynamic";
 
+/**
+ * The ideas board. The 92-project catalogue generated from the planning
+ * workbook used to sit under this — it was a menu nobody picked from, and
+ * most of it had no brief written and nobody named against it. What students
+ * put up for each other is the part that was worth keeping.
+ */
 export default async function ProjectsPage() {
   const session = await auth();
   const user = session!.user;
-  const [counts, coaches, ideas] = await Promise.all([
-    enrolmentCounts(),
-    coachList(),
-    projectIdeaList(),
-  ]);
-  const withCounts = projects.map((project) => ({
-    ...project,
-    members: counts.get(project.slug) ?? 0,
-  }));
+  const [coaches, rows] = await Promise.all([coachList(), projectIdeaList()]);
+
+  // "a month ago" is computed here, not in the card: it reads the clock, and
+  // doing that again during hydration would tear the page.
+  const now = new Date();
+  const ideas = rows.map((idea) => ({ ...idea, posted: formatRelative(idea.createdAt, now) }));
 
   return (
     <>
-      <section className="mb-10 rounded-[14px] border border-line bg-surface p-6">
-        <h1 className="text-2xl font-bold tracking-tight text-ink">Start your own project</h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">
-          The best projects come from something you have actually noticed. The list below is for
-          inspiration when you are stuck — not a menu you have to pick from.
-        </p>
-        <div className="mt-4">
-          <StartProject coaches={coaches} />
-        </div>
-      </section>
-
-      <section id="ideas" className="mb-12 scroll-mt-20">
-        <SectionHeading
-          eyebrow="From other students"
-          title="Project ideas"
-          description="Things people thought were worth doing but are not running themselves. Take one on and it becomes your project, with your coach."
-        />
-        <ProjectIdeas
-          ideas={ideas}
-          coaches={coaches}
-          meId={user.id}
-          canModerate={user.role !== "student"}
-        />
-      </section>
-
       <SectionHeading
-        eyebrow="Or borrow an idea"
-        title={`${projects.length} projects other people have suggested`}
-        description="Each one is a starting point. You still write your own proposal: who it is for, what changes, and how you would know."
+        eyebrow="From other students"
+        title="Project ideas"
+        description="Things people thought were worth doing but are not running themselves. Take one on and it becomes your project, with your coach."
+        action={
+          <div className="flex flex-wrap gap-2">
+            <StartProject coaches={coaches} />
+            <PostIdea />
+          </div>
+        }
       />
-      <ProjectFilters projects={withCounts} />
+
+      <ProjectIdeas
+        ideas={ideas}
+        coaches={coaches}
+        meId={user.id}
+        canModerate={user.role !== "student"}
+      />
     </>
   );
 }

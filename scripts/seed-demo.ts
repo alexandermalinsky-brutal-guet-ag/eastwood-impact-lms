@@ -151,7 +151,7 @@ async function main() {
 
   await db().insert(enrolments).values({
     userId: studentId, projectSlug: OWNER.slug, ownTitle: OWNER.title,
-    fromCatalogue: false, role: "lead", status: "active",
+    role: "lead", status: "active",
     problem: P.problem, whoAffected: P.whoAffected, whatChanges: P.whatChanges,
     deliverable: P.deliverable, skills: P.skills, needs: P.needs, risk: P.risk,
     indicatorName: P.indicatorName, indicatorBaseline: P.indicatorBaseline,

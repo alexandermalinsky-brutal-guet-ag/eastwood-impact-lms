@@ -5,7 +5,6 @@ import { auth } from "@/auth";
 import { AttendanceSummary } from "@/components/AttendanceSummary";
 import { StartProject } from "@/components/StartProject";
 import { Empty, LinkButton } from "@/components/ui";
-import { getProject } from "@/lib/curriculum";
 import { PROPOSAL_STATES, proposalState } from "@/lib/proposal";
 import { coachList, myAttendance, myEnrolments } from "@/lib/queries";
 
@@ -40,7 +39,7 @@ export default async function Dashboard() {
             {cards.length === 0 ? `Let's start something, ${firstName}.` : `Here's today, ${firstName}.`}
           </h1>
         </div>
-        <StartProject coaches={coaches} />
+        <StartProject coaches={coaches} large />
       </div>
 
       {cards.length === 0 ? (
@@ -51,7 +50,6 @@ export default async function Dashboard() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {cards.map(({ enrolment, state }) => {
-            const project = getProject(enrolment.projectSlug);
             return (
               <Link
                 key={enrolment.id}
@@ -64,7 +62,7 @@ export default async function Dashboard() {
                 </p>
 
                 <h2 className="mt-2 text-lg font-bold leading-snug text-ink">
-                  {enrolment.ownTitle || project?.title || enrolment.projectSlug}
+                  {enrolment.ownTitle || enrolment.projectSlug}
                 </h2>
 
                 <div className="mt-4 rounded-lg bg-paper p-3">

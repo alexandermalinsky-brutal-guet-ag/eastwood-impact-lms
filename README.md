@@ -16,7 +16,7 @@ attendance register.
 | --- | --- | --- |
 | Landing | `/` | Public front page; redirects to the dashboard once signed in |
 | Dashboard | `/dashboard` | Your projects, where each proposal stands, your attendance |
-| Projects | `/projects` | The ideas board, plus the catalogue, filterable and searchable |
+| Project Hub | `/projects` | The ideas board — what students put up for each other |
 | Project workspace | `/projects/[slug]` | The Impact Proposal, and its approval |
 | Toolkit | `/toolkit` | Teaching practices, grouped by the phase they help with |
 | Handbook | `/handbook` | How to run a project here, in one page |
@@ -33,8 +33,15 @@ sends it back with a reason. That is the whole platform.
 
 Starting a project is two steps — what it is, then who is coaching you. The
 first step has a second way out: an idea worth doing that you are not going to
-run yourself goes on the **project ideas** board on `/projects` instead, with
-no coach attached, for someone else to take on.
+run yourself goes on the **Project Hub** board instead, with no coach
+attached, for someone else to take on.
+
+The 92-project catalogue generated from the planning workbook is gone. It was
+a menu nobody picked from: 66 entries had nobody named against them and most
+had no brief written. `npm run data:extract` no longer produces it, and the
+extractor now carries the hand-edited `phase` and `written` fields across a
+regeneration instead of resetting them — without that, running it emptied the
+toolkit.
 
 The rest of the programme — the dated plan, the kanban board, reflection
 cycles, evidence, the level map, scorecards and the final report — was built

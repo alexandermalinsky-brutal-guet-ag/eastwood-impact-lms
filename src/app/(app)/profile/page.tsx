@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { auth } from "@/auth";
 import { Empty, SectionHeading } from "@/components/ui";
-import { getProject } from "@/lib/curriculum";
 import { formatLongDate } from "@/lib/dates";
 import { PHASES } from "@/lib/handbook";
 import { PROPOSAL_STATES, proposalState } from "@/lib/proposal";
@@ -101,7 +100,6 @@ export default async function ProfilePage() {
         ) : (
           <div className="space-y-4">
             {enrolments.map((enrolment) => {
-              const project = getProject(enrolment.projectSlug);
               const state = PROPOSAL_STATES[proposalState(enrolment)];
               const withdrawn = enrolment.status === "withdrawn";
               return (
@@ -116,7 +114,7 @@ export default async function ProfilePage() {
                   </p>
 
                   <h3 className="mt-1.5 text-lg font-bold leading-snug text-ink">
-                    {enrolment.ownTitle || project?.title || enrolment.projectSlug}
+                    {enrolment.ownTitle || enrolment.projectSlug}
                   </h3>
 
                   <p className="mt-0.5 text-sm text-muted">

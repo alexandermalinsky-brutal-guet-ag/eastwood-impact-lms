@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { CoachQueue } from "@/components/CoachQueue";
 import { Empty, SectionHeading } from "@/components/ui";
-import { getProject } from "@/lib/curriculum";
 import { formatDate } from "@/lib/dates";
 import { PROPOSAL_STATES, proposalState } from "@/lib/proposal";
 import { proposalsAwaitingReview, studentProjects } from "@/lib/queries";
@@ -27,8 +26,6 @@ export default async function CoachPage() {
     studentProjects(),
   ]);
 
-  const title = (slug: string, own: string) => own || getProject(slug)?.title || slug;
-
   return (
     <>
       <SectionHeading
@@ -43,7 +40,7 @@ export default async function CoachPage() {
 
       <CoachQueue
         meId={meId}
-        proposals={proposals.map((p) => ({ ...p, title: title(p.projectSlug, p.ownTitle) }))}
+        proposals={proposals.map((p) => ({ ...p, title: p.ownTitle || p.projectSlug }))}
       />
 
       <section className="mt-12">
@@ -76,7 +73,7 @@ export default async function CoachPage() {
                       <td className="px-4 py-3 font-semibold text-ink">{r.studentName ?? r.studentEmail}</td>
                       <td className="px-4 py-3">
                         <Link href={`/projects/${r.projectSlug}`} className="text-ink hover:text-royal-purple">
-                          {title(r.projectSlug, r.ownTitle)}
+                          {r.ownTitle || r.projectSlug}
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-muted">{r.coachName || "—"}</td>

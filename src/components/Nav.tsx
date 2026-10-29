@@ -12,7 +12,7 @@ import type { Role } from "@/db/schema";
 // to a Help link in the footer of the dashboard.
 const LINKS = [
   { href: "/dashboard", label: "Home" },
-  { href: "/projects", label: "Explore projects" },
+  { href: "/projects", label: "Project Hub" },
   { href: "/toolkit", label: "Toolkit" },
   { href: "/profile", label: "Profile" },
 ];

@@ -35,3 +35,28 @@ export function formatDueDate(value: string, options: Intl.DateTimeFormatOptions
     timeZone: "UTC", ...options,
   });
 }
+
+/**
+ * "3 days ago". Call this on the server only and pass the string down: it
+ * reads the clock, so computing it again during hydration would produce a
+ * different answer and tear the page — the same class of bug as above.
+ */
+export function formatRelative(value: Date, now: Date = new Date()): string {
+  const seconds = Math.round((value.getTime() - now.getTime()) / 1000);
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["year", 60 * 60 * 24 * 365],
+    ["month", 60 * 60 * 24 * 30],
+    ["week", 60 * 60 * 24 * 7],
+    ["day", 60 * 60 * 24],
+    ["hour", 60 * 60],
+    ["minute", 60],
+  ];
+  const format = new Intl.RelativeTimeFormat("en-GB", { numeric: "auto" });
+
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) {
+      return format.format(Math.round(seconds / size), unit);
+    }
+  }
+  return "just now";
+}

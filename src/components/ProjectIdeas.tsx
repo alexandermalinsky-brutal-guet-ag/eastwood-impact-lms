@@ -6,8 +6,7 @@ import { useState, useTransition } from "react";
 import { removeProjectIdea, startOwnProject } from "@/lib/actions";
 import { CoachChoice, type Coach } from "@/components/CoachChoice";
 import { Modal } from "@/components/Modal";
-import { Empty, buttonClass } from "@/components/ui";
-import { formatDate } from "@/lib/dates";
+import { buttonClass } from "@/components/ui";
 
 export type Idea = {
   id: string;
@@ -15,13 +14,22 @@ export type Idea = {
   summary: string;
   suggestedById: string | null;
   suggestedByName: string;
-  createdAt: Date;
+  /** Formatted on the server — see formatRelative. */
+  posted: string;
 };
 
+/** Initials for the avatar, from however much of a name we have. */
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
+}
+
 /**
- * Ideas students have put up for each other. A noticeboard you cannot act on
- * is just a list, so every row can be taken on — which makes it your project,
- * with your coach, and leaves the idea up for anyone else who wants it too.
+ * The ideas board: one card per idea, posted by a person, with their name on
+ * it. A noticeboard you cannot act on is just a list, so every card can be
+ * taken on — which makes it your project, with your coach, and leaves the
+ * idea up for anyone else who wants it too.
  */
 export function ProjectIdeas({
   ideas,
@@ -52,15 +60,6 @@ export function ProjectIdeas({
     });
   }
 
-  if (ideas.length === 0) {
-    return (
-      <Empty title="No ideas on the board yet">
-        Noticed something worth doing that you are not going to run yourself?
-        Put it up from <span className="font-semibold">Start a project</span>.
-      </Empty>
-    );
-  }
-
   return (
     <>
       {error ? (
@@ -69,57 +68,70 @@ export function ProjectIdeas({
         </p>
       ) : null}
 
-      <div className="card overflow-x-auto p-0">
-        <table className="w-full min-w-[40rem] text-sm">
-          <thead className="bg-paper text-left text-xs uppercase tracking-wider text-muted">
-            <tr>
-              <th className="px-4 py-3 font-bold">Idea</th>
-              <th className="px-4 py-3 font-bold">Suggested by</th>
-              <th className="px-4 py-3 font-bold">When</th>
-              <th className="px-4 py-3 text-right font-bold">Take it on</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ideas.map((idea) => (
-              <tr key={idea.id} className="border-t border-line align-top">
-                <td className="px-4 py-3">
-                  <p className="font-semibold text-ink">{idea.title}</p>
-                  {idea.summary ? (
-                    <p className="mt-0.5 max-w-prose text-sm leading-relaxed text-muted">
-                      {idea.summary}
-                    </p>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3 text-muted">{idea.suggestedByName || "—"}</td>
-                <td className="px-4 py-3 tabular-nums text-muted">{formatDate(idea.createdAt)}</td>
-                <td className="px-4 py-3">
-                  <div className="flex flex-wrap justify-end gap-1.5">
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() => { setTaking(idea); setCoachId(""); setError(""); }}
-                      className={buttonClass("secondary")}
-                    >
-                      Start this
-                    </button>
-                    {canModerate || idea.suggestedById === meId ? (
-                      <button
-                        type="button"
-                        disabled={pending}
-                        aria-label={`Remove ${idea.title}`}
-                        onClick={() => run(() => removeProjectIdea(idea.id))}
-                        className="rounded-lg border border-line bg-surface px-2.5 py-1 text-xs font-bold text-muted hover:border-red-300 hover:text-red-700"
-                      >
-                        Remove
-                      </button>
-                    ) : null}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {ideas.length === 0 ? (
+        <div className="card border-dashed p-8 text-center">
+          <p className="font-semibold text-ink">No ideas up yet</p>
+          <p className="mx-auto mt-1 max-w-md text-sm text-muted">
+            Noticed something worth doing that you are not going to run yourself? Post it, and
+            someone else can pick it up.
+          </p>
+        </div>
+      ) : (
+        /* Columns rather than a grid, so cards of different lengths pack
+           together instead of leaving a ragged row of whitespace. */
+        <div className="columns-1 gap-5 sm:columns-2 lg:columns-3 [&>*]:mb-5">
+          {ideas.map((idea) => (
+            <article key={idea.id} className="card break-inside-avoid p-5">
+              <div className="flex items-center gap-2.5">
+                <span
+                  aria-hidden
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-royal-purple text-[0.7rem] font-bold text-white"
+                >
+                  {initials(idea.suggestedByName)}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink">
+                    {idea.suggestedByName || "Someone"}
+                  </p>
+                  <p className="text-xs text-muted">{idea.posted}</p>
+                </div>
+              </div>
+
+              <h3 className="mt-3.5 text-lg font-bold leading-snug tracking-tight text-ink">
+                {idea.title}
+              </h3>
+
+              {idea.summary ? (
+                <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted">
+                  {idea.summary}
+                </p>
+              ) : null}
+
+              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3.5">
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => { setTaking(idea); setCoachId(""); setError(""); }}
+                  className={buttonClass("secondary")}
+                >
+                  Start this
+                </button>
+                {canModerate || idea.suggestedById === meId ? (
+                  <button
+                    type="button"
+                    disabled={pending}
+                    aria-label={`Remove ${idea.title}`}
+                    onClick={() => run(() => removeProjectIdea(idea.id))}
+                    className="rounded-lg px-2.5 py-1 text-xs font-bold text-muted hover:text-red-700"
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
 
       <Modal
         open={Boolean(taking)}

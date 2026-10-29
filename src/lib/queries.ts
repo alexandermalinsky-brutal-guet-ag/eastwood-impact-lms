@@ -54,22 +54,6 @@ export async function myEnrolmentFor(userId: string, projectSlug: string) {
   }, null as EnrolmentRow | null);
 }
 
-/** How many people are signed up to each project, for the browse pages. */
-export async function enrolmentCounts() {
-  const rows = await safe(
-    () =>
-      db()
-        .select({
-          projectSlug: enrolments.projectSlug,
-          count: sql<number>`cast(count(*) as int)`,
-        })
-        .from(enrolments)
-        .groupBy(enrolments.projectSlug),
-    [] as { projectSlug: string; count: number }[],
-  );
-  return new Map(rows.map((r) => [r.projectSlug, r.count]));
-}
-
 export async function projectRoster(projectSlug: string) {
   return safe(
     () =>

@@ -19,7 +19,6 @@ import {
   users,
   type AttendanceStatus,
 } from "@/db/schema";
-import { getProject } from "@/lib/curriculum";
 
 async function requireUser() {
   const session = await auth();
@@ -63,33 +62,6 @@ async function assignedCoach(coachId: unknown) {
   if (!coach) throw new Error("Pick a coach from the list.");
 
   return { coachId: coach.id, coachName: coach.name ?? coach.email };
-}
-
-export async function joinProject(projectSlug: string, coachId?: string) {
-  const user = await requireUser();
-  const slug = slugSchema.parse(projectSlug);
-  if (!getProject(slug)) throw new Error("Unknown project.");
-  const coach = await assignedCoach(coachId);
-
-  const existing = await db()
-    .select({ id: enrolments.id })
-    .from(enrolments)
-    .where(
-      and(eq(enrolments.userId, user.id), eq(enrolments.projectSlug, slug)),
-    )
-    .limit(1);
-
-  if (existing.length === 0) {
-    await db().insert(enrolments).values({
-      userId: user.id,
-      projectSlug: slug,
-      role: user.role === "student" ? "member" : "lead",
-      ...coach,
-    });
-  }
-
-  revalidatePath(`/projects/${slug}`);
-  revalidatePath("/dashboard");
 }
 
 /**
@@ -208,7 +180,6 @@ export async function startOwnProject(formData: FormData) {
   const slug = `own-${user.id.slice(0, 8)}-${Date.now().toString(36)}`;
   await db().insert(enrolments).values({
     userId: user.id, projectSlug: slug, ownTitle: title, ownSummary: summary,
-    fromCatalogue: false,
     role: user.role === "student" ? "member" : "lead",
     ...coach,
   });
@@ -225,7 +196,7 @@ export async function startOwnProject(formData: FormData) {
 export async function addProjectIdea(formData: FormData) {
   const user = await requireUser();
   const title = z.string().trim().min(3, "Give the idea a title.").max(120).parse(formData.get("title"));
-  const summary = z.string().trim().max(300).parse(formData.get("summary") ?? "");
+  const summary = z.string().trim().max(2000).parse(formData.get("summary") ?? "");
 
   await db().insert(projectIdeas).values({
     title, summary,

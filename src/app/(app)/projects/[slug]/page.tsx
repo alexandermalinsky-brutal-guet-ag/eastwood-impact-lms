@@ -4,23 +4,13 @@ import { notFound } from "next/navigation";
 
 import { auth } from "@/auth";
 import { ImpactProposal } from "@/components/ImpactProposal";
-import { JoinButton } from "@/components/JoinButton";
-import { Empty } from "@/components/ui";
-import { getProject, projects } from "@/lib/curriculum";
+import { LeaveProject } from "@/components/LeaveProject";
 import { formatDate } from "@/lib/dates";
 import { PROPOSAL_STATES, proposalState } from "@/lib/proposal";
-import { coachList, enrolmentBySlug, myEnrolmentFor, projectRoster } from "@/lib/queries";
+import { enrolmentBySlug, myEnrolmentFor, projectRoster } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
-
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
-}
-
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const project = getProject((await params).slug);
-  return { title: project?.title ?? "Project" };
-}
+export const metadata: Metadata = { title: "Project" };
 
 /**
  * A project is its Impact Proposal and nothing else. Who it is for, what
@@ -33,77 +23,62 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const user = session!.user;
 
   const mineHere = await myEnrolmentFor(user.id, slug);
-  const catalogue = getProject(slug);
   const isStaff = user.role !== "student";
 
-  // An own-idea project has no catalogue entry, so a coach opening it from
-  // their queue has nothing to render unless we look it up by slug.
+  // A coach opening a project from their queue does not own it, so it has to
+  // be looked up by slug as well as by owner.
   const enrolment = mineHere ?? (isStaff ? await enrolmentBySlug(slug) : null);
-  if (!catalogue && !enrolment) notFound();
+  if (!enrolment) notFound();
 
-  const title = catalogue?.title ?? enrolment?.ownTitle ?? "Project";
-  const [roster, coaches] = await Promise.all([projectRoster(slug), coachList()]);
-  const mine = Boolean(enrolment) && enrolment!.userId === user.id;
-  const state = enrolment ? PROPOSAL_STATES[proposalState(enrolment)] : null;
+  const title = enrolment.ownTitle || slug;
+  const roster = await projectRoster(slug);
+  const mine = enrolment.userId === user.id;
+  const state = PROPOSAL_STATES[proposalState(enrolment)];
 
   return (
     <>
-      <Link href="/projects" className="text-sm font-semibold text-muted hover:text-royal-purple">
-        ← All projects
+      <Link href="/dashboard" className="text-sm font-semibold text-muted hover:text-royal-purple">
+        ← Back
       </Link>
 
       <header className="mt-4 flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
-          {state ? (
-            <p className={`mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${state.text}`}>
-              <span className={`h-2 w-2 rounded-full ${state.dot}`} />
-              {state.label}
-            </p>
-          ) : null}
+          <p className={`mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${state.text}`}>
+            <span className={`h-2 w-2 rounded-full ${state.dot}`} />
+            {state.label}
+          </p>
 
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-ink">{title}</h1>
 
-          {/* The proposal's problem statement supersedes whatever was written
-              on day one, which in turn stands in for a catalogue brief. */}
-          {enrolment?.problem || catalogue?.description || enrolment?.ownSummary ? (
+          {/* The proposal's problem statement supersedes the one-liner written
+              on day one, once there is one. */}
+          {enrolment.problem || enrolment.ownSummary ? (
             <p className="mt-3 text-base leading-relaxed text-muted">
-              {enrolment?.problem || catalogue?.description || enrolment?.ownSummary}
+              {enrolment.problem || enrolment.ownSummary}
             </p>
           ) : null}
 
-          {enrolment ? (
-            <p className="mt-3 text-sm text-muted">
-              Coached by{" "}
-              <span className="font-semibold text-ink">
-                {enrolment.coachName || "nobody yet"}
-              </span>
-            </p>
-          ) : null}
+          <p className="mt-3 text-sm text-muted">
+            Coached by{" "}
+            <span className="font-semibold text-ink">
+              {enrolment.coachName || "nobody yet"}
+            </span>
+          </p>
         </div>
 
-        <JoinButton
-          projectSlug={slug}
-          enrolmentId={enrolment?.id ?? null}
-          status={enrolment?.status ?? null}
-          approved={Boolean(enrolment?.approvedAt)}
-          withdrawnReason={enrolment?.withdrawnReason ?? ""}
-          coaches={coaches}
-        />
+        {mine ? (
+          <LeaveProject
+            enrolmentId={enrolment.id}
+            status={enrolment.status}
+            approved={Boolean(enrolment.approvedAt)}
+            withdrawnReason={enrolment.withdrawnReason}
+          />
+        ) : null}
       </header>
 
-      {enrolment ? (
-        <div className="mt-8">
-          <ImpactProposal enrolment={enrolment} canEdit={mine} canReview={isStaff} />
-        </div>
-      ) : (
-        <section className="mt-8">
-          <Empty title="You are not on this project yet">
-            Joining gives you the Impact Proposal: who it is for, what would be
-            different, and how you would know. A coach reads it and either
-            approves it or sends it back.
-          </Empty>
-        </section>
-      )}
+      <div className="mt-8">
+        <ImpactProposal enrolment={enrolment} canEdit={mine} canReview={isStaff} />
+      </div>
 
       {isStaff && roster.length > 0 ? (
         <section className="mt-12">

@@ -1,0 +1,1 @@
+ALTER TABLE "enrolment" DROP COLUMN "fromCatalogue";

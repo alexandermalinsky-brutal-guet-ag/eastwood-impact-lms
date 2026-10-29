@@ -18,7 +18,7 @@ import { buttonClass } from "@/components/ui";
  * are not going to run goes on the noticeboard instead, and skips the coach
  * entirely — nobody has committed to it.
  */
-export function StartProject({ coaches }: { coaches: Coach[] }) {
+export function StartProject({ coaches, large = false }: { coaches: Coach[]; large?: boolean }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
@@ -80,7 +80,7 @@ export function StartProject({ coaches }: { coaches: Coach[] }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`${buttonClass("primary")} px-6 py-3 text-base`}
+        className={`${buttonClass("primary")}${large ? " px-6 py-3 text-base" : ""}`}
       >
         Start a project
       </button>
