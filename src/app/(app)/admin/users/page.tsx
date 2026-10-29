@@ -11,8 +11,8 @@ export const metadata: Metadata = { title: "Accounts" };
 export const dynamic = "force-dynamic";
 
 /**
- * Adding and managing accounts. Separate from the Programme page, which is
- * about where students are in the work — this one is about who can get in.
+ * Adding and managing accounts: who can get in, what they can do, and which
+ * phase of the programme each student is working in.
  */
 export default async function AccountsPage() {
   const session = await auth();

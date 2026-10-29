@@ -354,12 +354,13 @@ export async function setPhase(
   phase: "exploration" | "execution" | "legacy",
 ) {
   const actor = await requireUser();
-  if (actor.role === "student") {
+  // The owner holds a student account but still runs the Accounts page.
+  if (actor.role === "student" && !canManageUsers(actor)) {
     throw new Error("Only a coach can change a student's phase.");
   }
 
   await db().update(users).set({ phase }).where(eq(users.id, userId));
-  revalidatePath("/staff");
+  revalidatePath("/admin/users");
   revalidatePath("/profile");
 }
 
@@ -370,7 +371,6 @@ export async function setActive(userId: string, active: boolean) {
   if (userId === actor.id) throw new Error("You cannot archive your own account.");
 
   await db().update(users).set({ active }).where(eq(users.id, userId));
-  revalidatePath("/staff");
   revalidatePath("/admin/users");
 }
 
@@ -828,7 +828,6 @@ export async function createUser(formData: FormData) {
   });
 
   revalidatePath("/admin/users");
-  revalidatePath("/staff");
   return { email: input.email, password, generated: !chosen };
 }
 
@@ -839,7 +838,6 @@ export async function setRole(userId: string, role: (typeof ROLES)[number]) {
 
   await db().update(users).set({ role: z.enum(ROLES).parse(role) }).where(eq(users.id, userId));
   revalidatePath("/admin/users");
-  revalidatePath("/staff");
 }
 
 /** Issues a new password and hands it back once. Does not email anyone. */

@@ -5,8 +5,8 @@ International School**.
 
 Students choose a project from the programme menu, run it through the school's
 own Plan – Act – Reflect cycle, and build a record that stands up at demo time.
-Staff get a view of where students are actually going and which parts of the
-plan still need a person against them.
+Coaches work from a queue of what is waiting on them, and keep the weekly
+attendance register.
 
 ---
 
@@ -22,7 +22,6 @@ plan still need a person against them.
 | Toolkit | `/toolkit` | 58 teaching practices, 9 of them flagged as core |
 | Handbook | `/handbook` | The programme's own structures: journey, goals, evaluation, progression |
 | Profile | `/profile` | The Impact Profile — the holistic synthesis feeding the Eastwood Passport |
-| Staff | `/staff` | Take-up, roster, and the gaps in the plan (staff and admin only) |
 
 ### The six strands
 
@@ -78,7 +77,7 @@ src/data/{projects,resources,people,normalisations}.json
   team can audit what the platform changed
 
 Projects that arrived without a strand are **not** given one by guesswork. They
-surface as "Needs a strand" on `/strands` and `/staff` for a human to place.
+surface as "Needs a strand" rather than being placed by guesswork.
 
 The handbook expects projects to span several strands. The workbook records
 one, so that is treated as the *lead* strand; the only projects carrying a real
@@ -222,8 +221,8 @@ Accounts carry `grade`, `phase`, `academicYear` and `active`.
 **Phase is the field that means something.** The handbook is explicit that
 progression is by demonstrated readiness, not chronological age, so nothing in
 the app gates on `grade` — a coach moves a student between Exploration,
-Execution & Leadership and Legacy from `/staff`, and the student sees where
-they are on `/profile`. `academicYear` lets a cohort be rolled over without
+Execution & Leadership and Legacy from `/admin/users`, and the student sees
+where they are on `/profile`. `academicYear` lets a cohort be rolled over without
 deleting history; `active` archives a leaver without destroying their record.
 
 ### Creating individual accounts
@@ -280,8 +279,8 @@ not self-service by design.
 
 ### Roles
 
-`student` joins projects · `coach` also sees the coach queue, attendance
-registers and `/staff` · `admin` also sees `/admin/users`.
+`student` joins projects · `coach` also sees the coach queue and attendance
+registers · `admin` also sees `/admin/users`.
 
 One address can be given the Accounts page without being an admin, through
 `OWNER_EMAILS` (see `src/lib/access.ts`). That exists so the platform owner can

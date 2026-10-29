@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 
-import { createUser, resetPassword, setActive, setRole } from "@/lib/actions";
+import { createUser, resetPassword, setActive, setPhase, setRole } from "@/lib/actions";
 import { Button, buttonClass } from "@/components/ui";
+import { PHASES } from "@/lib/handbook";
 import type { Role } from "@/db/schema";
 
 type Person = {
@@ -147,9 +148,7 @@ export function ManageUsers({ people, meId }: { people: Person[]; meId: string }
                     name="phase" defaultValue="exploration"
                     className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink"
                   >
-                    <option value="exploration">Exploration</option>
-                    <option value="execution">Execution</option>
-                    <option value="legacy">Legacy</option>
+                    {PHASES.map((ph) => <option key={ph.key} value={ph.key}>{ph.name}</option>)}
                   </select>
                 </label>
               </div>
@@ -185,6 +184,7 @@ export function ManageUsers({ people, meId }: { people: Person[]; meId: string }
               <th className="px-4 py-3 font-bold">Name</th>
               <th className="px-4 py-3 font-bold">Email</th>
               <th className="px-4 py-3 font-bold">Role</th>
+              <th className="px-4 py-3 font-bold">Phase</th>
               <th className="px-4 py-3 font-bold">Projects</th>
               <th className="px-4 py-3 text-right font-bold">Account</th>
             </tr>
@@ -199,7 +199,7 @@ export function ManageUsers({ people, meId }: { people: Person[]; meId: string }
                     {isMe ? <span className="ml-2 text-xs font-normal text-muted">you</span> : null}
                     {p.enabled ? null : <span className="ml-2 text-xs font-normal text-muted">archived</span>}
                     {p.role === "student" && p.grade ? (
-                      <span className="block text-xs font-normal text-muted">Grade {p.grade} · {p.phase}</span>
+                      <span className="block text-xs font-normal text-muted">Grade {p.grade}</span>
                     ) : null}
                   </td>
                   <td className="px-4 py-3 text-muted">{p.email}</td>
@@ -217,6 +217,25 @@ export function ManageUsers({ people, meId }: { people: Person[]; meId: string }
                       >
                         {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
                       </select>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {/* Phase is demonstrated readiness, not year group, so it is
+                        always someone's explicit decision. */}
+                    {p.role === "student" ? (
+                      <select
+                        value={p.phase}
+                        disabled={busy}
+                        onChange={(e) =>
+                          void run(() => setPhase(p.id, e.target.value as Person["phase"]))
+                        }
+                        aria-label={`Phase for ${p.name ?? p.email}`}
+                        className="rounded-lg border border-line bg-surface px-2 py-1 text-sm text-ink"
+                      >
+                        {PHASES.map((ph) => <option key={ph.key} value={ph.key}>{ph.name}</option>)}
+                      </select>
+                    ) : (
+                      <span className="text-muted">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3 tabular-nums text-muted">

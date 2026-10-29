@@ -91,7 +91,7 @@ export function Register({
       <div className="card border-dashed p-8 text-center">
         <p className="font-semibold text-ink">No active students</p>
         <p className="mx-auto mt-1.5 max-w-md text-sm text-muted">
-          A register lists every active student. Add students on the Programme page first.
+          A register lists every active student. Add students on the Accounts page first.
         </p>
       </div>
     );

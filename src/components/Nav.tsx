@@ -32,7 +32,6 @@ export function Nav({
       : [
           { href: "/coach", label: "Coach" },
           { href: "/attendance", label: "Attendance" },
-          { href: "/staff", label: "Programme" },
         ]),
     // The owner holds a student account but still manages who can get in.
     ...(canManageUsers(user) ? [{ href: "/admin/users", label: "Accounts" }] : []),

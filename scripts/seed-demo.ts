@@ -19,7 +19,7 @@ import { attendance, attendanceSessions, criteria, enrolments, evidence, helpReq
 const DEMO_DOMAIN = "demo.eastwoodmontreux.ch"; // legacy cohort, cleared on reseed
 
 /**
- * Accounts from earlier batches that kept showing up on the Programme roster
+ * Accounts from earlier batches that kept showing up on the Accounts roster
  * and contradicting "three accounts". None of them owned a project.
  */
 const RETIRED_EMAILS = ["alexandermalinsky@icloud.com", "melissa@eastwoodmontreux.ch"];
