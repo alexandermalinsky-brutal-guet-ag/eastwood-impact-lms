@@ -14,7 +14,7 @@ import { eq, inArray, like, or, sql } from "drizzle-orm";
 import { hash } from "bcryptjs";
 
 import { db, isDatabaseConfigured } from "../src/db";
-import { attendance, attendanceSessions, criteria, enrolments, evidence, helpRequests, milestones, reflections, scorecards, tasks, users } from "../src/db/schema";
+import { attendance, attendanceSessions, enrolments, users } from "../src/db/schema";
 
 const DEMO_DOMAIN = "demo.eastwoodmontreux.ch"; // legacy cohort, cleared on reseed
 
@@ -31,11 +31,9 @@ type Phase = "exploration" | "execution" | "legacy";
 
 
 /**
- * The platform's own project, owned by the person building it.
- *
- * Everything here is true: the dates come from the git history, the evidence
- * from what actually shipped, and the indicator counts the demo cohort rather
- * than pretending real students are already using it.
+ * The platform's own project, owned by the person building it. Everything
+ * here is true — only the Impact Proposal survives, because that is the only
+ * phase the platform has built.
  */
 const OWNER = {
   email: "alexander.malinsky@eastwood.global",
@@ -46,10 +44,6 @@ const OWNER = {
 };
 
 const OWNER_PROJECT = {
-  phase: "execute" as const,
-  level: 6,
-  strands: ["Technologies", "Action"],
-  type: "internal-to-external" as const,
   problem:
     "The IMPACT programme is fully designed in a 99-page handbook and run on a spreadsheet. Proposals, goals, reflections and coach assessments live in four places, owned by nobody, and are lost at the end of the year.",
   whoAffected:
@@ -57,7 +51,7 @@ const OWNER_PROJECT = {
   whatChanges:
     "A student opens one page and knows what to do today. A coach opens one page and knows in a minute who needs them. The record of a project survives the year it was done in.",
   deliverable:
-    "A live platform running the four-phase journey end to end: Impact Proposal, coach approval, dated plan, a level map that unlocks on validated evidence, and a report assembled from the project itself.",
+    "A live platform a student and a coach can both use: the student writes an Impact Proposal, the coach approves it or sends it back, and the record survives the year it was done in.",
   skills:
     "Shipping something real to a deadline, taking a critical brief without defending the first version, and cutting features that describe the programme instead of helping anyone run a project.",
   needs:
@@ -67,77 +61,10 @@ const OWNER_PROJECT = {
   indicatorName: "Student projects tracked end to end in the platform",
   indicatorBaseline: "0 of 92",
   indicatorTarget: "25 — one cohort, by the end of the pilot term",
-  indicatorCurrent: "5 (demo projects, not yet real students)",
-  milestones: [
-    { title: "First build live on Vercel with the curriculum imported", dueDate: "2026-09-08", done: true },
-    { title: "Align the platform with the IMPACT Handbook", dueDate: "2026-09-14", done: true },
-    { title: "Production database, accounts, and sign-in working", dueDate: "2026-10-08", done: true },
-    { title: "Release 1 of the Improvement Brief", dueDate: "2026-10-22", done: true },
-    { title: "Demo to the IMPACT team and settle the six open questions", dueDate: "2026-10-30", done: false },
-    { title: "Release 2: weekly check-ins, file evidence, AI kits", dueDate: "2026-12-12", done: false },
-    { title: "Pilot with one cohort and measure the indicator", dueDate: "2027-02-27", done: false },
-  ],
-  criteria: [
-    { label: "A student can create, submit and plan a project without anyone explaining where things are", met: true },
-    { label: "A coach can see in under a minute which students are stalled", met: true },
-    { label: "Every issue listed in the Improvement Brief is closed", met: true },
-    { label: "One real cohort has run a project in it start to finish", met: false },
-    { label: "A finished project produces a report without retyping anything", met: false },
-  ],
-  evidence: [
-    { level: 1, status: "validated" as "validated" | "submitted" | "returned",
-      note: "Read the 99-page handbook against the planning workbook. The handbook specifies proposals, approval, SMART goals, a charter, two scorecards and an Impact Profile. None of it had anywhere to live — the workbook held 87 project ideas, 61 with no point person and 6 with no strand.",
-      comment: "Counting the gaps rather than asserting them is what makes this a problem statement and not an opinion." },
-    { level: 2, status: "validated" as const,
-      note: "Proposal with the indicator set at 0 of 92 projects tracked, target one cohort.",
-      comment: "The target is a cohort rather than 'everyone', which is the right size for a first pilot." },
-    { level: 3, status: "validated" as const,
-      note: "Seven dated milestones from first build through to the pilot measurement, with the release plan from the brief as the spine.",
-      comment: "Dates are realistic and the last one is the only one that actually tests the idea." },
-    { level: 4, status: "validated" as const,
-      note: "First real test: live in production on 8 October, one month after the first commit. Sixteen reviewed commits, migrations applied to a clean database, every write ownership-checked.",
-      url: "https://eastwood-impact-lms.vercel.app",
-      comment: "Live is live. The month from nothing to production is the part to lead with." },
-    { level: 5, status: "validated" as const,
-      note: "Mid-showcase: Release 1 presented to the IMPACT team on 22 October. The brief asked for impact to replace strands as the organising idea, five trackers merged into one path, a coach view, and nine beta issues closed. All delivered.",
-      value: "9 of 9 issues closed",
-      comment: "Taking the brief at face value rather than arguing with it is why this moved as fast as it did." },
-    { level: 6, status: "submitted" as const,
-      note: "Five projects now run end to end in the platform — proposal, approved plan, dated milestones, validated evidence. But they are demo projects I created, not real students, so I am not sure this counts as the indicator moving. Submitting it to ask rather than to claim it.",
-      value: "5 of 92",
-      url: "" },
-  ],
-  cycles: [
-    {
-      plan: "Build the platform from the handbook and the planning workbook, generating the curriculum from the spreadsheet rather than retyping it.",
-      act: "Shipped in a month. The extractor logged 87 normalisations and refused to guess a strand for the six projects that arrived without one, which surfaced gaps nobody had counted.",
-      reflect: "The refusal to guess turned out to be the most useful decision. Showing 61 projects with no lead made a management fact visible that a tidier import would have hidden.",
-      q: "What else is the spreadsheet hiding that nobody has thought to count?",
-    },
-    {
-      plan: "Take the Improvement Brief and build Release 1 without arguing with any of it.",
-      act: "Rebuilt the organising idea around impact, merged five trackers into one path, added the level map and the coach queue, and closed all nine beta issues. Then spent a second pass deleting: 53 blank practice pages hidden, eight handbook sections cut to one, two numbering systems reduced to one.",
-      reflect: "The first version was structurally right and unreadable. The deletion pass changed more than the building pass did. I should have cut earlier rather than adding a feature for every line of the handbook.",
-      q: "How do I tell the difference between a concept the programme needs and one I added because the document mentioned it?",
-    },
-  ],
-  help: [
-    { question: "The 53 unwritten practice pages are the biggest thing blocking Release 3, and they are content work, not code. Who owns writing them, and can we start with the nine core practices rather than all of them?" },
-  ],
-  selfCard: {
-    ratings: { progress: 4, effort: 5, challenges: 4, collaborate: 3, adjustments: 5 },
-    notes: {
-      progress: "Release 1 shipped and live. The pilot — the only thing that actually tests the idea — has not started.",
-      effort: "Most of September and October, alongside the media work.",
-      challenges: "Scope. The handbook describes a whole programme and it was tempting to build all of it instead of the part students touch.",
-      collaborate: "Matthias's brief was the turning point and I should have asked for it a month earlier.",
-      adjustments: "Cut strands from the organising idea, merged the trackers, hid everything unwritten.",
-    },
-    comment:
-      "The hardest part was deleting things I had built. The second pass removed more than the first pass added, and the platform is better for it. The open risk is unchanged: this gets admired in a demo and never used, because the content behind it has no owner.",
-    period: "October",
-  },
 };
+
+/**
+ * Three accounts, one project.};
 
 /**
  * Three accounts, one project. The cohort of invented students was removed —
@@ -217,60 +144,16 @@ async function main() {
   const studentId = ids.get("alex")!;
   const coachId = ids.get("matthias")!;
   const P = OWNER_PROJECT;
-  const doneCount = P.milestones.filter((m) => m.done).length;
 
-  const [e] = await db().insert(enrolments).values({
+  await db().insert(enrolments).values({
     userId: studentId, projectSlug: OWNER.slug, ownTitle: OWNER.title,
     fromCatalogue: false, role: "lead", status: "active",
-    phase: P.phase, level: P.level, targetStrands: P.strands, projectType: P.type,
     problem: P.problem, whoAffected: P.whoAffected, whatChanges: P.whatChanges,
     deliverable: P.deliverable, skills: P.skills, needs: P.needs, risk: P.risk,
     indicatorName: P.indicatorName, indicatorBaseline: P.indicatorBaseline,
-    indicatorTarget: P.indicatorTarget, indicatorCurrent: P.indicatorCurrent,
+    indicatorTarget: P.indicatorTarget,
     proposalSubmittedAt: new Date(),
     approvedAt: new Date(), approvedBy: coachId, approvedByName: COACH_NAME,
-    leadCoachId: coachId,
-    charterSignedAt: new Date(), charterSignedByName: OWNER.name,
-    planValidatedAt: new Date(), planValidatedByName: COACH_NAME,
-  }).returning({ id: enrolments.id });
-
-  for (const [i, m] of P.milestones.entries()) {
-    await db().insert(milestones).values({
-      enrolmentId: e.id, title: m.title, dueDate: m.dueDate, done: m.done, position: i,
-    });
-    await db().insert(tasks).values({
-      enrolmentId: e.id, title: m.title,
-      status: m.done ? "done" : i === doneCount ? "doing" : "backlog",
-      position: i,
-    });
-  }
-
-  await db().insert(criteria).values(P.criteria.map((c, i) => ({
-    enrolmentId: e.id, label: c.label, met: c.met, position: i,
-  })));
-
-  await db().insert(evidence).values(P.evidence.map((ev) => ({
-    enrolmentId: e.id, level: ev.level, note: ev.note,
-    url: "url" in ev ? (ev.url as string) : "",
-    value: "value" in ev ? (ev.value as string) : "",
-    status: ev.status,
-    reviewedAt: ev.status === "submitted" ? null : new Date(),
-    reviewedByName: ev.status === "submitted" ? "" : COACH_NAME,
-    reviewComment: "comment" in ev ? (ev.comment as string) : "",
-  })));
-
-  await db().insert(reflections).values(P.cycles.map((c, i) => ({
-    enrolmentId: e.id, cycle: i + 1, plan: c.plan, act: c.act, reflect: c.reflect, furtherQuestion: c.q,
-  })));
-
-  await db().insert(helpRequests).values(P.help.map((h) => ({
-    enrolmentId: e.id, question: h.question,
-  })));
-
-  await db().insert(scorecards).values({
-    enrolmentId: e.id, kind: "student", authorId: studentId,
-    ratings: JSON.stringify(P.selfCard.ratings), notes: JSON.stringify(P.selfCard.notes),
-    comment: P.selfCard.comment, periodLabel: P.selfCard.period,
   });
 
   // Attendance at the weekly work sessions, ending last week so the register
@@ -312,8 +195,8 @@ async function main() {
     console.log(`  ${person.role.padEnd(8)} ${person.email}`);
   }
   console.log(`\n  Password: ${PASSWORD}`);
-  console.log(`\n  ${OWNER.name} owns "${OWNER.title}" at level ${P.level} of 7.`);
-  console.log(`  ${COACH_NAME} has evidence waiting and a question to answer.`);
+  console.log(`\n  ${OWNER.name} owns "${OWNER.title}", proposal approved by ${COACH_NAME}.`);
+  console.log(`  The coach queue is empty — start a project and submit it to fill it.`);
   console.log(`  ${register.length} work sessions marked: late twice, excused once.\n`);
 }
 

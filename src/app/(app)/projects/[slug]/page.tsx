@@ -3,19 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { auth } from "@/auth";
-import { Criteria } from "@/components/Criteria";
 import { ImpactProposal } from "@/components/ImpactProposal";
-import { Kanban } from "@/components/Kanban";
-import { LevelMap } from "@/components/LevelMap";
-import { Plan } from "@/components/Plan";
-import { ProjectTabs } from "@/components/ProjectTabs";
-import { ReflectionCycles } from "@/components/ReflectionCycles";
-import { AskCoach, EvidenceLog, ImpactTracker, ReportDraft } from "@/components/Execute";
 import { JoinButton } from "@/components/JoinButton";
 import { Empty } from "@/components/ui";
 import { getProject, projects } from "@/lib/curriculum";
 import { formatDate } from "@/lib/dates";
-import { enrolmentBySlug, enrolmentDetail, myEnrolmentFor, projectRoster } from "@/lib/queries";
+import { PROPOSAL_STATES, proposalState } from "@/lib/proposal";
+import { enrolmentBySlug, myEnrolmentFor, projectRoster } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: project?.title ?? "Project" };
 }
 
+/**
+ * A project is its Impact Proposal and nothing else. Who it is for, what
+ * would be different, how you would know — written by the student, read by a
+ * coach, approved or sent back. Everything that came after it is not built.
+ */
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const session = await auth();
@@ -43,11 +42,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   if (!catalogue && !enrolment) notFound();
 
   const title = catalogue?.title ?? enrolment?.ownTitle ?? "Project";
-  const detail = enrolment
-    ? await enrolmentDetail(enrolment.id)
-    : { tasks: [], criteria: [], reflections: [], milestones: [], evidence: [], help: [], scorecards: [] };
   const roster = await projectRoster(slug);
   const mine = Boolean(enrolment) && enrolment!.userId === user.id;
+  const state = enrolment ? PROPOSAL_STATES[proposalState(enrolment)] : null;
 
   return (
     <>
@@ -57,7 +54,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
       <header className="mt-4 flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
+          {state ? (
+            <p className={`mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${state.text}`}>
+              <span className={`h-2 w-2 rounded-full ${state.dot}`} />
+              {state.label}
+            </p>
+          ) : null}
+
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-ink">{title}</h1>
+
           {/* The proposal's problem statement supersedes whatever was written
               on day one, which in turn stands in for a catalogue brief. */}
           {enrolment?.problem || catalogue?.description || enrolment?.ownSummary ? (
@@ -65,88 +70,27 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               {enrolment?.problem || catalogue?.description || enrolment?.ownSummary}
             </p>
           ) : null}
-
-          {enrolment?.indicatorName ? (
-            <p className="mt-4 inline-flex flex-wrap items-baseline gap-2 rounded-lg bg-paper px-4 py-2 text-sm">
-              <span className="font-semibold text-ink">{enrolment.indicatorName}</span>
-              <span className="text-muted">
-                {enrolment.indicatorCurrent || enrolment.indicatorBaseline || "—"} → {enrolment.indicatorTarget || "—"}
-              </span>
-            </p>
-          ) : null}
         </div>
 
-        {enrolment ? (
-          <JoinButton
-            projectSlug={slug}
-            enrolmentId={enrolment.id}
-            status={enrolment.status}
-            phase={enrolment.phase}
-            level={enrolment.level}
-            charterSigned={Boolean(enrolment.charterSignedAt)}
-            withdrawnReason={enrolment.withdrawnReason}
-          />
-        ) : (
-          <JoinButton
-            projectSlug={slug}
-            enrolmentId={null}
-            status={null}
-            phase="create"
-            level={1}
-            charterSigned={false}
-            withdrawnReason=""
-          />
-        )}
+        <JoinButton
+          projectSlug={slug}
+          enrolmentId={enrolment?.id ?? null}
+          status={enrolment?.status ?? null}
+          approved={Boolean(enrolment?.approvedAt)}
+          withdrawnReason={enrolment?.withdrawnReason ?? ""}
+        />
       </header>
 
       {enrolment ? (
         <div className="mt-8">
-          <ProjectTabs
-            phase={enrolment.phase}
-            panes={{
-              overview: (
-                <div className="space-y-8">
-                  <LevelMap
-                    enrolmentId={enrolment.id}
-                    level={enrolment.level}
-                    evidence={detail.evidence}
-                    canSubmit={mine}
-                  />
-                  <ImpactProposal enrolment={enrolment} canEdit={mine} canReview={isStaff} />
-                </div>
-              ),
-              plan: (
-                <Plan
-                  enrolment={enrolment}
-                  milestones={detail.milestones}
-                  criteria={detail.criteria}
-                  canEdit={mine}
-                  canReview={isStaff}
-                  CriteriaBlock={<Criteria enrolmentId={enrolment.id} criteria={detail.criteria} />}
-                />
-              ),
-              work: (
-                <div className="space-y-8">
-                  <Kanban enrolmentId={enrolment.id} tasks={detail.tasks} />
-                  <AskCoach enrolmentId={enrolment.id} requests={detail.help} canAsk={mine} canAnswer={isStaff} />
-                  <ReflectionCycles enrolmentId={enrolment.id} reflections={detail.reflections} />
-                </div>
-              ),
-              evidence: (
-                <div className="space-y-8">
-                  <ImpactTracker enrolment={enrolment} canEdit={mine} />
-                  <EvidenceLog evidence={detail.evidence} canReview={isStaff} />
-                </div>
-              ),
-              report: <ReportDraft enrolment={enrolment} detail={detail} />,
-            }}
-          />
+          <ImpactProposal enrolment={enrolment} canEdit={mine} canReview={isStaff} />
         </div>
       ) : (
         <section className="mt-8">
           <Empty title="You are not on this project yet">
-            Joining gives you the Impact Proposal, a dated plan, a level map that unlocks on evidence,
-            and a report at the end that assembles itself from the work.
+            Joining gives you the Impact Proposal: who it is for, what would be
+            different, and how you would know. A coach reads it and either
+            approves it or sends it back.
           </Empty>
         </section>
       )}

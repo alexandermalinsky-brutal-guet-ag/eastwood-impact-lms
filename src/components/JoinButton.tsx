@@ -2,25 +2,25 @@
 
 import { useState, useTransition } from "react";
 
-import { joinProject, leaveProject, markComplete, rejoinProject } from "@/lib/actions";
+import { joinProject, leaveProject, rejoinProject } from "@/lib/actions";
 import { Button, buttonClass } from "@/components/ui";
-import { MAX_LEVEL, type PhaseKey } from "@/lib/handbook";
 
+/**
+ * Getting on and off a project. Approval is the line: before it, the project
+ * is a draft the student can simply drop; after it, a coach has spent time on
+ * it, so leaving is a withdrawal and the reason is kept.
+ */
 export function JoinButton({
   projectSlug,
   enrolmentId,
   status,
-  phase,
-  level,
-  charterSigned,
+  approved,
   withdrawnReason,
 }: {
   projectSlug: string;
   enrolmentId: string | null;
-  status: "active" | "complete" | "withdrawn" | null;
-  phase: PhaseKey;
-  level: number;
-  charterSigned: boolean;
+  status: "active" | "withdrawn" | null;
+  approved: boolean;
   withdrawnReason: string;
 }) {
   const [pending, start] = useTransition();
@@ -53,23 +53,19 @@ export function JoinButton({
     );
   }
 
-  // Completing needs the final level validated, which only a coach can do.
-  const canComplete = phase === "report" && level >= MAX_LEVEL;
-
   if (leaving) {
     return (
       <div className="w-full max-w-sm rounded-[14px] border border-mustard/50 bg-mustard/5 p-5">
-        {charterSigned ? (
+        {approved ? (
           <>
             <h3 className="font-bold text-ink">Withdraw from this project?</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted">
-              You signed the charter, so this is a withdrawal rather than a deletion. The project
-              leaves your dashboard; your proposal, evidence and reflections stay on your profile
-              and your coach is told why.
+              A coach approved this, so it is a withdrawal rather than a deletion. The project
+              leaves your dashboard; the proposal stays on your profile and your coach is told why.
             </p>
             <p className="mt-2.5 text-sm leading-relaxed text-ink">
               Before you do — most projects that feel impossible need re-scoping, not abandoning.
-              Ask your coach on the Work tab first.
+              Talk to your coach first.
             </p>
 
             <form
@@ -103,8 +99,8 @@ export function JoinButton({
           <>
             <h3 className="font-bold text-ink">Remove this project?</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted">
-              You have not signed the charter yet, so this is still a draft. Removing it deletes
-              the proposal and anything on the board. Nothing is kept.
+              No coach has approved it yet, so this is still a draft. Removing it deletes the
+              proposal. Nothing is kept.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <button
@@ -126,26 +122,8 @@ export function JoinButton({
   }
 
   return (
-    <div className="flex flex-col items-stretch gap-2">
-      {status === "complete" ? (
-        <span className="rounded-lg bg-forest-green px-4 py-2 text-center text-sm font-bold text-white">
-          Completed
-        </span>
-      ) : canComplete ? (
-        <Button disabled={pending} onClick={() => start(() => void markComplete(enrolmentId))} className="px-6 py-2.5">
-          Mark complete
-        </Button>
-      ) : (
-        <span className="rounded-lg border border-line px-4 py-2 text-center text-xs text-muted">
-          Completes at level {MAX_LEVEL}, after the final showcase
-        </span>
-      )}
-
-      {status === "complete" ? null : (
-        <Button variant="danger" onClick={() => setLeaving(true)}>
-          {charterSigned ? "Withdraw from project" : "Remove project"}
-        </Button>
-      )}
-    </div>
+    <Button variant="danger" onClick={() => setLeaving(true)}>
+      {approved ? "Withdraw from project" : "Remove project"}
+    </Button>
   );
 }

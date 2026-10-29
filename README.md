@@ -15,13 +15,27 @@ attendance register.
 | Area | Route | What it does |
 | --- | --- | --- |
 | Landing | `/` | Public front page; redirects to the dashboard once signed in |
-| Dashboard | `/dashboard` | Your active projects, open tasks, next actions |
-| Strands | `/strands` | The six IMPACT strands and what each one is for |
-| Projects | `/projects` | All 87 projects, filterable by strand and searchable |
-| Project workspace | `/projects/[slug]` | Kanban board, success criteria, Plan · Act · Reflect cycles |
-| Toolkit | `/toolkit` | 58 teaching practices, 9 of them flagged as core |
-| Handbook | `/handbook` | The programme's own structures: journey, goals, evaluation, progression |
-| Profile | `/profile` | The Impact Profile — the holistic synthesis feeding the Eastwood Passport |
+| Dashboard | `/dashboard` | Your projects, where each proposal stands, your attendance |
+| Projects | `/projects` | The catalogue, filterable by strand and searchable |
+| Project workspace | `/projects/[slug]` | The Impact Proposal, and its approval |
+| Toolkit | `/toolkit` | Teaching practices, grouped by the phase they help with |
+| Handbook | `/handbook` | How to run a project here, in one page |
+| Profile | `/profile` | Your phase of the programme, and every project you have started |
+| Coach | `/coach` | Proposals waiting on you, and where every student stands |
+| Attendance | `/attendance` | The weekly work-session registers |
+| Accounts | `/admin/users` | Adding and managing people |
+
+### What it does, and what it does not
+
+**One loop.** A student starts a project, writes an Impact Proposal, and sends
+it to a coach, who approves it or sends it back with a reason. That is the
+whole platform.
+
+The rest of the programme — the dated plan, the kanban board, reflection
+cycles, evidence, the level map, scorecards and the final report — was built
+and then deliberately removed, to get back to something small enough to pilot.
+The tables went with it (migration `0010`). Git history has all of it if any
+of it comes back.
 
 ### The six strands
 
@@ -43,9 +57,12 @@ readiness is scope, ambition and independence.
 3. **Development, Coaching & Execution** → reflection logs, mini-showcases
 4. **Presentation, Reflection & Evaluation** → final outcome, portfolio, panel
 
-`src/lib/handbook.ts` holds these definitions along with the scorecard
-dimensions, goal types, progression phases and external-impact categories. It
-is the single place to change if the handbook is revised.
+The platform covers stage 1 and the gate at the top of stage 2. The rest
+happens, it just does not live here.
+
+`src/lib/handbook.ts` holds the definitions the app still renders — the
+phases of work, the proposal fields and the progression phases. It is the
+single place to change if the handbook is revised.
 
 **Stage 2 is an approval gate.** A student can only advance one stage at a
 time, and cannot move themselves into or through approval — a coach does that.
@@ -149,27 +166,6 @@ createdb impact_lms
 Then set `DATABASE_URL="postgres://$USER@localhost:5432/impact_lms"` in
 `.env.local`. Stop it again with `pg_ctl -D /opt/homebrew/var/postgresql@16 stop`.
 
-### Calendar
-
-Each account has a private iCalendar feed at `/api/calendar/<token>` carrying
-every dated milestone across their projects. Students subscribe from
-`/calendar` — one button for Google Calendar, one for Apple/Outlook.
-
-It is a **subscription, not an export**: Google re-fetches it, so moving a
-milestone date moves it in the student's calendar too. A downloaded `.ics`
-would go stale the first time anything changed.
-
-Two things to know about the route:
-
-- It sits **outside the auth proxy**, because Google's servers fetch it with
-  no session. The UUID in the path is the only credential, which is why it is
-  a `calendarToken` on the user rather than the user id.
-- Line folding is **octet-based**, not character-based. A tick or an accent is
-  multiple bytes in UTF-8, and Google rejects lines over 75 octets.
-
-Two-way sync (events created from Google, writing back) needs Workspace OAuth
-— the same `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` as Google sign-in.
-
 ### The demo cohort
 
 For a walkthrough or a pitch, the platform needs to show a system in use — an
@@ -181,15 +177,14 @@ npm run demo:prod      # production
 npm run demo -- --clear
 ```
 
-Nine accounts and seven projects spread across all four journey stages, so
-every screen has something real on it: a finished Legacy project with two
-reflection cycles and both scorecards, work mid-execution, one proposal
-awaiting a coach's approval, and two Grade 9s exploring.
+Three accounts and one project: the platform's own, with its proposal
+approved, plus eight weeks of attendance. The invented cohort was removed —
+one true project demos better than five fictional ones.
 
-**The people are fictional.** Every demo account sits on
-`@demo.eastwoodmontreux.ch` so it is distinguishable from a real roster at a
-glance, and `--clear` removes the cohort and all its project data in one go.
-Re-running rebuilds from scratch rather than duplicating.
+The coach queue is empty on a fresh seed, by design: start a second project
+and submit it to see it fill. `--clear` removes the demo accounts and their
+project data; re-running rebuilds the project without disturbing anyone's
+signed-in session.
 
 ### Importing a student roster
 

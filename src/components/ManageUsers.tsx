@@ -10,7 +10,7 @@ import type { Role } from "@/db/schema";
 type Person = {
   id: string; name: string | null; email: string; role: Role;
   grade: string | null; phase: "exploration" | "execution" | "legacy";
-  enabled: boolean; active: number; complete: number;
+  enabled: boolean; active: number; withdrawn: number;
 };
 
 type Handover = { email: string; password: string; generated: boolean };
@@ -239,7 +239,7 @@ export function ManageUsers({ people, meId }: { people: Person[]; meId: string }
                     )}
                   </td>
                   <td className="px-4 py-3 tabular-nums text-muted">
-                    {p.active} active{p.complete ? `, ${p.complete} done` : ""}
+                    {p.active} active{p.withdrawn ? `, ${p.withdrawn} withdrawn` : ""}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap justify-end gap-1.5">

@@ -71,6 +71,13 @@
       "when": 1793268089136,
       "tag": "0009_rich_preak",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793268909346,
+      "tag": "0010_low_triathlon",
+      "breakpoints": true
     }
   ]
 }

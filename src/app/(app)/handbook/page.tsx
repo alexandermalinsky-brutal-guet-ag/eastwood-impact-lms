@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { LEVELS, PHASES_OF_WORK } from "@/lib/handbook";
-
 export const metadata: Metadata = { title: "How IMPACT works" };
 
 /**
- * One page. The old handbook ran to eight sections describing the programme;
- * this explains how to run a project, which is the only thing anyone needs
- * from it while they are working.
+ * One page, and only what the platform actually does today: you write an
+ * Impact Proposal and a coach approves it or sends it back. The phases,
+ * levels and evidence this page used to describe are the programme's shape,
+ * not something anyone can do here yet — so they are not promised here.
  */
 export default function HowItWorks() {
   return (
@@ -46,77 +45,29 @@ export default function HowItWorks() {
       </section>
 
       <section className="mt-14">
-        <h2 className="text-2xl font-bold tracking-tight text-ink">Four phases</h2>
-        <p className="mt-2 text-base leading-relaxed text-muted">
-          You move to the next phase when a coach says the work is there. Between those gates,
-          the project is yours to run.
-        </p>
-
+        <h2 className="text-2xl font-bold tracking-tight text-ink">What happens here</h2>
         <ol className="mt-6 space-y-3">
-          {PHASES_OF_WORK.map((phase) => {
-            const levels = LEVELS.filter((l) => l.phase === phase.key);
-            return (
-              <li key={phase.key} className="card overflow-hidden p-0">
-                <div className="flex flex-wrap items-baseline gap-3 border-b border-line bg-paper px-5 py-4">
-                  <span className="rounded-full bg-deep-blue px-3 py-1 text-xs font-bold text-white">
-                    {phase.number}
-                  </span>
-                  <h3 className="text-xl font-bold tracking-tight text-ink">{phase.name}</h3>
-                  <span className="text-sm text-muted">{phase.verb}</span>
-                </div>
-
-                <div className="px-5 py-4">
-                  <p className="text-sm leading-relaxed text-muted">{phase.summary}</p>
-
-                  <ul className="mt-4 space-y-2">
-                    {levels.map((l) => (
-                      <li key={l.n} className="flex gap-3 text-sm">
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-royal-purple text-[0.62rem] font-bold text-white">
-                          {l.n}
-                        </span>
-                        <span>
-                          <span className="font-semibold text-ink">{l.milestone}</span>
-                          <span className="text-muted"> — {l.evidence}</span>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <p className="mt-4 rounded-lg bg-royal-purple/5 px-4 py-2.5 text-sm text-ink">
-                    <span className="font-bold">Moves on when: </span>{phase.gate}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
+          {[
+            ["Start a project", "Your own idea, or one from the catalogue. A working title is enough to begin."],
+            ["Write the Impact Proposal", "The three questions above, plus what you will deliver, what you need, and the main risk. Every field shows you a strong answer and a weak one."],
+            ["Send it to a coach", "They read it and either approve it or send it back saying what is missing."],
+            ["Revise and send it again", "Sent back is not failed. It means someone told you exactly what would make it work."],
+          ].map(([step, what], i) => (
+            <li key={step} className="card flex gap-4 p-5">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-deep-blue text-xs font-bold text-white">
+                {i + 1}
+              </span>
+              <div>
+                <h3 className="font-bold text-ink">{step}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{what}</p>
+              </div>
+            </li>
+          ))}
         </ol>
-      </section>
-
-      <section className="mt-14">
-        <h2 className="text-2xl font-bold tracking-tight text-ink">
-          Levels unlock on evidence, not effort
-        </h2>
-        <p className="mt-2 text-base leading-relaxed text-muted">
-          Seven levels across the four phases. You reach the next one by showing something real —
-          a photo, a file, a number, something someone said — and a coach confirming it.
-          There are no points for logging in, and no leaderboard.
+        <p className="mt-4 text-sm leading-relaxed text-muted">
+          That is everything the platform does today. The rest of the programme — the plan, the
+          work, the evidence, the final showcase — still happens, it just does not live here yet.
         </p>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-[14px] border border-forest-green/40 bg-forest-green/5 p-5">
-            <p className="font-bold text-ink">One strong piece beats ten weak ones</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">
-              “Asked three Year 7s what they thought, here is what they said” is worth more than a
-              week of ticked boxes.
-            </p>
-          </div>
-          <div className="rounded-[14px] border border-mustard/40 bg-mustard/5 p-5">
-            <p className="font-bold text-ink">Sent back is not failed</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">
-              A coach returning your evidence means they told you what is missing. You revise and
-              send it again. Nothing is lost.
-            </p>
-          </div>
-        </div>
       </section>
 
       <section className="mt-14">
@@ -125,11 +76,8 @@ export default function HowItWorks() {
           {[
             ["Impact Proposal", "The first thing you write. Who it is for, what changes, and the one number you will watch."],
             ["Indicator", "That number. Where it is today, and where you want it."],
-            ["Definition of done", "Three to five things that must be true for this to count as finished."],
-            ["Milestone", "A dated step. Three to six of them, ending at the showcase."],
-            ["Evidence", "What you show a coach to unlock the next level."],
-            ["Charter", "You signing that you will see it through unless a coach agrees to change course."],
-            ["Plan · Act · Reflect", "A short write-up each cycle: what you planned, what happened, what you would do differently."],
+            ["Approved", "A coach has read your proposal and agreed it is a real project."],
+            ["Sent back", "A coach has told you what is missing. You revise and send it again."],
           ].map(([term, meaning]) => (
             <div key={term} className="grid gap-1 px-5 py-4 sm:grid-cols-[13rem_1fr] sm:gap-5">
               <dt className="font-bold text-ink">{term}</dt>
@@ -143,7 +91,7 @@ export default function HowItWorks() {
         <h2 className="text-2xl font-bold tracking-tight">Stuck on where to begin?</h2>
         <p className="mt-2 max-w-xl text-base leading-relaxed text-light-purple">
           Start with something that annoys you about this school, or something you wish existed.
-          Write one sentence about who it affects. That sentence is level one.
+          Write one sentence about who it affects. That sentence is the proposal's first line.
         </p>
         <Link
           href="/dashboard"

@@ -4,14 +4,7 @@ import { db, isDatabaseConfigured } from "@/db";
 import {
   attendance,
   attendanceSessions,
-  criteria,
   enrolments,
-  evidence,
-  helpRequests,
-  milestones,
-  reflections,
-  scorecards,
-  tasks,
   users,
   type AttendanceStatus,
 } from "@/db/schema";
@@ -58,57 +51,6 @@ export async function myEnrolmentFor(userId: string, projectSlug: string) {
       .limit(1);
     return row ?? null;
   }, null as EnrolmentRow | null);
-}
-
-export async function enrolmentDetail(enrolmentId: string) {
-  return safe(
-    async () => ({
-      tasks: await db()
-        .select()
-        .from(tasks)
-        .where(eq(tasks.enrolmentId, enrolmentId))
-        .orderBy(asc(tasks.position)),
-      criteria: await db()
-        .select()
-        .from(criteria)
-        .where(eq(criteria.enrolmentId, enrolmentId))
-        .orderBy(asc(criteria.position)),
-      reflections: await db()
-        .select()
-        .from(reflections)
-        .where(eq(reflections.enrolmentId, enrolmentId))
-        .orderBy(asc(reflections.cycle)),
-      milestones: await db()
-        .select()
-        .from(milestones)
-        .where(eq(milestones.enrolmentId, enrolmentId))
-        .orderBy(asc(milestones.position)),
-      evidence: await db()
-        .select()
-        .from(evidence)
-        .where(eq(evidence.enrolmentId, enrolmentId))
-        .orderBy(desc(evidence.submittedAt)),
-      help: await db()
-        .select()
-        .from(helpRequests)
-        .where(eq(helpRequests.enrolmentId, enrolmentId))
-        .orderBy(desc(helpRequests.createdAt)),
-      scorecards: await db()
-        .select()
-        .from(scorecards)
-        .where(eq(scorecards.enrolmentId, enrolmentId))
-        .orderBy(desc(scorecards.createdAt)),
-    }),
-    {
-      tasks: [] as (typeof tasks.$inferSelect)[],
-      criteria: [] as (typeof criteria.$inferSelect)[],
-      reflections: [] as (typeof reflections.$inferSelect)[],
-      milestones: [] as (typeof milestones.$inferSelect)[],
-      evidence: [] as (typeof evidence.$inferSelect)[],
-      help: [] as (typeof helpRequests.$inferSelect)[],
-      scorecards: [] as (typeof scorecards.$inferSelect)[],
-    },
-  );
 }
 
 /** How many people are signed up to each project, for the browse pages. */
@@ -168,7 +110,7 @@ export async function staffOverview() {
           phase: users.phase,
           enabled: users.active,
           active: sql<number>`cast(count(*) filter (where ${enrolments.status} = 'active') as int)`,
-          complete: sql<number>`cast(count(*) filter (where ${enrolments.status} = 'complete') as int)`,
+          withdrawn: sql<number>`cast(count(*) filter (where ${enrolments.status} = 'withdrawn') as int)`,
         })
         .from(users)
         .leftJoin(enrolments, eq(users.id, enrolments.userId))
@@ -183,7 +125,7 @@ export async function staffOverview() {
       phase: "exploration" | "execution" | "legacy";
       enabled: boolean;
       active: number;
-      complete: number;
+      withdrawn: number;
     }[],
   );
 }
@@ -218,136 +160,6 @@ export async function myProfile(userId: string) {
 }
 
 
-/**
- * The coach's daily view: one line per student project, with everything needed
- * to decide in a minute who needs attention.
- *
- * Stalled is defined by the brief: no evidence for seven days, or a milestone
- * past its date.
- */
-export async function coachBoard() {
-  return safe(async () => {
-    const rows = await db()
-      .select({
-        enrolmentId: enrolments.id,
-        projectSlug: enrolments.projectSlug,
-        ownTitle: enrolments.ownTitle,
-        phase: enrolments.phase,
-        level: enrolments.level,
-        status: enrolments.status,
-        withdrawnReason: enrolments.withdrawnReason,
-        submittedAt: enrolments.proposalSubmittedAt,
-        approvedAt: enrolments.approvedAt,
-        planValidatedAt: enrolments.planValidatedAt,
-        charterSignedAt: enrolments.charterSignedAt,
-        indicatorName: enrolments.indicatorName,
-        indicatorCurrent: enrolments.indicatorCurrent,
-        indicatorTarget: enrolments.indicatorTarget,
-        studentName: users.name,
-        studentEmail: users.email,
-        studentPhase: users.phase,
-      })
-      .from(enrolments)
-      .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(eq(users.role, "student"))
-      .orderBy(asc(users.name));
-
-    const ids = rows.map((r) => r.enrolmentId);
-    if (ids.length === 0) return { rows: [], pendingEvidence: [], pendingHelp: [] };
-
-    const lastEvidence = await db()
-      .select({
-        enrolmentId: evidence.enrolmentId,
-        last: sql<string>`max(${evidence.submittedAt})`,
-      })
-      .from(evidence)
-      .where(inArray(evidence.enrolmentId, ids))
-      .groupBy(evidence.enrolmentId);
-    const lastBy = new Map(lastEvidence.map((e) => [e.enrolmentId, e.last]));
-
-    const openMilestones = await db()
-      .select({ enrolmentId: milestones.enrolmentId, title: milestones.title, dueDate: milestones.dueDate })
-      .from(milestones)
-      .where(and(inArray(milestones.enrolmentId, ids), eq(milestones.done, false)))
-      .orderBy(asc(milestones.position));
-    const nextBy = new Map<string, { title: string; dueDate: string }>();
-    for (const m of openMilestones) if (!nextBy.has(m.enrolmentId)) nextBy.set(m.enrolmentId, m);
-
-    const pendingEvidence = await db()
-      .select({
-        id: evidence.id, level: evidence.level, note: evidence.note, url: evidence.url,
-        value: evidence.value, submittedAt: evidence.submittedAt,
-        projectSlug: enrolments.projectSlug, ownTitle: enrolments.ownTitle,
-        studentName: users.name,
-      })
-      .from(evidence)
-      .innerJoin(enrolments, eq(evidence.enrolmentId, enrolments.id))
-      .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(and(eq(evidence.status, "submitted"), eq(enrolments.status, "active")))
-      .orderBy(asc(evidence.submittedAt));
-
-    const pendingHelp = await db()
-      .select({
-        id: helpRequests.id, question: helpRequests.question, createdAt: helpRequests.createdAt,
-        projectSlug: enrolments.projectSlug, ownTitle: enrolments.ownTitle, studentName: users.name,
-      })
-      .from(helpRequests)
-      .innerJoin(enrolments, eq(helpRequests.enrolmentId, enrolments.id))
-      .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(and(sql`${helpRequests.answeredAt} is null`, eq(enrolments.status, "active")))
-      .orderBy(asc(helpRequests.createdAt));
-
-    const now = Date.now();
-    const WEEK = 7 * 24 * 60 * 60 * 1000;
-
-    return {
-      rows: rows.map((r) => {
-        const next = nextBy.get(r.enrolmentId) ?? null;
-        const last = lastBy.get(r.enrolmentId);
-        const lastDate = last ? new Date(last) : null;
-        const quiet = !lastDate || now - lastDate.getTime() > WEEK;
-        const overdue = Boolean(next?.dueDate && Date.parse(next.dueDate) < now);
-        const light =
-          r.status === "withdrawn" ? "withdrawn"
-          : r.status === "complete" ? "complete"
-          : overdue || quiet ? (overdue && quiet ? "stalled" : "at-risk")
-          : "on-track";
-        return { ...r, next, lastEvidenceAt: lastDate, light: light as CoachLight };
-      }),
-      pendingEvidence,
-      pendingHelp,
-    };
-  }, { rows: [], pendingEvidence: [], pendingHelp: [] } as Awaited<ReturnType<typeof coachBoardShape>>);
-}
-
-export type CoachLight = "on-track" | "at-risk" | "stalled" | "complete" | "withdrawn";
-
-/** Type carrier only — never called. */
-declare function coachBoardShape(): Promise<{
-  rows: {
-    enrolmentId: string; projectSlug: string; ownTitle: string;
-    phase: "create" | "plan" | "execute" | "report"; level: number;
-    status: "active" | "complete" | "withdrawn";
-    withdrawnReason: string;
-    submittedAt: Date | null; approvedAt: Date | null; planValidatedAt: Date | null;
-    charterSignedAt: Date | null;
-    indicatorName: string; indicatorCurrent: string; indicatorTarget: string;
-    studentName: string | null; studentEmail: string;
-    studentPhase: "exploration" | "execution" | "legacy";
-    next: { title: string; dueDate: string } | null;
-    lastEvidenceAt: Date | null;
-    light: CoachLight;
-  }[];
-  pendingEvidence: {
-    id: string; level: number; note: string; url: string; value: string;
-    submittedAt: Date; projectSlug: string; ownTitle: string; studentName: string | null;
-  }[];
-  pendingHelp: {
-    id: string; question: string; createdAt: Date;
-    projectSlug: string; ownTitle: string; studentName: string | null;
-  }[];
-}>;
-
 /** Proposals sitting in the approval queue. */
 export async function proposalsAwaitingReview() {
   return safe(() =>
@@ -370,65 +182,40 @@ export async function proposalsAwaitingReview() {
   );
 }
 
-/** Plans waiting for a coach to validate before Execute can start. */
-export async function plansAwaitingReview() {
+/**
+ * Every student project, for the coach's overview. One row each, with the
+ * fields `proposalState` reads — the coach page does not need anything else.
+ */
+export async function studentProjects() {
   return safe(() =>
     db()
       .select({
-        enrolmentId: enrolments.id, projectSlug: enrolments.projectSlug,
-        ownTitle: enrolments.ownTitle, studentName: users.name,
+        enrolmentId: enrolments.id,
+        projectSlug: enrolments.projectSlug,
+        ownTitle: enrolments.ownTitle,
+        status: enrolments.status,
+        problem: enrolments.problem,
+        proposalSubmittedAt: enrolments.proposalSubmittedAt,
+        approvedAt: enrolments.approvedAt,
+        returnedAt: enrolments.returnedAt,
+        withdrawnReason: enrolments.withdrawnReason,
+        joinedAt: enrolments.joinedAt,
+        studentName: users.name,
+        studentEmail: users.email,
       })
       .from(enrolments)
       .innerJoin(users, eq(enrolments.userId, users.id))
-      .where(and(
-        eq(enrolments.status, "active"),
-        eq(enrolments.phase, "plan"),
-        sql`${enrolments.planValidatedAt} is null`,
-        sql`${enrolments.approvedAt} is not null`,
-      ))
-      .orderBy(asc(enrolments.approvedAt)),
-    [] as { enrolmentId: string; projectSlug: string; ownTitle: string; studentName: string | null }[],
+      .where(eq(users.role, "student"))
+      .orderBy(asc(users.name)),
+    [] as {
+      enrolmentId: string; projectSlug: string; ownTitle: string;
+      status: "active" | "withdrawn"; problem: string;
+      proposalSubmittedAt: Date | null; approvedAt: Date | null; returnedAt: Date | null;
+      withdrawnReason: string; joinedAt: Date;
+      studentName: string | null; studentEmail: string;
+    }[],
   );
 }
-
-
-/** The secret in the student's calendar feed URL. */
-export async function myCalendarToken(userId: string) {
-  return safe(async () => {
-    const [row] = await db()
-      .select({ token: users.calendarToken })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-    return row?.token ?? null;
-  }, null as string | null);
-}
-
-/** Every dated milestone across a student's projects, soonest first. */
-export async function upcomingDeadlines(userId: string) {
-  return safe(
-    () =>
-      db()
-        .select({
-          id: milestones.id,
-          title: milestones.title,
-          dueDate: milestones.dueDate,
-          done: milestones.done,
-          projectSlug: enrolments.projectSlug,
-          ownTitle: enrolments.ownTitle,
-        })
-        .from(milestones)
-        .innerJoin(enrolments, eq(milestones.enrolmentId, enrolments.id))
-        .where(and(
-          eq(enrolments.userId, userId),
-          eq(enrolments.status, "active"),
-          sql`${milestones.dueDate} <> ''`,
-        ))
-        .orderBy(asc(milestones.dueDate)),
-    [] as { id: string; title: string; dueDate: string; done: boolean; projectSlug: string; ownTitle: string }[],
-  );
-}
-
 
 /**
  * The enrolment for a project by slug, regardless of who owns it. Staff need

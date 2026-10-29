@@ -134,25 +134,6 @@ export const strandCounts = STRANDS.map((strand) => ({
   count: projectsInStrand(strand).length,
 }));
 
-/**
- * Default success criteria offered when someone joins a project — the school's
- * "definition of done" practice, pre-filled so a student starts from a shape
- * rather than a blank page. They are editable per enrolment.
- */
-export const DEFAULT_CRITERIA = [
-  "The outcome exists and someone outside the project has seen it",
-  "I can explain the problem I framed and why it mattered",
-  "I completed at least two Plan – Act – Reflect cycles",
-  "I acted on feedback from a coach or peer at least once",
-];
-
-export const DEFAULT_TASKS = [
-  { title: "Frame the problem in one sentence", status: "backlog" as const },
-  { title: "Agree success criteria with a coach", status: "backlog" as const },
-  { title: "Book the first work session", status: "backlog" as const },
-];
-
-
 /** Practices grouped by the phase of work they help with. */
 export function practicesByPhase(phase: string): Resource[] {
   return resources.filter((r) => r.phase === phase);

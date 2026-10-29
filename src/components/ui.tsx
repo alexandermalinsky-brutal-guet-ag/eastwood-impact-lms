@@ -29,16 +29,6 @@ export function StrandChip({
   );
 }
 
-export function Card({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return <div className={`card p-5 ${className}`}>{children}</div>;
-}
-
 export function SectionHeading({
   eyebrow,
   title,
@@ -64,30 +54,6 @@ export function SectionHeading({
         ) : null}
       </div>
       {action}
-    </div>
-  );
-}
-
-export function Stat({
-  value,
-  label,
-  accent,
-}: {
-  value: ReactNode;
-  label: string;
-  accent?: string;
-}) {
-  return (
-    <div className="card p-4">
-      <p
-        className="text-3xl font-bold tabular-nums tracking-tight"
-        style={{ color: accent ?? "var(--color-deep-blue)" }}
-      >
-        {value}
-      </p>
-      <p className="mt-0.5 text-xs font-medium uppercase tracking-wider text-muted">
-        {label}
-      </p>
     </div>
   );
 }

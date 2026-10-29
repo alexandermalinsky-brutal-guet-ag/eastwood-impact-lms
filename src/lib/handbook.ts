@@ -65,43 +65,6 @@ export const PHASES_OF_WORK: ProjectPhase[] = [
   },
 ];
 
-export const PHASE_BY_KEY = new Map(PHASES_OF_WORK.map((p) => [p.key, p]));
-export const PHASE_ORDER: PhaseKey[] = PHASES_OF_WORK.map((p) => p.key);
-
-/**
- * The level map. A level unlocks only when the student submits evidence and a
- * coach validates it — evidence unlocks, not activity. Levels 1-3 and 7 are
- * the same for every project; 4-6 are adapted within the frame.
- */
-export type Level = {
-  n: number;
-  phase: PhaseKey;
-  milestone: string;
-  evidence: string;
-  /** Null where the level is adapted per project rather than fixed. */
-  fixed: boolean;
-};
-
-export const LEVELS: Level[] = [
-  { n: 1, phase: "create", milestone: "Problem framed", fixed: true,
-    evidence: "A one-sentence problem, plus proof you talked to three people affected by it." },
-  { n: 2, phase: "create", milestone: "Proposal approved", fixed: true,
-    evidence: "An Impact Proposal with a baseline and a target, approved by a coach." },
-  { n: 3, phase: "plan", milestone: "Plan locked", fixed: true,
-    evidence: "Dated milestones and a definition of done, with the charter signed." },
-  { n: 4, phase: "execute", milestone: "First real test", fixed: false,
-    evidence: "A photo, prototype or first event — and what you learned from it." },
-  { n: 5, phase: "execute", milestone: "Mid-showcase", fixed: false,
-    evidence: "A short presentation to peers, and the feedback you got back." },
-  { n: 6, phase: "execute", milestone: "Impact measured", fixed: false,
-    evidence: "The indicator updated against its target, with the source of the number." },
-  { n: 7, phase: "report", milestone: "Final showcase", fixed: true,
-    evidence: "The Impact Report, presented to the panel." },
-];
-
-export const LEVEL_BY_N = new Map(LEVELS.map((l) => [l.n, l]));
-export const MAX_LEVEL = LEVELS.length;
-
 /**
  * The Impact Proposal. Every field carries a strong and a weak example —
  * students write better when they can see what good looks like.
@@ -165,75 +128,12 @@ export const PROPOSAL_FIELDS = [
   },
 ] as const;
 
-export type ProposalFieldKey = (typeof PROPOSAL_FIELDS)[number]["key"];
-
 /** The indicator is the heart of "impact first": one number, measured twice. */
 export const INDICATOR_FIELDS = {
   name: { label: "The one thing we will measure", good: "New Year 7s who can name a buddy", weak: "Happiness" },
   baseline: { label: "Where it is today", good: "0 of 60", weak: "Low" },
   target: { label: "Where we want it", good: "50 of 60 by October half-term", weak: "Higher" },
 } as const;
-/**
- * Goal types. The handbook is explicit that a project's 3–5 goals should
- * combine all three, and that the qualitative ones are deliberate: judgment,
- * perseverance and ethical awareness cannot be reduced to numerical targets.
- */
-export type GoalKind = "deliverable" | "milestone" | "qualitative";
-
-export const GOAL_KINDS: {
-  key: GoalKind;
-  label: string;
-  hint: string;
-  colour: string;
-}[] = [
-  {
-    key: "deliverable",
-    label: "Tangible deliverable",
-    hint: "A prototype, publication, event or campaign — something that exists at the end.",
-    colour: "var(--color-blue-purple)",
-  },
-  {
-    key: "milestone",
-    label: "Process milestone",
-    hint: "A stage in the project lifecycle: a testing phase, an iteration, an engagement cycle.",
-    colour: "var(--color-mustard)",
-  },
-  {
-    key: "qualitative",
-    label: "Qualitative growth",
-    hint: "Leadership, collaboration quality, resilience. Observed and discussed, not counted.",
-    colour: "var(--color-forest-green)",
-  },
-];
-
-/**
- * The Student IMPACT Scorecard — a reflective tool reviewed by a coach, not a
- * self-grading exercise. Completed bi-monthly.
- */
-export const STUDENT_SCORECARD = [
-  { key: "progress", label: "Assess progress", hint: "How far have you actually advanced toward your goals?" },
-  { key: "effort", label: "Manage effort", hint: "What commitment and time have you put in?" },
-  { key: "challenges", label: "Identify challenges", hint: "What obstacles and difficulties have surfaced?" },
-  { key: "collaborate", label: "Collaborate", hint: "How well is the team working and communicating?" },
-  { key: "adjustments", label: "Make adjustments", hint: "What are you changing as a result of this reflection?" },
-] as const;
-
-/**
- * The Coach Scorecard — completed twice per month and calibrated in the Coach
- * Council to reduce individual bias.
- */
-export const COACH_SCORECARD = [
-  { key: "initiative", label: "Initiative and ownership" },
-  { key: "leadership", label: "Leadership and collaboration" },
-  { key: "creativity", label: "Creativity and problem-solving" },
-  { key: "resilience", label: "Resilience and adaptability" },
-  { key: "ethics", label: "Ethical behaviour and responsibility" },
-] as const;
-
-export type ScorecardKey =
-  | (typeof STUDENT_SCORECARD)[number]["key"]
-  | (typeof COACH_SCORECARD)[number]["key"];
-
 /**
  * Progression is by demonstrated readiness, not chronological age — a stated
  * core belief of the school. Grades are the typical rhythm, not a rule.
@@ -264,85 +164,4 @@ export const PHASES = [
     expectation:
       "A single Legacy Project that may outlive graduation: handed to younger students, or grown into an independent venture.",
   },
-] as const;
-
-/** The student's own progression, distinct from a project's phase of work. */
-export type ProgressionPhaseKey = (typeof PHASES)[number]["key"];
-
-/** How a project engages the world beyond the project team. */
-export const PROJECT_TYPES = [
-  { key: "internal", label: "Internal", hint: "Impact within the school community." },
-  { key: "external", label: "External", hint: "Engages audiences, partners or stakeholders outside the school." },
-  {
-    key: "internal-to-external",
-    label: "Internal → External",
-    hint: "Starts inside the school and is taken outward as it matures.",
-  },
-] as const;
-
-export type ProjectType = (typeof PROJECT_TYPES)[number]["key"];
-
-/** The handbook's categories of external impact. No category is privileged. */
-export const EXTERNAL_CATEGORIES = [
-  {
-    key: "community",
-    name: "Community and social impact",
-    description:
-      "Needs within local or global communities — wellbeing initiatives, educational outreach, awareness campaigns, social innovation. Develops empathy and ethical judgment.",
-  },
-  {
-    key: "cultural",
-    name: "Cultural and creative contribution",
-    description:
-      "Storytelling, performance, media and artistic production shared publicly. Emphasises communication, creativity and audience engagement.",
-  },
-  {
-    key: "environmental",
-    name: "Environmental and sustainability",
-    description:
-      "Stewardship, conservation and regenerative practice. Students confront real trade-offs between ambition, feasibility and impact.",
-  },
-  {
-    key: "technological",
-    name: "Technological and entrepreneurial",
-    description:
-      "Designing, prototyping or testing tools, platforms and services with real users. Develops iteration and ethical awareness around technology.",
-  },
-  {
-    key: "research",
-    name: "Research, advocacy and knowledge sharing",
-    description:
-      "Investigation, analysis and public dissemination — data collection, policy research, or content aimed at changing understanding or behaviour.",
-  },
-] as const;
-
-/**
- * Coaching roles. Every project has a Lead Strand Coach; Co-Strand Coaches and
- * External Mentors are added where the project needs them.
- */
-export const COACH_ROLES = [
-  {
-    key: "lead",
-    name: "Lead Strand Coach",
-    responsibility: "Overall direction and coherence, progress against goals, and learning outcomes.",
-  },
-  {
-    key: "co",
-    name: "Co-Strand Coach",
-    responsibility: "Targeted expertise and domain-specific feedback on one dimension of the project.",
-  },
-  {
-    key: "external",
-    name: "External Mentor",
-    responsibility: "Industry or community perspective, increasing authenticity and relevance.",
-  },
-] as const;
-
-/** Cadences the handbook fixes explicitly. */
-export const RHYTHMS = [
-  { what: "Structured work sessions", cadence: "Weekly" },
-  { what: "Coach Scorecards", cadence: "Twice monthly" },
-  { what: "Coach Council", cadence: "Twice monthly" },
-  { what: "Student reflection logs", cadence: "Bi-monthly" },
-  { what: "Mini-showcases", cadence: "At regular intervals" },
 ] as const;
