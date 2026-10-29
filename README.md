@@ -117,7 +117,7 @@ Requires Node 20+ and Python 3 (for the extraction script only).
 npm install
 cp .env.example .env.local     # then fill in DATABASE_URL and AUTH_SECRET
 npm run db:migrate             # apply drizzle/*.sql
-npm run db:seed                # create the first accounts
+npm run db:seed                # create the first admin, then add the rest in-app
 npm run dev
 ```
 
@@ -228,8 +228,8 @@ deleting history; `active` archives a leaver without destroying their record.
 
 ### Creating individual accounts
 
-`npm run db:seed` is for bootstrapping. For one account at a time — which is
-how real people should be added — use:
+Most accounts should be added from the Accounts page. For one from the command
+line — scripted onboarding, or before anyone can sign in — use:
 
 ```bash
 npm run user -- --email someone@eastwoodmontreux.ch --name "Their Name" --role coach
@@ -260,10 +260,18 @@ crashing. That way the first deploy succeeds before the store exists.
 
 ### Accounts
 
-`npm run db:seed` creates a coach account for everyone named as a point person
-in the planning workbook, plus an `impact@` admin. It prints a shared bootstrap
-password once — **change these on first sign-in.** Set `SEED_PASSWORD` to choose
-your own.
+People are added from the **Accounts** page (`/admin/users`) by an admin: name,
+school email, role, and a password that is generated and shown once. Only a
+hash is stored, so a lost password is reset rather than looked up.
+
+`npm run db:seed` exists only for the first run on an empty database, where
+there is nobody to sign in as yet. It creates one admin and prints its password
+once; on a database that already has accounts it does nothing. Set
+`SEED_ADMIN_EMAIL`, `SEED_ADMIN_NAME` or `SEED_PASSWORD` to choose your own.
+
+It used to create a coach account for all 17 point people in the planning
+workbook, sharing one password. Being named against a project in the workbook
+is data; having an account is a decision somebody makes.
 
 Sign-in is email and password by default. To add Google Workspace sign-in, set
 `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`; accounts still have to exist on the
@@ -272,8 +280,13 @@ not self-service by design.
 
 ### Roles
 
-`student` joins projects · `coach` also sees project rosters · `admin` also sees
-`/staff`.
+`student` joins projects · `coach` also sees the coach queue, attendance
+registers and `/staff` · `admin` also sees `/admin/users`.
+
+One address can be given the Accounts page without being an admin, through
+`OWNER_EMAILS` (see `src/lib/access.ts`). That exists so the platform owner can
+hold a real student account — the student demo is then a student, not an admin
+pretending — while still adding people.
 
 ---
 

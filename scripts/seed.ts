@@ -1,83 +1,60 @@
 /**
- * Creates the first accounts so someone can sign in.
+ * Creates the one account needed to get in the first time.
  *
- *   DATABASE_URL=... npm run db:seed
+ *   npm run db:seed
  *
- * Passwords are read from SEED_PASSWORD (or generated and printed once).
- * Change them on first sign-in — these are bootstrap accounts, not real ones.
+ * That is all it does. Everyone else — students, coaches, other admins — is
+ * added from the Accounts page, by a person, with a password handed over
+ * directly. This used to create a coach account for all 17 point people named
+ * in the planning workbook plus an impact@ admin, all sharing one password.
+ * That was a roster, not a set of accounts: most of them never signed in, and
+ * the list came back every time the script ran.
+ *
+ * Being named against a project in the workbook is data. Having an account is
+ * a decision somebody makes.
  */
 import { randomBytes } from "node:crypto";
 
 import { hash } from "bcryptjs";
-import { eq } from "drizzle-orm";
 
-import people from "../src/data/people.json";
 import { db, isDatabaseConfigured } from "../src/db";
-import { users, type Role } from "../src/db/schema";
+import { users } from "../src/db/schema";
 
 if (!isDatabaseConfigured()) {
   console.error("Set DATABASE_URL before seeding.");
   process.exit(1);
 }
 
-const domain = process.env.ALLOWED_EMAIL_DOMAIN ?? "eastwoodmontreux.ch";
-
-function emailFor(name: string) {
-  const slug = name
-    .normalize("NFKD")
-    .replace(/[^a-zA-Z]/g, "")
-    .toLowerCase();
-  return `${slug}@${domain}`;
-}
+const DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN ?? "eastwood.global";
 
 async function main() {
-  const password = process.env.SEED_PASSWORD ?? randomBytes(9).toString("base64url");
-  const passwordHash = await hash(password, 10);
-
-  // Everyone named as a point person in the workbook becomes a coach account,
-  // plus a standing admin so there is someone who can see /staff.
-  const seeds: { name: string; email: string; role: Role }[] = (
-    people as { name: string }[]
-  ).map((person) => ({
-    name: person.name,
-    email: emailFor(person.name),
-    role: "coach" as const,
-  }));
-
-  seeds.push({ name: "IMPACT Admin", email: `impact@${domain}`, role: "admin" });
-
-  let created = 0;
-  for (const seed of seeds) {
-    const existing = await db()
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, seed.email))
-      .limit(1);
-
-    if (existing.length > 0) continue;
-
-    await db().insert(users).values({ ...seed, passwordHash });
-    created += 1;
+  // A bootstrap account only makes sense on an empty platform. If anyone can
+  // already sign in, they can add the next person themselves.
+  const [someone] = await db().select({ id: users.id }).from(users).limit(1);
+  if (someone) {
+    console.log("Accounts already exist — nothing to bootstrap.");
+    console.log("Add people from the Accounts page, or with: npm run user -- --email …");
+    return;
   }
 
-  console.log(`Created ${created} account(s), skipped ${seeds.length - created}.`);
+  const email = (process.env.SEED_ADMIN_EMAIL ?? `admin@${DOMAIN}`).toLowerCase();
+  const password = process.env.SEED_PASSWORD ?? randomBytes(12).toString("base64url");
+
+  await db().insert(users).values({
+    email,
+    name: process.env.SEED_ADMIN_NAME ?? "IMPACT Admin",
+    role: "admin",
+    passwordHash: await hash(password, 10),
+  });
+
+  console.log(`\nCreated the first admin: ${email}`);
   if (!process.env.SEED_PASSWORD) {
-    console.log(`\nShared bootstrap password: ${password}`);
-    console.log("Set SEED_PASSWORD to choose your own. Change these after first sign-in.\n");
+    console.log(`Password: ${password}`);
+    console.log("Shown once. Change it, or set SEED_PASSWORD to choose your own.");
   }
-  console.log(`Admin sign-in: impact@${domain}`);
+  console.log("\nSign in, then add everyone else from the Accounts page.\n");
 }
 
 main()
   .then(() => process.exit(0))
-  .catch((error: unknown) => {
-    // A bad connection string is the common case here and does not need a
-    // stack trace — just say what is wrong with it.
-    const message = error instanceof Error ? error.message : String(error);
-    if (/DATABASE_URL|ENOTFOUND|ECONNREFUSED|password authentication/i.test(message)) {
-      console.error(`\nCould not connect to the database.\n\n${message}\n`);
-    } else {
-      console.error(error);
-    }
-    process.exit(1);
-  });
+  .catch((err) => { console.error(err); process.exit(1); });
