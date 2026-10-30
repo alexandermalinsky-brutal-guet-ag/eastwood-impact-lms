@@ -27,20 +27,33 @@ export function SignInForm({
     setError("");
 
     const form = new FormData(event.currentTarget);
-    const result = await signIn("credentials", {
-      email: String(form.get("email") ?? "").trim(),
-      password: String(form.get("password") ?? ""),
-      redirect: false,
-    });
 
-    if (result?.error) {
-      setError("That email and password combination did not work.");
+    /**
+     * Both fields are disabled while a sign-in is in flight. If signIn() ever
+     * rejects — the server is down, the laptop is on a flaky connection — an
+     * unguarded await leaves `pending` true forever, and the form stays
+     * greyed out: you cannot type into it, and you cannot paste into it
+     * either. Clearing the flag in `finally` is what makes that temporary.
+     */
+    try {
+      const result = await signIn("credentials", {
+        email: String(form.get("email") ?? "").trim(),
+        password: String(form.get("password") ?? ""),
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("That email and password combination did not work.");
+        return;
+      }
+
+      router.push(next);
+      router.refresh();
+    } catch {
+      setError("Could not reach the server. Check your connection and try again.");
+    } finally {
       setPending(false);
-      return;
     }
-
-    router.push(next);
-    router.refresh();
   }
 
   return (
