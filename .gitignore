@@ -16,3 +16,6 @@ roster-credentials-*.csv
 
 # PowerPoint lock files
 ~$*
+
+# Production data snapshots — never commit
+backups/
