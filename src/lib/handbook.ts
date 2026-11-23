@@ -7,14 +7,18 @@
  */
 
 /**
- * The four phases a project moves through, from the Improvement Brief
- * (15 Oct 2026). Renamed from Ideation / Goals / Execution / Presentation:
- * these say what the student does rather than what the programme calls it.
+ * The phases a project moves through, from the Improvement Brief
+ * (15 Oct 2026). Renamed from Ideation / Goals / Execution: these say what
+ * the student does rather than what the programme calls it.
  *
  * A coach gates every move between phases. Between gates the student owns
  * the work.
+ *
+ * A fourth phase, Report, used to close the sequence. The page that carried
+ * it is gone, so the phase is gone with it — a stage of the journey nothing
+ * in the platform can reach is a promise, not a feature.
  */
-export type PhaseKey = "create" | "plan" | "execute" | "report";
+export type PhaseKey = "create" | "plan" | "execute";
 
 export type ProjectPhase = {
   key: PhaseKey;
@@ -53,15 +57,6 @@ export const PHASES_OF_WORK: ProjectPhase[] = [
     summary:
       "Do the work. Log evidence against each milestone and keep the indicator moving toward its target.",
     gate: "Every milestone has evidence a coach has validated.",
-  },
-  {
-    key: "report",
-    number: 4,
-    name: "Report",
-    verb: "Prove what changed",
-    summary:
-      "Target against result, the best evidence, what you leave behind, and an honest reflection on what did not work.",
-    gate: "The Impact Report has been presented and signed off.",
   },
 ];
 
